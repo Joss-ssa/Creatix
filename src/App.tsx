@@ -182,6 +182,7 @@ export default function App() {
   } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingColors, setIsGeneratingColors] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [imageSeedOffset, setImageSeedOffset] = useState(0);
 
   useEffect(() => {
@@ -227,12 +228,13 @@ export default function App() {
     if (!panicInput.trim()) return;
     setIsGenerating(true);
     setImageSeedOffset(0);
+    setErrorMsg(null);
     try {
       const availableIconsList = Object.keys(IconMap).join(', ');
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: `El usuario quiere dibujar: "${panicInput}". Genera un JSON con: 1) 'ideas': un arreglo de 3 ideas sueltas, creativas y cortas ESCRITAS EN ESPAÑOL. Cada idea debe tener 'text' (la idea en español) y 'imagePrompts' (un arreglo de 4 descripciones MUY detalladas en inglés para generar imágenes con IA. DEBEN excluir personas explícitamente, ej: "cyberpunk city street, neon lights, highly detailed, no humans, empty streets"). 2) 'colors': un arreglo de 5 colores sugeridos, cada uno con 'hex' (código hexadecimal de 6 caracteres con el #, ej. "#FF5733"), 'name' (nombre creativo en español) y 'reason' (por qué usarlo, en español). 3) 'theme': un objeto para estilizar la interfaz basado en la vibra de la idea. Debe incluir: 'bgGradient' (un CSS linear-gradient que incluya tonos MUY oscuros y tonos MUY claros del color base, creando un contraste ALTAMENTE notorio y estético que simule el movimiento del agua al animarse, SIN usar color blanco), 'textColor' (color hexadecimal para el texto principal que contraste perfectamente con el bgGradient), 'cardBg' (color CSS para el fondo de las tarjetas, ej. 'rgba(255,255,255,0.8)' para temas claros o 'rgba(0,0,0,0.6)' para temas oscuros), 'cardTextColor' (color hexadecimal para el texto dentro de las tarjetas), y 'textureOpacity' (un número entre 0.05 y 0.3 para la opacidad de la textura de fondo). 4) 'backgroundIcons': un arreglo de 3 a 5 nombres de iconos que mejor representen la idea, ELEGIDOS ESTRICTAMENTE de esta lista: ${availableIconsList}.`,
+        contents: `El usuario quiere dibujar: "${panicInput}". Genera un JSON con: 1) 'ideas': un arreglo de 3 ideas sueltas, creativas y cortas ESCRITAS EN ESPAÑOL. Cada idea debe tener 'text' (la idea en español) y 'imagePrompts' (un arreglo de 4 descripciones MUY detalladas en inglés para generar imágenes con IA. DEBEN excluir personas explícitamente, ej: "cyberpunk city street, neon lights, highly detailed, empty streets"). 2) 'colors': un arreglo de 5 colores sugeridos, cada uno con 'hex' (código hexadecimal de 6 caracteres con el #, ej. "#FF5733"), 'name' (nombre creativo en español) y 'reason' (por qué usarlo, en español). 3) 'theme': un objeto para estilizar la interfaz basado en la vibra de la idea. Debe incluir: 'bgGradient' (un CSS linear-gradient que incluya tonos MUY oscuros y tonos MUY claros del color base, creando un contraste ALTAMENTE notorio y estético que simule el movimiento del agua al animarse, SIN usar color blanco), 'textColor' (color hexadecimal para el texto principal que contraste perfectamente con el bgGradient), 'cardBg' (color CSS para el fondo de las tarjetas, ej. 'rgba(255,255,255,0.8)' para temas claros o 'rgba(0,0,0,0.6)' para temas oscuros), 'cardTextColor' (color hexadecimal para el texto dentro de las tarjetas), y 'textureOpacity' (un número entre 0.05 y 0.3 para la opacidad de la textura de fondo). 4) 'backgroundIcons': un arreglo de 3 a 5 nombres de iconos que mejor representen la idea, ELEGIDOS ESTRICTAMENTE de esta lista: ${availableIconsList}.`,
         config: {
           responseMimeType: 'application/json',
           responseSchema: {
@@ -281,11 +283,22 @@ export default function App() {
           }
         }
       });
-      const data = JSON.parse(response.text || '{}');
+      let text = '';
+      try {
+        text = response.text || '{}';
+      } catch (e) {
+        throw new Error("La IA no pudo generar una respuesta. Intenta con otra idea.");
+      }
+      text = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+      const data = JSON.parse(text);
+      if (!data.ideas || !data.colors || !data.theme) {
+        throw new Error("La respuesta de la IA fue incompleta.");
+      }
       setPanicData(data);
       setSeed(Math.random());
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating panic ideas:", error);
+      setErrorMsg(error.message || "Error desconocido al generar ideas");
     } finally {
       setIsGenerating(false);
     }
@@ -294,6 +307,7 @@ export default function App() {
   const handleRegenerateColors = async () => {
     if (!panicInput.trim() || !panicData) return;
     setIsGeneratingColors(true);
+    setErrorMsg(null);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const response = await ai.models.generateContent({
@@ -332,12 +346,22 @@ export default function App() {
           }
         }
       });
-      const data = JSON.parse(response.text || '{}');
+      let text = '';
+      try {
+        text = response.text || '{}';
+      } catch (e) {
+        throw new Error("La IA no pudo generar nuevos colores.");
+      }
+      text = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+      const data = JSON.parse(text);
       if (data.colors && data.theme) {
         setPanicData({ ...panicData, colors: data.colors, theme: data.theme });
+      } else {
+        throw new Error("La respuesta de la IA fue incompleta.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating new colors:", error);
+      setErrorMsg(error.message || "Error al generar nuevos colores");
     } finally {
       setIsGeneratingColors(false);
     }
@@ -369,7 +393,7 @@ export default function App() {
         <div 
           className="absolute inset-0 pointer-events-none mix-blend-overlay transition-opacity duration-1000"
           style={{
-            backgroundImage: `url(https://image.pollinations.ai/prompt/${encodeURIComponent(enhanceImagePrompt(panicData.ideas[0].imagePrompts[0] || 'art'))}?width=1920&height=1080&nologo=true&seed=${Math.floor(seed * 1000)})`,
+            backgroundImage: `url(https://image.pollinations.ai/prompt/${encodeURIComponent(enhanceImagePrompt(panicData.ideas[0]?.imagePrompts?.[0] || 'art'))}?width=1920&height=1080&nologo=true&seed=${Math.floor(seed * 1000)})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             opacity: panicData.theme.textureOpacity,
@@ -560,10 +584,10 @@ export default function App() {
                     className="group relative w-full rounded-[36px] p-[4px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all active:scale-[0.98] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] disabled:opacity-50 disabled:active:scale-100 text-white"
                   >
                     <div className="absolute inset-0 animate-subtle-gradient-light bg-[length:400%_400%]"></div>
-                    <div className="flex items-center justify-between p-8 bg-slate-900 rounded-[32px] relative h-full w-full overflow-hidden">
+                    <div className="flex items-center justify-between p-8 bg-emerald-900 rounded-[32px] relative h-full w-full overflow-hidden">
                       <FloatingBackground isFullScreen={false} variant="dark" />
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3 z-0" />
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#2A7D7A]/40 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3 z-0" />
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#2A7D7A]/50 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
                       
                       <div className="flex items-center gap-6 text-left relative z-10">
                         <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
@@ -573,12 +597,12 @@ export default function App() {
                           <h3 className="text-2xl font-display font-bold text-white mb-1">
                             {isGenerating ? 'Generando...' : (challenge ? 'Otro reto' : 'Generar reto')}
                           </h3>
-                          <p className="text-lg text-teal-50 font-medium opacity-90">
+                          <p className="text-lg text-emerald-50 font-medium opacity-90">
                             Idea aleatoria para dibujar
                           </p>
                         </div>
                       </div>
-                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-teal-900 transition-colors shrink-0 relative z-10">
+                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-emerald-900 transition-colors shrink-0 relative z-10">
                         <ArrowLeft className="w-7 h-7 rotate-180" />
                       </div>
                     </div>
@@ -589,10 +613,10 @@ export default function App() {
                     className="group relative w-full rounded-[36px] p-[4px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all active:scale-[0.98] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-white"
                   >
                     <div className="absolute inset-0 animate-subtle-gradient-panic bg-[length:400%_400%]"></div>
-                    <div className="flex items-center justify-between p-8 bg-slate-900 rounded-[32px] relative h-full w-full overflow-hidden">
+                    <div className="flex items-center justify-between p-8 bg-rose-900 rounded-[32px] relative h-full w-full overflow-hidden">
                       <FloatingBackground isFullScreen={false} variant="dark" />
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3 z-0" />
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-rose-500/30 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3 z-0" />
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-rose-500/50 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
                       
                       <div className="flex items-center gap-6 text-left relative z-10">
                         <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
@@ -602,12 +626,12 @@ export default function App() {
                           <h3 className="text-2xl font-display font-bold text-white mb-1">
                             Botón de pánico
                           </h3>
-                          <p className="text-lg text-teal-50 font-medium opacity-90">
+                          <p className="text-lg text-rose-50 font-medium opacity-90">
                             Supera el bloqueo creativo
                           </p>
                         </div>
                       </div>
-                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-rose-600 transition-colors shrink-0 relative z-10">
+                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-rose-900 transition-colors shrink-0 relative z-10">
                         <ArrowLeft className="w-7 h-7 rotate-180" />
                       </div>
                     </div>
@@ -740,6 +764,11 @@ export default function App() {
                     {isGenerating ? 'Pensando...' : 'Inspirarme'}
                   </button>
                 </div>
+                {errorMsg && (
+                  <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-xl text-sm font-medium">
+                    {errorMsg}
+                  </div>
+                )}
                 </div>
               </div>
 
@@ -807,7 +836,7 @@ export default function App() {
                             
                             {/* Imágenes para esta idea */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pl-0 sm:pl-[88px]">
-                              {idea.imagePrompts.map((prompt, j) => (
+                              {idea.imagePrompts && idea.imagePrompts.map((prompt, j) => (
                                 <motion.div 
                                   key={`${seed}-${i}-${j}-${imageSeedOffset}`}
                                   initial={{ opacity: 0, scale: 0.8 }}
