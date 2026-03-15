@@ -103,17 +103,17 @@ const FloatingBackground = ({ isFullScreen = true, variant = 'light', customGrad
           100% { background-position: 0% 0%; }
         }
         .animate-subtle-gradient-light {
-          background: linear-gradient(120deg, #5EEAD4, #2DD4BF, #14B8A6, #0D9488);
+          background: linear-gradient(120deg, #34D399, #10B981, #059669, #047857);
           background-size: 400% 400%;
           animation: subtle-gradient 15s ease-in-out infinite;
         }
         .animate-subtle-gradient-dark {
-          background: linear-gradient(120deg, #2DD4BF, #14B8A6, #0D9488, #0F766E);
+          background: linear-gradient(120deg, #10B981, #059669, #047857, #064E3B);
           background-size: 400% 400%;
           animation: subtle-gradient 15s ease-in-out infinite;
         }
         .animate-subtle-gradient-panic {
-          background: linear-gradient(120deg, #FFE4E6, #F43F5E, #FDA4AF, #BE123C);
+          background: linear-gradient(120deg, #FCA5A5, #EF4444, #DC2626, #991B1B);
           background-size: 400% 400%;
           animation: subtle-gradient 15s ease-in-out infinite;
         }
@@ -584,10 +584,10 @@ export default function App() {
                     className="group relative w-full rounded-[36px] p-[4px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all active:scale-[0.98] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] disabled:opacity-50 disabled:active:scale-100 text-white"
                   >
                     <div className="absolute inset-0 animate-subtle-gradient-light bg-[length:400%_400%]"></div>
-                    <div className="flex items-center justify-between p-8 bg-emerald-900 rounded-[32px] relative h-full w-full overflow-hidden">
+                    <div className="flex items-center justify-between p-8 bg-green-900 rounded-[32px] relative h-full w-full overflow-hidden">
                       <FloatingBackground isFullScreen={false} variant="dark" />
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3 z-0" />
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#2A7D7A]/50 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-green-500/50 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
                       
                       <div className="flex items-center gap-6 text-left relative z-10">
                         <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
@@ -597,12 +597,12 @@ export default function App() {
                           <h3 className="text-2xl font-display font-bold text-white mb-1">
                             {isGenerating ? 'Generando...' : (challenge ? 'Otro reto' : 'Generar reto')}
                           </h3>
-                          <p className="text-lg text-emerald-50 font-medium opacity-90">
+                          <p className="text-lg text-green-50 font-medium opacity-90">
                             Idea aleatoria para dibujar
                           </p>
                         </div>
                       </div>
-                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-emerald-900 transition-colors shrink-0 relative z-10">
+                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-green-900 transition-colors shrink-0 relative z-10">
                         <ArrowLeft className="w-7 h-7 rotate-180" />
                       </div>
                     </div>
@@ -613,10 +613,10 @@ export default function App() {
                     className="group relative w-full rounded-[36px] p-[4px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all active:scale-[0.98] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-white"
                   >
                     <div className="absolute inset-0 animate-subtle-gradient-panic bg-[length:400%_400%]"></div>
-                    <div className="flex items-center justify-between p-8 bg-rose-900 rounded-[32px] relative h-full w-full overflow-hidden">
+                    <div className="flex items-center justify-between p-8 bg-red-900 rounded-[32px] relative h-full w-full overflow-hidden">
                       <FloatingBackground isFullScreen={false} variant="dark" />
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3 z-0" />
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-rose-500/50 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-500/50 rounded-full blur-xl translate-y-1/3 -translate-x-1/4 z-0" />
                       
                       <div className="flex items-center gap-6 text-left relative z-10">
                         <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
@@ -626,12 +626,12 @@ export default function App() {
                           <h3 className="text-2xl font-display font-bold text-white mb-1">
                             Botón de pánico
                           </h3>
-                          <p className="text-lg text-rose-50 font-medium opacity-90">
+                          <p className="text-lg text-red-50 font-medium opacity-90">
                             Supera el bloqueo creativo
                           </p>
                         </div>
                       </div>
-                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-rose-900 transition-colors shrink-0 relative z-10">
+                      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-red-900 transition-colors shrink-0 relative z-10">
                         <ArrowLeft className="w-7 h-7 rotate-180" />
                       </div>
                     </div>
