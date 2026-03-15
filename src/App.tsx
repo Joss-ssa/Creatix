@@ -231,7 +231,7 @@ export default function App() {
     setErrorMsg(null);
     try {
       const availableIconsList = Object.keys(IconMap).join(', ');
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: `El usuario quiere dibujar: "${panicInput}". Genera un JSON con: 1) 'ideas': un arreglo de 3 ideas sueltas, creativas y cortas ESCRITAS EN ESPAÑOL. Cada idea debe tener 'text' (la idea en español) y 'imagePrompts' (un arreglo de 4 descripciones MUY detalladas en inglés para generar imágenes con IA. DEBEN excluir personas explícitamente, ej: "cyberpunk city street, neon lights, highly detailed, empty streets"). 2) 'colors': un arreglo de 5 colores sugeridos, cada uno con 'hex' (código hexadecimal de 6 caracteres con el #, ej. "#FF5733"), 'name' (nombre creativo en español) y 'reason' (por qué usarlo, en español). 3) 'theme': un objeto para estilizar la interfaz basado en la vibra de la idea. Debe incluir: 'bgGradient' (un CSS linear-gradient que incluya tonos MUY oscuros y tonos MUY claros del color base, creando un contraste ALTAMENTE notorio y estético que simule el movimiento del agua al animarse, SIN usar color blanco), 'textColor' (color hexadecimal para el texto principal que contraste perfectamente con el bgGradient), 'cardBg' (color CSS para el fondo de las tarjetas, ej. 'rgba(255,255,255,0.8)' para temas claros o 'rgba(0,0,0,0.6)' para temas oscuros), 'cardTextColor' (color hexadecimal para el texto dentro de las tarjetas), y 'textureOpacity' (un número entre 0.05 y 0.3 para la opacidad de la textura de fondo). 4) 'backgroundIcons': un arreglo de 3 a 5 nombres de iconos que mejor representen la idea, ELEGIDOS ESTRICTAMENTE de esta lista: ${availableIconsList}.`,
@@ -309,7 +309,7 @@ export default function App() {
     setIsGeneratingColors(true);
     setErrorMsg(null);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: `El usuario quiere dibujar: "${panicInput}". Genera un JSON con: 1) 'colors': un arreglo de 5 NUEVOS colores sugeridos (diferentes a los anteriores), cada uno con 'hex' (código hexadecimal de 6 caracteres con el #, ej. "#FF5733"), 'name' (nombre creativo en español) y 'reason' (por qué usarlo, en español). 2) 'theme': un objeto para estilizar la interfaz con los NUEVOS colores. Debe incluir: 'bgGradient' (CSS linear-gradient que incluya tonos MUY oscuros y tonos MUY claros del color base, creando un contraste ALTAMENTE notorio y estético que simule el movimiento del agua al animarse, SIN usar color blanco), 'textColor' (hexadecimal que contraste), 'cardBg' (rgba para las tarjetas), 'cardTextColor' (hexadecimal para el texto de las tarjetas), y 'textureOpacity' (número entre 0.05 y 0.3).`,
