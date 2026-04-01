@@ -294,16 +294,14 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       const rotY = dy * Math.cos(playerState.current.pitch) - rotZ * Math.sin(playerState.current.pitch);
       const finalZ = dy * Math.sin(playerState.current.pitch) + rotZ * Math.cos(playerState.current.pitch);
 
-      if (finalZ > 10) {
-        const scale = fov / finalZ;
-        return {
-          x: (canvas.width / 2) + rotX * scale,
-          y: (canvas.height / 2) + rotY * scale,
-          scale: scale,
-          z: finalZ
-        };
-      }
-      return null;
+      const clampedZ = Math.max(1, finalZ);
+      const scale = fov / clampedZ;
+      return {
+        x: (canvas.width / 2) + rotX * scale,
+        y: (canvas.height / 2) + rotY * scale,
+        scale: scale,
+        z: finalZ
+      };
     }
 
     let animationId: number;
@@ -360,18 +358,19 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       const pathWidth = 200;
       const step = 200; 
       const maxDrawZ = Math.min(playerState.current.z + drawDistance, maxZ);
+      const startDrawZ = Math.max(0, playerState.current.z - drawDistance);
 
       // Draw River and Cliff for Phase 3
       if (isConstruction) {
         // River
         ctx.fillStyle = '#00A8E8'; // Vibrant cyan/blue river
-        for (let z = Math.max(0, playerState.current.z - 500); z <= maxDrawZ; z += step) {
+        for (let z = startDrawZ; z <= maxDrawZ; z += step) {
           const p1L = project(getPathX(z) - 5000, 800, z); // Wider river, lower down
           const p1R = project(getPathX(z) - 400, 800, z);
           const p2L = project(getPathX(z + step) - 5000, 800, z + step);
           const p2R = project(getPathX(z + step) - 400, 800, z + step);
 
-          if (p1L && p1R && p2L && p2R) {
+          if (p1L.z > 1 || p2L.z > 1) {
             ctx.beginPath();
             ctx.moveTo(p1L.x, p1L.y);
             ctx.lineTo(p1R.x, p1R.y);
@@ -388,13 +387,13 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         cliffGrad.addColorStop(1, '#5C4033'); // Dark rock base
         ctx.fillStyle = cliffGrad;
         
-        for (let z = Math.max(0, playerState.current.z - 500); z <= maxDrawZ; z += step) {
+        for (let z = startDrawZ; z <= maxDrawZ; z += step) {
           const pTop = project(getPathX(z) - pathWidth - 50, 0, z);
           const pBot = project(getPathX(z) - 400, 800, z);
           const pTopNext = project(getPathX(z + step) - pathWidth - 50, 0, z + step);
           const pBotNext = project(getPathX(z + step) - 400, 800, z + step);
 
-          if (pTop && pBot && pTopNext && pBotNext) {
+          if (pTop.z > 1 || pTopNext.z > 1) {
             ctx.beginPath();
             ctx.moveTo(pTop.x, pTop.y);
             ctx.lineTo(pBot.x, pBot.y);
@@ -406,13 +405,13 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       }
 
       // Draw Path Polygons
-      for (let z = Math.max(0, playerState.current.z - 500); z <= maxDrawZ; z += step) {
+      for (let z = startDrawZ; z <= maxDrawZ; z += step) {
         const p1L = project(getPathX(z) - pathWidth, 0, z);
         const p1R = project(getPathX(z) + pathWidth, 0, z);
         const p2L = project(getPathX(z + step) - pathWidth, 0, z + step);
         const p2R = project(getPathX(z + step) + pathWidth, 0, z + step);
 
-        if (p1L && p1R && p2L && p2R) {
+        if (p1L.z > 1 || p2L.z > 1) {
           ctx.beginPath();
           ctx.moveTo(p1L.x, p1L.y);
           ctx.lineTo(p1R.x, p1R.y);
