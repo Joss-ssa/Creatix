@@ -5,8 +5,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle } from 'lucide-react';
 import { Game2D } from './components/Game2D';
+import { ReflectionsModal } from './components/ReflectionsModal';
+import { HelpModal } from './components/HelpModal';
 
 // --- Constants & Content ---
 
@@ -55,7 +57,7 @@ const CLARIDAD_EXERCISES = [
 ];
 
 type Stage = 'NIEBLA' | 'EXPLORACION' | 'CLARIDAD';
-type AppState = 'START_MENU' | 'STAGE_INTRO' | 'PLAYING' | 'CARD_VIEW';
+type AppState = 'START_MENU' | 'STAGE_INTRO' | 'PLAYING' | 'CARD_VIEW' | 'END_SCREEN';
 
 // --- Main Application ---
 
@@ -63,6 +65,7 @@ export default function App() {
   const [appState, setAppState] = useState<AppState>('START_MENU');
   const [stage, setStage] = useState<Stage>('NIEBLA');
   const [currentPhrase, setCurrentPhrase] = useState<string>("");
+  const [selectedPhrases, setSelectedPhrases] = useState<string[]>([]);
   const [introPhrase, setIntroPhrase] = useState("");
   
   // New states for the requested flow
@@ -72,10 +75,30 @@ export default function App() {
   const [showControlsMenu, setShowControlsMenu] = useState(false);
   const [showMHint, setShowMHint] = useState(false);
   const [hasShownControlsForStage, setHasShownControlsForStage] = useState(false);
+  const [showReflectionsModal, setShowReflectionsModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   useEffect(() => {
     setIntroPhrase(THEME_PHRASES[Math.floor(Math.random() * THEME_PHRASES.length)]);
   }, []);
+
+  // Global keydown for 'P' in Phase 2 and 'C' in Phase 3
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (appState === 'PLAYING') {
+        if (stage === 'EXPLORACION' && e.key.toLowerCase() === 'p' && !showReflectionsModal) {
+          setShowReflectionsModal(true);
+          document.exitPointerLock();
+        }
+        if (stage === 'CLARIDAD' && e.key.toLowerCase() === 'c' && !showHelpModal) {
+          setShowHelpModal(true);
+          document.exitPointerLock();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [appState, stage, showReflectionsModal, showHelpModal]);
 
   // Controls menu timer
   useEffect(() => {
@@ -140,6 +163,12 @@ export default function App() {
   };
 
   const handleAcceptPhrase = () => {
+    setSelectedPhrases(prev => {
+      if (!prev.includes(currentPhrase)) {
+        return [...prev, currentPhrase];
+      }
+      return prev;
+    });
     setPhraseSelectedForStage(true);
     setAppState('PLAYING');
   };
@@ -150,11 +179,14 @@ export default function App() {
     } else if (stage === 'EXPLORACION') {
       setStage('CLARIDAD');
     } else {
-      setStage('CLARIDAD');
+      setAppState('END_SCREEN');
+      document.exitPointerLock();
+      return;
     }
     // Reset states for the new stage
     setPhraseSelectedForStage(false);
     setCurrentPhrase("");
+    setSelectedPhrases([]);
     setTimeLeft(300);
     setIsTimerRunning(false);
     setAppState('STAGE_INTRO');
@@ -166,49 +198,30 @@ export default function App() {
     CLARIDAD_EXERCISES;
 
   return (
-    <div className="min-h-screen w-full bg-sky-100 font-sans selection:bg-sky-200 overflow-hidden relative">
+    <div className="min-h-screen w-full bg-black font-sans selection:bg-sky-200 overflow-hidden relative">
       
-      {(appState === 'PLAYING' || appState === 'CARD_VIEW') && (
-        <Game2D 
-          key={stage}
-          stage={stage} 
-          appState={appState}
-          onPhraseSelect={handlePhraseSelect} 
-          phrases={currentPhrasesList}
-          hasSelectedPhrase={phraseSelectedForStage}
-          selectedPhrase={currentPhrase}
-          onEnterTunnel={handleEnterTunnel}
-        />
-      )}
+      <Game2D 
+        key={stage}
+        stage={stage} 
+        appState={appState}
+        onPhraseSelect={handlePhraseSelect} 
+        phrases={currentPhrasesList}
+        hasSelectedPhrase={phraseSelectedForStage}
+        selectedPhrases={selectedPhrases}
+        onEnterTunnel={handleEnterTunnel}
+      />
 
-      {/* Top Doors Menu */}
-      {appState === 'PLAYING' && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-2 max-w-[90%] overflow-x-auto pb-2 scrollbar-hide pointer-events-none">
-          {currentPhrasesList.map((phrase, idx) => {
-            const isSelected = phraseSelectedForStage && currentPhrase === phrase;
-            return (
-              <div 
-                key={idx}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-md border text-xs font-bold transition-all duration-500 max-w-[150px] truncate ${
-                  isSelected 
-                    ? 'bg-[#FFD700] border-[#FFD700] text-[#2A1408] shadow-[0_0_15px_rgba(255,215,0,0.8)]' 
-                    : 'bg-[#1a1a1a]/80 border-[#333] text-[#FFD700] shadow-[0_0_5px_rgba(255,215,0,0.3)]'
-                }`}
-                title={phrase}
-              >
-                {phrase}
-              </div>
-            );
-          })}
-        </div>
-      )}
+
 
       {/* Controls Menu Overlay */}
       {showControlsMenu && appState === 'PLAYING' && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 bg-black/80 border-2 border-[#FFD700] rounded-xl p-8 text-white text-center shadow-[0_0_40px_rgba(255,215,0,0.4)] backdrop-blur-md">
           <h3 className="text-2xl font-extrabold text-[#FFD700] mb-6 uppercase tracking-widest" style={{ fontFamily: '"Playfair Display", serif' }}>Controles</h3>
-          <div className="flex flex-col gap-4 text-lg font-medium">
-            <p><span className="font-bold text-[#FDE68A] inline-block w-24 text-right mr-3">[W][A][S][D]</span> Moverse</p>
+          <div className="flex flex-col gap-4 text-lg font-medium text-left">
+            <p><span className="font-bold text-[#FDE68A] inline-block w-24 text-right mr-3">[W]</span> Adelante</p>
+            <p><span className="font-bold text-[#FDE68A] inline-block w-24 text-right mr-3">[S]</span> Atrás</p>
+            <p><span className="font-bold text-[#FDE68A] inline-block w-24 text-right mr-3">[A]</span> Izquierda</p>
+            <p><span className="font-bold text-[#FDE68A] inline-block w-24 text-right mr-3">[D]</span> Derecha</p>
             <p><span className="font-bold text-[#FDE68A] inline-block w-24 text-right mr-3">[Ratón]</span> Mirar</p>
             <p><span className="font-bold text-[#FDE68A] inline-block w-24 text-right mr-3">[E]</span> Interactuar</p>
           </div>
@@ -227,8 +240,32 @@ export default function App() {
 
       {/* M Hint Overlay */}
       {showMHint && appState === 'PLAYING' && (
-        <div className="absolute bottom-8 right-8 z-30 bg-black/60 border border-[#FFD700]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(255,215,0,0.2)] backdrop-blur-sm">
-          Presiona <span className="font-bold text-[#FFD700] text-base mx-1">M</span> para activar el menú
+        <div className="absolute bottom-8 right-8 z-30 flex flex-col gap-3 items-end">
+          <div className="bg-black/60 border border-[#FFD700]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(255,215,0,0.2)] backdrop-blur-sm">
+            Presiona <span className="font-bold text-[#FFD700] text-base mx-1">M</span> para activar el menú
+          </div>
+          {stage === 'EXPLORACION' && (
+            <div className="bg-black/60 border border-[#FFD700]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(255,215,0,0.2)] backdrop-blur-sm">
+              Presiona <span className="font-bold text-[#FFD700] text-base mx-1">P</span> para reflexionar
+            </div>
+          )}
+          {stage === 'CLARIDAD' && (
+            <div className="flex flex-col items-end gap-2">
+              <div className="bg-black/60 border border-[#FFD700]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(255,215,0,0.2)] backdrop-blur-sm">
+                Presiona <span className="font-bold text-[#FFD700] text-base mx-1">C</span> para activar
+              </div>
+              <button 
+                onClick={() => {
+                  setShowHelpModal(true);
+                  document.exitPointerLock();
+                }}
+                className="bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-bold rounded-lg px-5 py-3 text-sm shadow-[0_0_15px_rgba(255,215,0,0.5)] flex items-center gap-2 hover:scale-105 transition-transform"
+              >
+                <HelpCircle className="w-5 h-5" />
+                Ayuda Creativa
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -341,7 +378,7 @@ export default function App() {
                   onClick={handleAcceptPhrase}
                   className="w-full px-8 py-4 rounded-full bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-extrabold text-lg hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_20px_rgba(255,215,0,0.6)] hover:shadow-[0_0_40px_rgba(255,215,0,0.9)] active:scale-95 flex items-center justify-center gap-2 uppercase tracking-wider"
                 >
-                  <span>{stage === 'EXPLORACION' ? 'Estoy listo' : 'Así me siento'}</span>
+                  <span>{stage === 'EXPLORACION' ? 'Estoy listo' : (stage === 'CLARIDAD' ? 'Vamos a crear' : 'Así me siento')}</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <button
@@ -354,8 +391,44 @@ export default function App() {
             </motion.div>
           </div>
         )}
+        {appState === 'END_SCREEN' && (
+          <div className="absolute inset-0 flex items-center justify-center z-50 p-4 bg-black/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="max-w-xl w-full p-12 rounded-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_80px_rgba(255,215,0,0.6)] flex flex-col items-center text-center gap-6"
+            >
+              <Sparkles className="w-16 h-16 text-[#FFD700]" />
+              <h2 className="text-4xl font-extrabold text-[#FFD700] font-serif">¡Haz encontrado la luz!</h2>
+              <p className="text-xl text-[#FDE68A] leading-relaxed font-serif">
+                Has creado nuevas ideas y tienes la capacidad de hacerlas realidad.
+              </p>
+              <button
+                onClick={() => {
+                  setStage('NIEBLA');
+                  setPhraseSelectedForStage(false);
+                  setCurrentPhrase("");
+                  setSelectedPhrases([]);
+                  setTimeLeft(300);
+                  setIsTimerRunning(false);
+                  setAppState('START_MENU');
+                }}
+                className="mt-8 px-8 py-4 rounded-full bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-extrabold text-lg hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_20px_rgba(255,215,0,0.5)] hover:shadow-[0_0_40px_rgba(255,215,0,0.8)] active:scale-95 uppercase tracking-wider"
+              >
+                Volver al Inicio
+              </button>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
 
+      {showReflectionsModal && (
+        <ReflectionsModal onClose={() => setShowReflectionsModal(false)} />
+      )}
+
+      {showHelpModal && (
+        <HelpModal onClose={() => setShowHelpModal(false)} />
+      )}
     </div>
   );
 }

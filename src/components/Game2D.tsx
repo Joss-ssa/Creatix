@@ -6,7 +6,7 @@ interface Game2DProps {
   onPhraseSelect: (phrase: string) => void;
   phrases: string[];
   hasSelectedPhrase: boolean;
-  selectedPhrase?: string;
+  selectedPhrases: string[];
   onEnterTunnel: () => void;
 }
 
@@ -22,7 +22,7 @@ interface Particle {
   color: string;
 }
 
-export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect, phrases, hasSelectedPhrase, selectedPhrase, onEnterTunnel }) => {
+export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect, phrases, hasSelectedPhrase, selectedPhrases, onEnterTunnel }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Persist game state across re-renders
@@ -83,12 +83,12 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
     const isExploration = stage === 'EXPLORACION';
     const isConstruction = stage === 'CONSTRUCCION';
 
-    const skyTop = isFog ? '#020B1A' : (isExploration ? '#8AB4F8' : (isConstruction ? '#0077FF' : '#040B14'));
-    const skyMid = isFog ? '#0A2540' : (isExploration ? '#D7B4F3' : (isConstruction ? '#3399FF' : '#0A2E3F'));
-    const skyBot = isFog ? '#1A6B8C' : (isExploration ? '#FFB6C1' : (isConstruction ? '#88CCFF' : '#1A4A5A'));
+    const skyTop = isFog ? '#020B1A' : (isExploration ? '#8AB4F8' : (isConstruction ? '#1DA2D8' : '#040B14'));
+    const skyMid = isFog ? '#0A2540' : (isExploration ? '#D7B4F3' : (isConstruction ? '#4DA6FF' : '#0A2E3F'));
+    const skyBot = isFog ? '#1A6B8C' : (isExploration ? '#FFB6C1' : (isConstruction ? '#87CEEB' : '#1A4A5A'));
     
-    const groundBase = isFog ? '#020B12' : (isExploration ? '#2A4B5C' : (isConstruction ? '#88D42E' : '#02050A'));
-    const pathColor = isFog ? '#151A20' : (isExploration ? '#7A7A9A' : (isConstruction ? '#A0E040' : '#111111'));
+    const groundBase = isFog ? '#020B12' : (isExploration ? '#2A4B5C' : (isConstruction ? '#8CC63F' : '#02050A'));
+    const pathColor = isFog ? '#151A20' : (isExploration ? '#7A7A9A' : (isConstruction ? '#9ACD32' : '#111111'));
     const fogColor = isFog ? 'rgba(10, 50, 75, ' : (isExploration ? 'rgba(215, 180, 243, ' : (isConstruction ? 'rgba(255, 255, 255, ' : 'rgba(10, 46, 63, '));
 
     const objects: any[] = [];
@@ -115,6 +115,14 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       }
     });
 
+    // Start Tunnel (Decorative)
+    objects.push({
+      type: 'start_tunnel',
+      x: getPathX(0),
+      y: 0,
+      z: 0
+    });
+
     // End Tunnel
     objects.push({
       type: 'end_mountain',
@@ -124,10 +132,10 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
     });
 
     if (isConstruction) {
-      // Add a fox near the first signpost (on the right side)
+      // Add a fox sleeping on the left cliff edge
       objects.push({
         type: 'fox',
-        x: getPathX(2000) + 250,
+        x: getPathX(2000) - 220, // Left edge of the cliff
         y: 0,
         z: 2000,
         scale: 1.5
@@ -186,6 +194,9 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       // In Phase 3, the river is on the left, so only place trees on the right
       if (isConstruction && isLeft) {
         treeOffset = 300 + Math.random() * 1500; // Force to right side
+      } else if (isExploration) {
+        // In Phase 2, push trees further away so they don't block the path
+        treeOffset = isLeft ? -450 - Math.random() * 1000 : 450 + Math.random() * 1000;
       }
 
       objects.push({
@@ -205,6 +216,9 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         // In Phase 3, limit left side flowers to the edge of the cliff
         if (isConstruction && isLeft) {
            flowerOffset = -50 - Math.random() * 100;
+        } else if (isExploration) {
+           // In Phase 2, push mushrooms further away so they don't block the path
+           flowerOffset = isLeft ? -250 - Math.random() * 500 : 250 + Math.random() * 500;
         }
         
         let colors;
@@ -216,7 +230,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
             colors = ['#FF4040']; // Red for mushrooms
             type = Math.random() > 0.5 ? 'red_mushroom' : 'small_flower';
         } else if (isConstruction) {
-            colors = ['#FFFFFF', '#FFD700']; // White and yellow flowers
+            colors = ['#FFFFFF', '#FFD700', '#FF69B4', '#FFA500']; // White, yellow, pink, orange flowers
             type = 'small_flower';
         } else {
             colors = ['#FF1493', '#8A2BE2', '#FF4500', '#FFD700'];
@@ -278,6 +292,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         }
       }
       context.fillText(line, x, currentY);
+      return currentY + lineHeight;
     }
 
     // 3D to 2D Projection Helper
@@ -294,7 +309,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       const rotY = dy * Math.cos(playerState.current.pitch) - rotZ * Math.sin(playerState.current.pitch);
       const finalZ = dy * Math.sin(playerState.current.pitch) + rotZ * Math.cos(playerState.current.pitch);
 
-      const clampedZ = Math.max(1, finalZ);
+      const clampedZ = Math.max(20, finalZ); // Increased from 1 to 20 to prevent massive scales that crash the browser
       const scale = fov / clampedZ;
       return {
         x: (canvas.width / 2) + rotX * scale,
@@ -333,10 +348,10 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         playerState.current.x += moveX;
         playerState.current.z += moveZ;
 
-        // Invisible Walls: Restrict player to the path
-        playerState.current.z = Math.max(0, Math.min(maxZ - 200, playerState.current.z));
+        // Invisible Walls: Restrict player strictly to the path
+        playerState.current.z = Math.max(300, Math.min(maxZ - 200, playerState.current.z));
         const currentPathX = getPathX(playerState.current.z);
-        const pathWidthLimit = 400; // Invisible wall boundary
+        const pathWidthLimit = 180; // Strictly within the 200 path width
         playerState.current.x = Math.max(currentPathX - pathWidthLimit, Math.min(currentPathX + pathWidthLimit, playerState.current.x));
       }
 
@@ -347,6 +362,22 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       skyGrad.addColorStop(1, skyBot);
       ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw Sun for Phase 3
+      if (isConstruction) {
+        const sunX = canvas.width * 0.2;
+        const sunY = canvas.height * 0.2;
+        
+        const sunGrad = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 150);
+        sunGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        sunGrad.addColorStop(0.2, 'rgba(255, 255, 200, 0.8)');
+        sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.fillStyle = sunGrad;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 150, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // 2. Ground Base
       const horizonY = canvas.height / 2 - Math.tan(playerState.current.pitch) * fov;
@@ -363,7 +394,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       // Draw River and Cliff for Phase 3
       if (isConstruction) {
         // River
-        ctx.fillStyle = '#00A8E8'; // Vibrant cyan/blue river
+        ctx.fillStyle = '#00BFFF'; // Vibrant cyan/blue river
         for (let z = startDrawZ; z <= maxDrawZ; z += step) {
           const p1L = project(getPathX(z) - 5000, 800, z); // Wider river, lower down
           const p1R = project(getPathX(z) - 400, 800, z);
@@ -382,9 +413,10 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         
         // Cliff Wall (Grassy/Rocky)
         const cliffGrad = ctx.createLinearGradient(0, canvas.height/2, 0, canvas.height);
-        cliffGrad.addColorStop(0, '#4CAF50'); // Grass top
-        cliffGrad.addColorStop(0.2, '#8B4513'); // Dirt/Rock
-        cliffGrad.addColorStop(1, '#5C4033'); // Dark rock base
+        cliffGrad.addColorStop(0, '#8CC63F'); // Grass top
+        cliffGrad.addColorStop(0.1, '#4A5D23'); // Darker grass/dirt
+        cliffGrad.addColorStop(0.5, '#4F5D65'); // Gray rock
+        cliffGrad.addColorStop(1, '#2F3E46'); // Dark gray rock base
         ctx.fillStyle = cliffGrad;
         
         for (let z = startDrawZ; z <= maxDrawZ; z += step) {
@@ -471,7 +503,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         ctx.scale(scale, scale);
 
         const fogIntensity = Math.min(1, z / drawDistance);
-        ctx.globalAlpha = isConstruction ? 1 - (fogIntensity * 0.1) : 1 - (fogIntensity * 0.6); // Reduced fog intensity
+        ctx.globalAlpha = isConstruction ? 1 - (fogIntensity * 0.1) : (isExploration ? 1 : 1 - (fogIntensity * 0.6)); // Reduced fog intensity
 
         if (obj.type === 'tree') {
           const s = obj.scale;
@@ -666,7 +698,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         }
         else if (obj.type === 'small_flower') {
           const s = obj.scale;
-          ctx.fillStyle = '#FFD700'; // Yellow/white flowers
+          ctx.fillStyle = obj.color || '#FFD700';
           ctx.beginPath();
           ctx.arc(0, -5 * s, 5 * s, 0, Math.PI*2);
           ctx.fill();
@@ -704,46 +736,64 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
           const s = obj.scale;
           
           // Trunk
-          ctx.fillStyle = '#E8ECEF'; // White/light gray bark
+          ctx.fillStyle = '#F5F5F5'; // White/light gray bark
           ctx.beginPath();
-          ctx.fillRect(-15 * s, -1000 * s, 30 * s, 1000 * s);
+          ctx.fillRect(-12 * s, -1200 * s, 24 * s, 1200 * s);
+          
+          // Trunk shadow (right side)
+          ctx.fillStyle = '#D3D3D3';
+          ctx.beginPath();
+          ctx.fillRect(0, -1200 * s, 12 * s, 1200 * s);
           
           // Black spots on bark
           ctx.fillStyle = '#2C3539';
-          for (let i = 1; i < 8; i++) {
-             const spotY = -100 * s * i - (Math.abs(Math.sin(obj.x * i)) * 50 * s);
-             const spotH = 10 * s + Math.abs(Math.cos(obj.z * i)) * 10 * s;
-             ctx.fillRect(-15 * s, spotY, 15 * s + Math.abs(Math.sin(obj.x)) * 15 * s, spotH);
+          for (let i = 1; i < 12; i++) {
+             const spotY = -100 * s * i - (Math.abs(Math.sin(obj.x * i)) * 30 * s);
+             const spotH = 5 * s + Math.abs(Math.cos(obj.z * i)) * 8 * s;
+             const spotW = 10 * s + Math.abs(Math.sin(obj.x)) * 10 * s;
+             const isRight = Math.sin(obj.z * i) > 0;
+             ctx.fillRect(isRight ? 0 : -12 * s, spotY, spotW, spotH);
           }
 
-          // Leaves
-          ctx.fillStyle = '#4CAF50'; // Vibrant green
-          ctx.beginPath();
-          ctx.arc(0, -900 * s, 250 * s, 0, Math.PI * 2);
-          ctx.arc(-150 * s, -800 * s, 200 * s, 0, Math.PI * 2);
-          ctx.arc(150 * s, -800 * s, 200 * s, 0, Math.PI * 2);
-          ctx.arc(0, -1100 * s, 200 * s, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // Leaf highlights
-          ctx.fillStyle = '#81C784';
-          ctx.beginPath();
-          ctx.arc(-50 * s, -950 * s, 100 * s, 0, Math.PI * 2);
-          ctx.arc(-200 * s, -850 * s, 80 * s, 0, Math.PI * 2);
-          ctx.arc(100 * s, -850 * s, 80 * s, 0, Math.PI * 2);
-          ctx.fill();
+          // Leaves (Painterly style)
+          const drawLeafCluster = (cx: number, cy: number, radius: number) => {
+             // Dark base
+             ctx.fillStyle = '#4A7C2A';
+             ctx.beginPath();
+             ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+             ctx.fill();
+             
+             // Mid tone
+             ctx.fillStyle = '#6B8E23';
+             ctx.beginPath();
+             ctx.arc(cx - radius * 0.2, cy - radius * 0.2, radius * 0.8, 0, Math.PI * 2);
+             ctx.fill();
+             
+             // Highlight (sun from top left)
+             ctx.fillStyle = '#9ACD32';
+             ctx.beginPath();
+             ctx.arc(cx - radius * 0.4, cy - radius * 0.4, radius * 0.5, 0, Math.PI * 2);
+             ctx.fill();
+          };
+
+          drawLeafCluster(0, -1000 * s, 250 * s);
+          drawLeafCluster(-150 * s, -900 * s, 180 * s);
+          drawLeafCluster(150 * s, -850 * s, 200 * s);
+          drawLeafCluster(0, -1200 * s, 220 * s);
+          drawLeafCluster(-100 * s, -1100 * s, 150 * s);
+          drawLeafCluster(120 * s, -1050 * s, 160 * s);
         }
         else if (obj.type === 'mountain') {
           const s = obj.scale;
-          ctx.fillStyle = '#2E8B57'; // Sea green
+          ctx.fillStyle = isConstruction ? '#2E5A3A' : '#2E8B57'; // Darker green/blueish shadow for base
           ctx.beginPath();
           ctx.moveTo(-500 * s, 0);
           ctx.lineTo(0, -800 * s);
           ctx.lineTo(500 * s, 0);
           ctx.fill();
           
-          // Mountain highlight/shadow
-          ctx.fillStyle = '#3CB371';
+          // Mountain highlight (left side)
+          ctx.fillStyle = isConstruction ? '#4CAF50' : '#3CB371'; // Lighter green
           ctx.beginPath();
           ctx.moveTo(-500 * s, 0);
           ctx.lineTo(0, -800 * s);
@@ -810,7 +860,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
           const pillarW = 50;
           const archX = -archW / 2;
           const archY = -archH;
-          const isSelected = hasSelectedPhrase && obj.phrase === selectedPhrase;
+          const isSelected = hasSelectedPhrase && selectedPhrases.includes(obj.phrase);
 
           // Draw arched structure (open in the middle)
           ctx.beginPath();
@@ -956,43 +1006,86 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
             };
           }
         }
-        else if (obj.type === 'end_mountain') {
-          // Tunnel Entrance
-          ctx.fillStyle = '#02050A';
-          ctx.beginPath();
-          ctx.arc(0, 0, 600, Math.PI, 0);
-          ctx.fill();
+        else if (obj.type === 'end_mountain' || obj.type === 'start_tunnel') {
+          const isEnd = obj.type === 'end_mountain';
+          const tunnelW = 800; // Narrower to look like doors
+          const tunnelH = 1200; // Taller
+          const archThickness = 80;
 
-          if (hasSelectedPhrase) {
-            const glowGrad = ctx.createRadialGradient(0, -300, 0, 0, -300, 600);
-            glowGrad.addColorStop(0, 'rgba(255, 215, 0, 1)');
+          const drawArchPath = (expand: number = 0) => {
+            const w = tunnelW / 2 + expand;
+            const h = tunnelH + expand;
+            const archRadius = w;
+            const straightH = h - archRadius;
+            
+            ctx.beginPath();
+            ctx.moveTo(-w, 0);
+            ctx.lineTo(-w, -straightH);
+            ctx.arc(0, -straightH, archRadius, Math.PI, 0);
+            ctx.lineTo(w, 0);
+            ctx.closePath();
+          };
+
+          // Draw Outer Frame
+          drawArchPath(archThickness);
+          ctx.fillStyle = '#2a2d34';
+          ctx.fill();
+          
+          ctx.lineWidth = 6;
+          ctx.strokeStyle = '#FFD700'; // Gold trim
+          ctx.stroke();
+
+          // Draw the Doors (Always closed, static)
+          ctx.save();
+          drawArchPath(0);
+          ctx.clip();
+          
+          // Wood background (Rich brown)
+          ctx.fillStyle = '#4A2E1B';
+          ctx.fill();
+          
+          // Center gap
+          ctx.strokeStyle = '#111';
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, -tunnelH);
+          ctx.stroke();
+          
+          // Simple handles
+          ctx.fillStyle = '#FFD700';
+          ctx.beginPath();
+          ctx.arc(-40, -tunnelH * 0.5, 15, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(40, -tunnelH * 0.5, 15, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Glowing effect when ready to enter
+          if (isEnd && hasSelectedPhrase) {
+            const glowGrad = ctx.createRadialGradient(0, -tunnelH/2, 0, 0, -tunnelH/2, tunnelW/2);
+            glowGrad.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
             glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = glowGrad;
-            ctx.beginPath();
-            ctx.arc(0, 0, 600, Math.PI, 0);
-            ctx.fill();
-          } else {
-            ctx.strokeStyle = '#1A4A5A';
-            ctx.lineWidth = 15;
-            for(let i=-500; i<=500; i+=100) {
-              ctx.beginPath();
-              ctx.moveTo(i, 0);
-              ctx.lineTo(i, -550);
-              ctx.stroke();
-            }
+            ctx.fillRect(-tunnelW/2, -tunnelH, tunnelW, tunnelH);
           }
+          
+          ctx.restore();
 
-          const distToPlayer = Math.sqrt(Math.pow(obj.x - playerState.current.x, 2) + Math.pow(obj.z - playerState.current.z, 2));
-          if (distToPlayer < 1000 && distToPlayer < closestInteractionDist && appState === 'PLAYING') {
-            closestInteractionDist = distToPlayer;
-            if (hasSelectedPhrase) {
-              interactionText = 'Presiona E para entrar al túnel';
-              interactionAction = () => {
-                document.exitPointerLock();
-                onEnterTunnel();
-              };
-            } else {
-              interactionText = 'Selecciona un arco para abrir el túnel';
+          // Interaction
+          if (isEnd) {
+            const distToPlayer = Math.sqrt(Math.pow(obj.x - playerState.current.x, 2) + Math.pow(obj.z - playerState.current.z, 2));
+            if (distToPlayer < 1000 && distToPlayer < closestInteractionDist && appState === 'PLAYING') {
+              closestInteractionDist = distToPlayer;
+              if (hasSelectedPhrase) {
+                interactionText = 'Presiona E para entrar al túnel';
+                interactionAction = () => {
+                  document.exitPointerLock();
+                  onEnterTunnel();
+                };
+              } else {
+                interactionText = 'Selecciona un arco para abrir el túnel';
+              }
             }
           }
         }
@@ -1032,6 +1125,10 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         gradient.addColorStop(0, fogColor + '0.0)');
         gradient.addColorStop(0.8, fogColor + '0.0)');
         gradient.addColorStop(1, fogColor + '0.05)');
+      } else if (isExploration) {
+        // No fog in Phase 2
+        gradient.addColorStop(0, fogColor + '0.0)');
+        gradient.addColorStop(1, fogColor + '0.0)');
       } else {
         gradient.addColorStop(0, fogColor + '0.6)');
         gradient.addColorStop(0.5, fogColor + '0.3)');
@@ -1041,19 +1138,64 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 6. On-Screen Indication (Path Illuminated)
-      if (hasSelectedPhrase && appState === 'PLAYING') {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-        ctx.fillRect(0, 0, canvas.width, 80);
+      // 5.5 Vignette (Shadows to hide map limits beyond the forest)
+      if (!isConstruction) {
+        const vignetteGrad = ctx.createRadialGradient(
+          canvas.width / 2, canvas.height / 2, canvas.height * 0.4,
+          canvas.width / 2, canvas.height / 2, canvas.width * 0.8
+        );
+        vignetteGrad.addColorStop(0, 'rgba(0,0,0,0)');
+        vignetteGrad.addColorStop(0.7, 'rgba(0,0,0,0.5)');
+        vignetteGrad.addColorStop(1, 'rgba(0,0,0,0.95)');
+        ctx.fillStyle = vignetteGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // 6. On-Screen Indication (Left Panel for Selected Phrases)
+      if (selectedPhrases.length > 0 && appState === 'PLAYING') {
+        const panelWidth = 320;
         
+        // Draw panel background
+        ctx.fillStyle = 'rgba(10, 15, 20, 0.85)';
+        ctx.fillRect(0, 0, panelWidth, canvas.height);
+        
+        // Draw panel border
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(panelWidth, 0);
+        ctx.lineTo(panelWidth, canvas.height);
+        ctx.stroke();
+
+        // Title
         ctx.fillStyle = '#FFD700';
-        ctx.shadowColor = '#FFD700';
-        ctx.shadowBlur = 15;
-        ctx.font = 'bold 24px "Inter", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText("✨ Sigue el camino iluminado hacia el túnel de salida ✨", canvas.width / 2, 40);
-        ctx.shadowBlur = 0;
+        ctx.font = 'bold 22px "Playfair Display", serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        let panelTitle = 'Opciones Seleccionadas:';
+        if (stage === 'NIEBLA') panelTitle = 'Emociones identificadas:';
+        if (stage === 'EXPLORACION') panelTitle = 'Acciones a tomar:';
+        if (stage === 'CLARIDAD') panelTitle = 'Ejercicios de claridad:';
+        ctx.fillText(panelTitle, 25, 40);
+        
+        // Divider
+        ctx.beginPath();
+        ctx.moveTo(25, 75);
+        ctx.lineTo(panelWidth - 25, 75);
+        ctx.stroke();
+
+        // List phrases
+        ctx.font = '15px "Inter", sans-serif';
+        ctx.fillStyle = '#FFF8DC';
+        let currentY = 100;
+        
+        selectedPhrases.forEach((phrase, idx) => {
+          ctx.fillStyle = '#FFD700';
+          ctx.fillText(`${idx + 1}.`, 25, currentY);
+          ctx.fillStyle = '#FFF8DC';
+          currentY = wrapText(ctx, phrase, 50, currentY, panelWidth - 75, 24);
+          currentY += 15; // Spacing between phrases
+        });
       }
 
       // 7. Interaction UI
