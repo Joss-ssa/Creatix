@@ -77,6 +77,16 @@ export default function App() {
   const [hasShownControlsForStage, setHasShownControlsForStage] = useState(false);
   const [showReflectionsModal, setShowReflectionsModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     setIntroPhrase(THEME_PHRASES[Math.floor(Math.random() * THEME_PHRASES.length)]);
@@ -209,6 +219,7 @@ export default function App() {
         hasSelectedPhrase={phraseSelectedForStage}
         selectedPhrases={selectedPhrases}
         onEnterTunnel={handleEnterTunnel}
+        isMobile={isMobile}
       />
 
 
@@ -239,7 +250,7 @@ export default function App() {
       )}
 
       {/* M Hint Overlay */}
-      {showMHint && appState === 'PLAYING' && (
+      {showMHint && appState === 'PLAYING' && !isMobile && (
         <div className="absolute bottom-8 right-8 z-30 flex flex-col gap-3 items-end">
           <div className="bg-black/60 border border-[#FFD700]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(255,215,0,0.2)] backdrop-blur-sm">
             Presiona <span className="font-bold text-[#FFD700] text-base mx-1">M</span> para activar el menú
@@ -277,7 +288,7 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="max-w-2xl w-full p-12 pt-24 rounded-t-[200px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_60px_rgba(255,215,0,0.5)] flex flex-col items-center text-center gap-8 relative overflow-hidden"
+              className={`${isMobile ? 'p-6 pt-16' : 'p-12 pt-24'} max-w-2xl w-full rounded-t-[200px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_60px_rgba(255,215,0,0.5)] flex flex-col items-center text-center gap-8 relative overflow-hidden`}
             >
               {/* Inner decorative border */}
               <div className="absolute inset-5 border-2 border-[#FFD700]/60 rounded-t-[180px] rounded-b-xl pointer-events-none shadow-[inset_0_0_20px_rgba(255,215,0,0.3)]"></div>
@@ -286,10 +297,10 @@ export default function App() {
               <div className="p-5 bg-gradient-to-br from-[#FFD700] to-[#B8860B] rounded-full text-[#2A1408] shadow-[0_0_30px_rgba(255,215,0,0.8)] relative z-10">
                 <Sparkles className="w-12 h-12" />
               </div>
-              <h1 className="text-6xl font-extrabold text-[#FFD700] tracking-widest drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] uppercase relative z-10" style={{ fontFamily: '"Playfair Display", serif' }}>
+              <h1 className={`${isMobile ? 'text-4xl' : 'text-6xl'} font-extrabold text-[#FFD700] tracking-widest drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] uppercase relative z-10`} style={{ fontFamily: '"Playfair Display", serif' }}>
                 Creatix
               </h1>
-              <p className="text-2xl text-[#FDE68A] font-serif italic leading-relaxed px-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">
+              <p className={`${isMobile ? 'text-lg' : 'text-2xl'} text-[#FDE68A] font-serif italic leading-relaxed px-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10`}>
                 "{introPhrase}"
               </p>
               <button
@@ -310,7 +321,7 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="max-w-md w-full p-10 pt-16 rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_50px_rgba(255,215,0,0.5)] flex flex-col items-center text-center gap-6 relative overflow-hidden"
+              className={`${isMobile ? 'p-6 pt-12' : 'p-10 pt-16'} max-w-md w-full rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_50px_rgba(255,215,0,0.5)] flex flex-col items-center text-center gap-6 relative overflow-hidden`}
             >
               {/* Inner decorative border */}
               <div className="absolute inset-4 border-2 border-[#FFD700]/60 rounded-t-[134px] rounded-b-xl pointer-events-none shadow-[inset_0_0_15px_rgba(255,215,0,0.3)]"></div>
@@ -321,11 +332,11 @@ export default function App() {
                 {stage === 'CLARIDAD' && <Sun className="w-10 h-10" />}
               </div>
               <div className="relative z-10">
-                <h2 className="text-sm font-bold tracking-widest uppercase text-[#FDE68A] mb-1 drop-shadow-md">Nivel Actual</h2>
-                <h3 className="text-4xl font-extrabold text-[#FFD700] capitalize drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]" style={{ fontFamily: '"Playfair Display", serif' }}>{stage}</h3>
+                <h2 className="text-xs font-bold tracking-widest uppercase text-[#FDE68A] mb-1 drop-shadow-md">Nivel Actual</h2>
+                <h3 className={`${isMobile ? 'text-3xl' : 'text-4xl'} font-extrabold text-[#FFD700] capitalize drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]`} style={{ fontFamily: '"Playfair Display", serif' }}>{stage}</h3>
               </div>
 
-              <p className="text-lg text-[#FDE68A] leading-relaxed px-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10 font-serif">
+              <p className={`${isMobile ? 'text-base' : 'text-lg'} text-[#FDE68A] leading-relaxed px-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10 font-serif`}>
                 {stage === 'NIEBLA' && "Estás en la niebla. Lee un arco para entender cómo te sientes y abrir el túnel."}
                 {stage === 'EXPLORACION' && "La niebla se disipa. Encuentra una acción, tómate tu tiempo y cruza el túnel."}
                 {stage === 'CLARIDAD' && "El camino está claro. Disfruta de la creatividad."}
@@ -349,12 +360,12 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="max-w-md w-full p-10 pt-16 rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_50px_rgba(255,215,0,0.5)] flex flex-col items-center text-center gap-6 relative overflow-hidden"
+              className={`${isMobile ? 'p-6 pt-12' : 'p-10 pt-16'} max-w-md w-full rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_50px_rgba(255,215,0,0.5)] flex flex-col items-center text-center gap-6 relative overflow-hidden`}
             >
               {/* Inner decorative border */}
               <div className="absolute inset-4 border-2 border-[#FFD700]/60 rounded-t-[134px] rounded-b-xl pointer-events-none shadow-[inset_0_0_15px_rgba(255,215,0,0.3)]"></div>
 
-              <p className="text-2xl font-medium leading-relaxed font-serif italic text-[#FFD700] drop-shadow-[0_0_10px_rgba(255,215,0,0.6)] relative z-10 mt-4">
+              <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-medium leading-relaxed font-serif italic text-[#FFD700] drop-shadow-[0_0_10px_rgba(255,215,0,0.6)] relative z-10 mt-4`}>
                 "{currentPhrase}"
               </p>
 
@@ -396,11 +407,11 @@ export default function App() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="max-w-xl w-full p-12 rounded-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_80px_rgba(255,215,0,0.6)] flex flex-col items-center text-center gap-6"
+              className={`${isMobile ? 'p-6' : 'p-12'} max-w-xl w-full rounded-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_80px_rgba(255,215,0,0.6)] flex flex-col items-center text-center gap-6`}
             >
-              <Sparkles className="w-16 h-16 text-[#FFD700]" />
-              <h2 className="text-4xl font-extrabold text-[#FFD700] font-serif">¡Haz encontrado la luz!</h2>
-              <p className="text-xl text-[#FDE68A] leading-relaxed font-serif">
+              <Sparkles className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} text-[#FFD700]`} />
+              <h2 className={`${isMobile ? 'text-3xl' : 'text-4xl'} font-extrabold text-[#FFD700] font-serif`}>¡Haz encontrado la luz!</h2>
+              <p className={`${isMobile ? 'text-base' : 'text-xl'} text-[#FDE68A] leading-relaxed font-serif`}>
                 Has creado nuevas ideas y tienes la capacidad de hacerlas realidad.
               </p>
               <button

@@ -8,6 +8,7 @@ interface Game2DProps {
   hasSelectedPhrase: boolean;
   selectedPhrases: string[];
   onEnterTunnel: () => void;
+  isMobile?: boolean;
 }
 
 interface Particle {
@@ -22,8 +23,10 @@ interface Particle {
   color: string;
 }
 
-export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect, phrases, hasSelectedPhrase, selectedPhrases, onEnterTunnel }) => {
+export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect, phrases, hasSelectedPhrase, selectedPhrases, onEnterTunnel, isMobile }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const joystickRef = useRef<HTMLDivElement>(null);
+  const joystickKnobRef = useRef<HTMLDivElement>(null);
   
   // Persist game state across re-renders
   const playerState = useRef({
@@ -31,6 +34,16 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
     z: 0,
     yaw: 0,
     pitch: 0
+  });
+
+  const touchControls = useRef({
+    joystickActive: false,
+    joystickStart: { x: 0, y: 0 },
+    joystickCurrent: { x: 0, y: 0 },
+    moveForward: false,
+    moveBackward: false,
+    moveLeft: false,
+    moveRight: false
   });
 
   useEffect(() => {
@@ -328,21 +341,31 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         let moveX = 0;
         let moveZ = 0;
 
-        if (keys['w'] || keys['arrowup']) {
+        if (keys['w'] || keys['arrowup'] || touchControls.current.moveForward) {
           moveZ += speed * Math.cos(playerState.current.yaw);
           moveX += speed * Math.sin(playerState.current.yaw);
         }
-        if (keys['s'] || keys['arrowdown']) {
+        if (keys['s'] || keys['arrowdown'] || touchControls.current.moveBackward) {
           moveZ -= speed * Math.cos(playerState.current.yaw);
           moveX -= speed * Math.sin(playerState.current.yaw);
         }
-        if (keys['a'] || keys['arrowleft']) {
+        if (keys['a'] || keys['arrowleft'] || touchControls.current.moveLeft) {
           moveX -= speed * Math.cos(playerState.current.yaw);
           moveZ += speed * Math.sin(playerState.current.yaw);
         }
-        if (keys['d'] || keys['arrowright']) {
+        if (keys['d'] || keys['arrowright'] || touchControls.current.moveRight) {
           moveX += speed * Math.cos(playerState.current.yaw);
           moveZ -= speed * Math.sin(playerState.current.yaw);
+        }
+
+        // Mobile Joystick Camera Control
+        if (isMobile && touchControls.current.joystickActive) {
+          const dx = touchControls.current.joystickCurrent.x - touchControls.current.joystickStart.x;
+          const dy = touchControls.current.joystickCurrent.y - touchControls.current.joystickStart.y;
+          
+          playerState.current.yaw -= dx * 0.0005;
+          playerState.current.pitch -= dy * 0.0005;
+          playerState.current.pitch = Math.max(-0.2, Math.min(0.2, playerState.current.pitch));
         }
 
         playerState.current.x += moveX;
@@ -1153,7 +1176,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
 
       // 6. On-Screen Indication (Left Panel for Selected Phrases)
       if (selectedPhrases.length > 0 && appState === 'PLAYING') {
-        const panelWidth = 320;
+        const panelWidth = isMobile ? 220 : 320;
         
         // Draw panel background
         ctx.fillStyle = 'rgba(10, 15, 20, 0.85)';
@@ -1169,32 +1192,34 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
 
         // Title
         ctx.fillStyle = '#FFD700';
-        ctx.font = 'bold 22px "Playfair Display", serif';
+        ctx.font = `bold ${isMobile ? '16px' : '22px'} "Playfair Display", serif`;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
-        let panelTitle = 'Opciones Seleccionadas:';
-        if (stage === 'NIEBLA') panelTitle = 'Emociones identificadas:';
-        if (stage === 'EXPLORACION') panelTitle = 'Acciones a tomar:';
-        if (stage === 'CLARIDAD') panelTitle = 'Ejercicios de claridad:';
-        ctx.fillText(panelTitle, 25, 40);
+        let panelTitle = 'Selección:';
+        if (!isMobile) {
+          if (stage === 'NIEBLA') panelTitle = 'Emociones identificadas:';
+          if (stage === 'EXPLORACION') panelTitle = 'Acciones a tomar:';
+          if (stage === 'CLARIDAD') panelTitle = 'Ejercicios de claridad:';
+        }
+        ctx.fillText(panelTitle, 20, 40);
         
         // Divider
         ctx.beginPath();
-        ctx.moveTo(25, 75);
-        ctx.lineTo(panelWidth - 25, 75);
+        ctx.moveTo(20, 75);
+        ctx.lineTo(panelWidth - 20, 75);
         ctx.stroke();
 
         // List phrases
-        ctx.font = '15px "Inter", sans-serif';
+        ctx.font = `${isMobile ? '12px' : '15px'} "Inter", sans-serif`;
         ctx.fillStyle = '#FFF8DC';
         let currentY = 100;
         
         selectedPhrases.forEach((phrase, idx) => {
           ctx.fillStyle = '#FFD700';
-          ctx.fillText(`${idx + 1}.`, 25, currentY);
+          ctx.fillText(`${idx + 1}.`, 20, currentY);
           ctx.fillStyle = '#FFF8DC';
-          currentY = wrapText(ctx, phrase, 50, currentY, panelWidth - 75, 24);
-          currentY += 15; // Spacing between phrases
+          currentY = wrapText(ctx, phrase, 40, currentY, panelWidth - 60, isMobile ? 18 : 24);
+          currentY += isMobile ? 10 : 15; // Spacing between phrases
         });
       }
 
@@ -1244,11 +1269,131 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
     };
   }, [stage, appState, onPhraseSelect, phrases, hasSelectedPhrase, onEnterTunnel]);
 
+  const handleJoystickStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchControls.current.joystickActive = true;
+    touchControls.current.joystickStart = { x: touch.clientX, y: touch.clientY };
+    touchControls.current.joystickCurrent = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleJoystickMove = (e: React.TouchEvent) => {
+    if (!touchControls.current.joystickActive) return;
+    const touch = e.touches[0];
+    touchControls.current.joystickCurrent = { x: touch.clientX, y: touch.clientY };
+    
+    if (joystickKnobRef.current) {
+      const dx = touch.clientX - touchControls.current.joystickStart.x;
+      const dy = touch.clientY - touchControls.current.joystickStart.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDist = 40;
+      const limitedDx = (dx / dist) * Math.min(dist, maxDist);
+      const limitedDy = (dy / dist) * Math.min(dist, maxDist);
+      joystickKnobRef.current.style.transform = `translate(${limitedDx}px, ${limitedDy}px)`;
+    }
+  };
+
+  const handleJoystickEnd = () => {
+    touchControls.current.joystickActive = false;
+    if (joystickKnobRef.current) {
+      joystickKnobRef.current.style.transform = 'translate(0, 0)';
+    }
+  };
+
   return (
-    <canvas 
-      ref={canvasRef} 
-      className="absolute inset-0 w-full h-full"
-      style={{ cursor: appState === 'PLAYING' ? 'none' : 'default' }}
-    />
+    <div className="absolute inset-0 w-full h-full overflow-hidden touch-none">
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 w-full h-full"
+        style={{ cursor: appState === 'PLAYING' ? 'none' : 'default' }}
+      />
+      
+      {isMobile && appState === 'PLAYING' && (
+        <>
+          {/* Movement Arrows (Left Side) */}
+          <div className="absolute bottom-12 left-12 flex flex-col gap-4 z-40">
+            <button 
+              className="w-16 h-16 bg-black/40 border-2 border-[#FFD700]/50 rounded-xl flex items-center justify-center active:bg-[#FFD700]/20 active:scale-95 transition-all"
+              onTouchStart={(e) => { e.preventDefault(); touchControls.current.moveForward = true; }}
+              onTouchEnd={(e) => { e.preventDefault(); touchControls.current.moveForward = false; }}
+            >
+              <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[20px] border-b-[#FFD700]"></div>
+            </button>
+            <button 
+              className="w-16 h-16 bg-black/40 border-2 border-[#FFD700]/50 rounded-xl flex items-center justify-center active:bg-[#FFD700]/20 active:scale-95 transition-all"
+              onTouchStart={(e) => { e.preventDefault(); touchControls.current.moveBackward = true; }}
+              onTouchEnd={(e) => { e.preventDefault(); touchControls.current.moveBackward = false; }}
+            >
+              <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-[#FFD700]"></div>
+            </button>
+          </div>
+
+          {/* Camera Joystick (Right Side) */}
+          <div 
+            ref={joystickRef}
+            className="absolute bottom-12 right-12 w-32 h-32 bg-black/40 border-2 border-[#FFD700]/30 rounded-full flex items-center justify-center z-40"
+            onTouchStart={handleJoystickStart}
+            onTouchMove={handleJoystickMove}
+            onTouchEnd={handleJoystickEnd}
+          >
+            <div 
+              ref={joystickKnobRef}
+              className="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#B8860B] rounded-full shadow-[0_0_15px_rgba(255,215,0,0.5)] pointer-events-none transition-transform duration-75"
+            ></div>
+            <div className="absolute -top-8 text-[#FFD700] text-[10px] font-bold uppercase tracking-widest opacity-60">Cámara</div>
+          </div>
+
+          {/* Mobile Interaction Button (Center Right) */}
+          <button 
+            className="absolute top-1/2 right-8 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-[#B8860B] to-[#FFD700] rounded-full flex items-center justify-center z-40 shadow-[0_0_20px_rgba(255,215,0,0.4)] active:scale-90 transition-all border-4 border-[#2A1408]"
+            onTouchStart={(e) => {
+              e.preventDefault();
+              // Trigger 'E' key logic
+              const ev = new KeyboardEvent('keydown', { key: 'e' });
+              window.dispatchEvent(ev);
+            }}
+          >
+            <span className="text-[#2A1408] font-black text-xl">E</span>
+          </button>
+
+          {/* Mobile Phase Buttons (Top Right) */}
+          <div className="absolute top-8 right-8 flex flex-col gap-3 z-40 items-end">
+             {stage === 'EXPLORACION' && (
+               <button 
+                 className="px-4 py-2 bg-black/60 border border-[#FFD700] text-[#FFD700] rounded-lg text-xs font-bold uppercase tracking-wider active:bg-[#FFD700]/20"
+                 onTouchStart={(e) => {
+                   e.preventDefault();
+                   const ev = new KeyboardEvent('keydown', { key: 'p' });
+                   window.dispatchEvent(ev);
+                 }}
+               >
+                 Reflexionar
+               </button>
+             )}
+             {stage === 'CLARIDAD' && (
+               <button 
+                 className="px-4 py-2 bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] rounded-lg text-xs font-bold uppercase tracking-wider active:scale-95"
+                 onTouchStart={(e) => {
+                   e.preventDefault();
+                   const ev = new KeyboardEvent('keydown', { key: 'c' });
+                   window.dispatchEvent(ev);
+                 }}
+               >
+                 Ayuda Creativa
+               </button>
+             )}
+             <button 
+               className="px-4 py-2 bg-black/40 border border-[#FFD700]/50 text-white/80 rounded-lg text-xs font-bold uppercase tracking-wider active:bg-white/10"
+               onTouchStart={(e) => {
+                 e.preventDefault();
+                 const ev = new KeyboardEvent('keydown', { key: 'm' });
+                 window.dispatchEvent(ev);
+               }}
+             >
+               Menú
+             </button>
+          </div>
+        </>
+      )}
+    </div>
   );
 };

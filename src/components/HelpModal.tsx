@@ -71,35 +71,36 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-[#2A1408] border-2 border-[#FFD700] rounded-2xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-[0_0_40px_rgba(255,215,0,0.4)] text-[#FFF8DC] relative">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
+      <div className="bg-[#2A1408] border-2 border-[#FFD700] rounded-2xl p-4 sm:p-8 max-w-3xl w-full max-h-[95vh] overflow-y-auto shadow-[0_0_40px_rgba(255,215,0,0.4)] text-[#FFF8DC] relative">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#FFD700] hover:text-white transition-colors"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-[#FFD700] hover:text-white transition-colors p-2"
         >
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-3xl font-extrabold text-[#FFD700] mb-2 font-serif flex items-center gap-3">
-          <Sparkles className="w-8 h-8" />
-          Rincón de Ayuda Creativa
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#FFD700] mb-2 font-serif flex items-center gap-3">
+          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
+          Ayuda Creativa
         </h2>
-        <p className="text-[#FDE68A] mb-6">Escribe tus ideas sueltas y deja que la magia te inspire.</p>
+        <p className="text-sm sm:text-base text-[#FDE68A] mb-6">Escribe tus ideas sueltas y deja que la magia te inspire.</p>
 
         <div className="space-y-6">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <textarea 
               value={ideaInput}
               onChange={e => setIdeaInput(e.target.value)}
-              className="flex-1 bg-[#1A0C05] border border-[#B8860B] rounded-lg p-4 text-white focus:outline-none focus:border-[#FFD700] resize-none h-24"
-              placeholder="Ej: Un bosque flotante con relojes derretidos..."
+              className="flex-1 bg-[#1A0C05] border border-[#B8860B] rounded-lg p-4 text-white focus:outline-none focus:border-[#FFD700] resize-none h-24 text-sm sm:text-base"
+              placeholder="Ej: Un bosque flotante..."
             />
             <button
               onClick={() => generateContent('all')}
               disabled={loadingState.all || !ideaInput}
-              className="px-6 py-4 rounded-xl bg-gradient-to-br from-[#B8860B] to-[#FFD700] text-[#2A1408] font-bold hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_15px_rgba(255,215,0,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-2 min-w-[120px]"
+              className="px-6 py-4 rounded-xl bg-gradient-to-br from-[#B8860B] to-[#FFD700] text-[#2A1408] font-bold hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_15px_rgba(255,215,0,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex flex-row sm:flex-col items-center justify-center gap-2 min-w-[120px]"
             >
-              {loadingState.all ? <Loader2 className="w-6 h-6 animate-spin" /> : <><Sparkles className="w-6 h-6" /> Inspirar</>}
+              {loadingState.all ? <Loader2 className="w-6 h-6 animate-spin" /> : <RefreshCw className="w-6 h-6" />}
+              <span className="text-sm uppercase tracking-wider">Inspirarme</span>
             </button>
           </div>
 
@@ -110,8 +111,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                 <button onClick={() => generateContent('ideas')} disabled={loadingState.all || loadingState.ideas} className="absolute top-3 right-3 text-[#B8860B] hover:text-[#FFD700] transition-colors disabled:opacity-50">
                   <RefreshCw className={`w-5 h-5 ${loadingState.ideas ? 'animate-spin' : ''}`} />
                 </button>
-                <h3 className="text-[#FFD700] font-bold mb-4 flex items-center gap-2"><Lightbulb className="w-5 h-5" /> Ideas / Conceptos</h3>
-                <ul className="space-y-3 text-sm">
+                <h3 className="text-[#FFD700] font-bold mb-4 flex items-center gap-2 text-sm sm:text-base"><Lightbulb className="w-5 h-5" /> Ideas / Conceptos</h3>
+                <ul className="space-y-3 text-xs sm:text-sm">
                   {results.ideas.map((idea, i) => (
                     <li key={i} className="flex gap-2"><span className="text-[#B8860B]">•</span> {idea}</li>
                   ))}
@@ -123,12 +124,12 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                 <button onClick={() => generateContent('palette')} disabled={loadingState.all || loadingState.palette} className="absolute top-3 right-3 text-[#B8860B] hover:text-[#FFD700] transition-colors disabled:opacity-50">
                   <RefreshCw className={`w-5 h-5 ${loadingState.palette ? 'animate-spin' : ''}`} />
                 </button>
-                <h3 className="text-[#FFD700] font-bold mb-4 flex items-center gap-2"><Palette className="w-5 h-5" /> Paleta de Colores</h3>
-                <div className="flex flex-col gap-2">
+                <h3 className="text-[#FFD700] font-bold mb-4 flex items-center gap-2 text-sm sm:text-base"><Palette className="w-5 h-5" /> Paleta de Colores</h3>
+                <div className="flex flex-wrap sm:flex-col gap-2">
                   {results.palette.map((color, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full border border-white/20 shadow-inner" style={{ backgroundColor: color.startsWith('#') ? color : `#${color}` }}></div>
-                      <span className="text-sm font-mono uppercase">{color}</span>
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white/20 shadow-inner" style={{ backgroundColor: color.startsWith('#') ? color : `#${color}` }}></div>
+                      <span className="text-[10px] sm:text-sm font-mono uppercase">{color}</span>
                     </div>
                   ))}
                 </div>
@@ -139,8 +140,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                 <button onClick={() => generateContent('elements')} disabled={loadingState.all || loadingState.elements} className="absolute top-3 right-3 text-[#B8860B] hover:text-[#FFD700] transition-colors disabled:opacity-50">
                   <RefreshCw className={`w-5 h-5 ${loadingState.elements ? 'animate-spin' : ''}`} />
                 </button>
-                <h3 className="text-[#FFD700] font-bold mb-4 flex items-center gap-2"><Box className="w-5 h-5" /> Elementos Random</h3>
-                <ul className="space-y-3 text-sm">
+                <h3 className="text-[#FFD700] font-bold mb-4 flex items-center gap-2 text-sm sm:text-base"><Box className="w-5 h-5" /> Elementos Random</h3>
+                <ul className="space-y-3 text-xs sm:text-sm">
                   {results.elements.map((el, i) => (
                     <li key={i} className="flex gap-2"><span className="text-[#B8860B]">•</span> {el}</li>
                   ))}

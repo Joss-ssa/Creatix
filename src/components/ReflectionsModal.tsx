@@ -49,83 +49,88 @@ Sus respuestas:
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-[#2A1408] border-2 border-[#FFD700] rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[0_0_40px_rgba(255,215,0,0.4)] text-[#FFF8DC] relative">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
+      <div className="bg-[#2A1408] border-2 border-[#FFD700] rounded-2xl p-4 sm:p-8 max-w-2xl w-full max-h-[95vh] overflow-y-auto shadow-[0_0_40px_rgba(255,215,0,0.4)] text-[#FFF8DC] relative">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#FFD700] hover:text-white transition-colors"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-[#FFD700] hover:text-white transition-colors p-2"
         >
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-3xl font-extrabold text-[#FFD700] mb-6 font-serif text-center">Pensamientos y Reflexiones</h2>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#FFD700] mb-6 font-serif text-center">Pensamientos y Reflexiones</h2>
 
         {!report ? (
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="block text-lg font-medium text-[#FDE68A]">¿Qué hiciste?</label>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-1 sm:space-y-2">
+              <label className="block text-base sm:text-lg font-medium text-[#FDE68A]">¿Qué hiciste?</label>
               <textarea 
                 value={answers.q1}
                 onChange={e => setAnswers({...answers, q1: e.target.value})}
-                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-24"
+                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-20 sm:h-24 text-sm sm:text-base"
                 placeholder="Escribe aquí..."
               />
             </div>
-            <div className="space-y-2">
-              <label className="block text-lg font-medium text-[#FDE68A]">¿Qué viste?</label>
+            <div className="space-y-1 sm:space-y-2">
+              <label className="block text-base sm:text-lg font-medium text-[#FDE68A]">¿Qué viste?</label>
               <textarea 
                 value={answers.q2}
                 onChange={e => setAnswers({...answers, q2: e.target.value})}
-                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-24"
+                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-20 sm:h-24 text-sm sm:text-base"
                 placeholder="Escribe aquí..."
               />
             </div>
-            <div className="space-y-2">
-              <label className="block text-lg font-medium text-[#FDE68A]">¿Qué sentiste?</label>
+            <div className="space-y-1 sm:space-y-2">
+              <label className="block text-base sm:text-lg font-medium text-[#FDE68A]">¿Qué sentiste?</label>
               <textarea 
                 value={answers.q3}
                 onChange={e => setAnswers({...answers, q3: e.target.value})}
-                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-24"
+                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-20 sm:h-24 text-sm sm:text-base"
                 placeholder="Escribe aquí..."
               />
             </div>
-            <div className="space-y-2">
-              <label className="block text-lg font-medium text-[#FDE68A]">¿Te recuerda algo?</label>
+            <div className="space-y-1 sm:space-y-2">
+              <label className="block text-base sm:text-lg font-medium text-[#FDE68A]">¿Te recuerda algo?</label>
               <textarea 
                 value={answers.q4}
                 onChange={e => setAnswers({...answers, q4: e.target.value})}
-                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-24"
+                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-20 sm:h-24 text-sm sm:text-base"
                 placeholder="Escribe aquí..."
               />
             </div>
-            <div className="space-y-2">
-              <label className="block text-lg font-medium text-[#FDE68A]">¿Qué ideas tuviste... o generaste?</label>
+            <div className="space-y-1 sm:space-y-2">
+              <label className="block text-base sm:text-lg font-medium text-[#FDE68A]">¿Qué ideas tuviste?</label>
               <textarea 
                 value={answers.q5}
                 onChange={e => setAnswers({...answers, q5: e.target.value})}
-                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-24"
+                className="w-full bg-[#1A0C05] border border-[#B8860B] rounded-lg p-3 text-white focus:outline-none focus:border-[#FFD700] resize-none h-20 sm:h-24 text-sm sm:text-base"
                 placeholder="Escribe aquí..."
               />
             </div>
 
             <button
               onClick={handleSubmit}
-              disabled={isLoading || !answers.q1 || !answers.q2 || !answers.q3 || !answers.q4 || !answers.q5}
-              className="w-full mt-6 px-8 py-4 rounded-full bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-extrabold text-lg hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_20px_rgba(255,215,0,0.6)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={isLoading || !Object.values(answers).some(a => a.length > 0)}
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-extrabold text-lg hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_20px_rgba(255,215,0,0.5)] disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-wider"
             >
-              {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <><Send className="w-5 h-5" /> Enviar Reflexiones</>}
+              {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
+              Enviar Reflexiones
             </button>
           </div>
         ) : (
-          <div className="space-y-6 text-center">
-            <div className="bg-[#1A0C05] border border-[#FFD700]/50 rounded-xl p-6 text-lg leading-relaxed text-[#FFF8DC]">
-              {report}
+          <div className="flex flex-col items-center gap-8 py-8 animate-in fade-in zoom-in duration-500">
+            <div className="p-6 bg-[#1A0C05] border-2 border-[#FFD700]/40 rounded-2xl relative">
+              <div className="absolute -top-4 -left-4 text-4xl text-[#FFD700]/20 font-serif">“</div>
+              <p className="text-xl sm:text-2xl font-serif italic text-[#FDE68A] leading-relaxed text-center">
+                {report}
+              </p>
+              <div className="absolute -bottom-4 -right-4 text-4xl text-[#FFD700]/20 font-serif">”</div>
             </div>
             <button
               onClick={onClose}
-              className="px-8 py-3 rounded-full bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-extrabold hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)]"
+              className="px-10 py-4 rounded-full bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-bold text-lg hover:scale-105 transition-transform shadow-lg uppercase tracking-widest"
             >
-              Continuar el viaje
+              Continuar mi viaje
             </button>
           </div>
         )}
