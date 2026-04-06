@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle } from 'lucide-react';
+import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X } from 'lucide-react';
 import { Game2D } from './components/Game2D';
 import { ReflectionsModal } from './components/ReflectionsModal';
 import { HelpModal } from './components/HelpModal';
@@ -220,6 +220,9 @@ export default function App() {
         selectedPhrases={selectedPhrases}
         onEnterTunnel={handleEnterTunnel}
         isMobile={isMobile}
+        onOpenMenu={() => setShowControlsMenu(true)}
+        onOpenReflections={() => setShowReflectionsModal(true)}
+        onOpenHelp={() => setShowHelpModal(true)}
       />
 
 
@@ -362,6 +365,14 @@ export default function App() {
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className={`${isMobile ? 'p-6 pt-12' : 'p-10 pt-16'} max-w-md w-full rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_50px_rgba(255,215,0,0.5)] flex flex-col items-center text-center gap-6 relative overflow-hidden`}
             >
+              {isMobile && (
+                <button
+                  onClick={() => setAppState('PLAYING')}
+                  className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#2A1408] border-x-2 border-b-2 border-[#FFD700] text-[#FFD700] px-6 py-1.5 rounded-b-xl shadow-md flex items-center justify-center z-50"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
               {/* Inner decorative border */}
               <div className="absolute inset-4 border-2 border-[#FFD700]/60 rounded-t-[134px] rounded-b-xl pointer-events-none shadow-[inset_0_0_15px_rgba(255,215,0,0.3)]"></div>
 

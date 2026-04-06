@@ -9,6 +9,9 @@ interface Game2DProps {
   selectedPhrases: string[];
   onEnterTunnel: () => void;
   isMobile?: boolean;
+  onOpenMenu?: () => void;
+  onOpenReflections?: () => void;
+  onOpenHelp?: () => void;
 }
 
 interface Particle {
@@ -23,10 +26,23 @@ interface Particle {
   color: string;
 }
 
-export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect, phrases, hasSelectedPhrase, selectedPhrases, onEnterTunnel, isMobile }) => {
+export const Game2D: React.FC<Game2DProps> = ({ 
+  stage, 
+  appState, 
+  onPhraseSelect, 
+  phrases, 
+  hasSelectedPhrase, 
+  selectedPhrases, 
+  onEnterTunnel, 
+  isMobile,
+  onOpenMenu,
+  onOpenReflections,
+  onOpenHelp
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const joystickRef = useRef<HTMLDivElement>(null);
   const joystickKnobRef = useRef<HTMLDivElement>(null);
+  const keys = useRef<{ [key: string]: boolean }>({});
   
   // Persist game state across re-renders
   const playerState = useRef({
@@ -85,9 +101,8 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
     canvas.addEventListener('click', handleClick);
 
     // Controls
-    const keys: { [key: string]: boolean } = {};
-    const handleKeyDown = (e: KeyboardEvent) => { keys[e.key.toLowerCase()] = true; };
-    const handleKeyUp = (e: KeyboardEvent) => { keys[e.key.toLowerCase()] = false; };
+    const handleKeyDown = (e: KeyboardEvent) => { keys.current[e.key.toLowerCase()] = true; };
+    const handleKeyUp = (e: KeyboardEvent) => { keys.current[e.key.toLowerCase()] = false; };
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
@@ -332,6 +347,14 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
       };
     }
 
+    // Reset controls when appState changes to prevent auto-run
+    keys.current = {};
+    touchControls.current.moveForward = false;
+    touchControls.current.moveBackward = false;
+    touchControls.current.moveLeft = false;
+    touchControls.current.moveRight = false;
+    touchControls.current.joystickActive = false;
+
     let animationId: number;
 
     const draw = () => {
@@ -341,19 +364,19 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         let moveX = 0;
         let moveZ = 0;
 
-        if (keys['w'] || keys['arrowup'] || touchControls.current.moveForward) {
+        if (keys.current['w'] || keys.current['arrowup'] || touchControls.current.moveForward) {
           moveZ += speed * Math.cos(playerState.current.yaw);
           moveX += speed * Math.sin(playerState.current.yaw);
         }
-        if (keys['s'] || keys['arrowdown'] || touchControls.current.moveBackward) {
+        if (keys.current['s'] || keys.current['arrowdown'] || touchControls.current.moveBackward) {
           moveZ -= speed * Math.cos(playerState.current.yaw);
           moveX -= speed * Math.sin(playerState.current.yaw);
         }
-        if (keys['a'] || keys['arrowleft'] || touchControls.current.moveLeft) {
+        if (keys.current['a'] || keys.current['arrowleft'] || touchControls.current.moveLeft) {
           moveX -= speed * Math.cos(playerState.current.yaw);
           moveZ += speed * Math.sin(playerState.current.yaw);
         }
-        if (keys['d'] || keys['arrowright'] || touchControls.current.moveRight) {
+        if (keys.current['d'] || keys.current['arrowright'] || touchControls.current.moveRight) {
           moveX += speed * Math.cos(playerState.current.yaw);
           moveZ -= speed * Math.sin(playerState.current.yaw);
         }
@@ -363,7 +386,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
           const dx = touchControls.current.joystickCurrent.x - touchControls.current.joystickStart.x;
           const dy = touchControls.current.joystickCurrent.y - touchControls.current.joystickStart.y;
           
-          playerState.current.yaw -= dx * 0.0005;
+          playerState.current.yaw += dx * 0.0005; // Fixed inversion
           playerState.current.pitch -= dy * 0.0005;
           playerState.current.pitch = Math.max(-0.2, Math.min(0.2, playerState.current.pitch));
         }
@@ -1236,8 +1259,8 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
         ctx.textBaseline = 'middle';
         ctx.fillText(interactionText, canvas.width/2, canvas.height - 95);
 
-        if (keys['e'] && interactionAction) {
-          keys['e'] = false; // debounce
+        if (keys.current['e'] && interactionAction) {
+          keys.current['e'] = false; // debounce
           interactionAction();
         }
       }
@@ -1347,9 +1370,11 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
             className="absolute top-1/2 right-8 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-[#B8860B] to-[#FFD700] rounded-full flex items-center justify-center z-40 shadow-[0_0_20px_rgba(255,215,0,0.4)] active:scale-90 transition-all border-4 border-[#2A1408]"
             onTouchStart={(e) => {
               e.preventDefault();
-              // Trigger 'E' key logic
-              const ev = new KeyboardEvent('keydown', { key: 'e' });
-              window.dispatchEvent(ev);
+              keys.current['e'] = true;
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              keys.current['e'] = false;
             }}
           >
             <span className="text-[#2A1408] font-black text-xl">E</span>
@@ -1362,8 +1387,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
                  className="px-4 py-2 bg-black/60 border border-[#FFD700] text-[#FFD700] rounded-lg text-xs font-bold uppercase tracking-wider active:bg-[#FFD700]/20"
                  onTouchStart={(e) => {
                    e.preventDefault();
-                   const ev = new KeyboardEvent('keydown', { key: 'p' });
-                   window.dispatchEvent(ev);
+                   onOpenReflections?.();
                  }}
                >
                  Reflexionar
@@ -1374,8 +1398,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
                  className="px-4 py-2 bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] rounded-lg text-xs font-bold uppercase tracking-wider active:scale-95"
                  onTouchStart={(e) => {
                    e.preventDefault();
-                   const ev = new KeyboardEvent('keydown', { key: 'c' });
-                   window.dispatchEvent(ev);
+                   onOpenHelp?.();
                  }}
                >
                  Ayuda Creativa
@@ -1385,8 +1408,7 @@ export const Game2D: React.FC<Game2DProps> = ({ stage, appState, onPhraseSelect,
                className="px-4 py-2 bg-black/40 border border-[#FFD700]/50 text-white/80 rounded-lg text-xs font-bold uppercase tracking-wider active:bg-white/10"
                onTouchStart={(e) => {
                  e.preventDefault();
-                 const ev = new KeyboardEvent('keydown', { key: 'm' });
-                 window.dispatchEvent(ev);
+                 onOpenMenu?.();
                }}
              >
                Menú
