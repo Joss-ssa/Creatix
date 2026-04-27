@@ -387,7 +387,7 @@ export const Game2D: React.FC<Game2DProps> = ({
           const dy = touchControls.current.joystickCurrent.y - touchControls.current.joystickStart.y;
           
           playerState.current.yaw += dx * 0.0005; // Fixed inversion
-          playerState.current.pitch -= dy * 0.0005;
+          playerState.current.pitch += dy * 0.0005; // Inverted pitch control
           playerState.current.pitch = Math.max(-0.2, Math.min(0.2, playerState.current.pitch));
         }
 
@@ -1198,7 +1198,7 @@ export const Game2D: React.FC<Game2DProps> = ({
       }
 
       // 6. On-Screen Indication (Left Panel for Selected Phrases)
-      if (selectedPhrases.length > 0 && appState === 'PLAYING') {
+      if (selectedPhrases.length > 0 && appState === 'PLAYING' && stage !== 'NIEBLA' && stage !== 'EXPLORACION') {
         const panelWidth = isMobile ? 220 : 320;
         
         // Draw panel background
