@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X, Maximize, Minimize, Compass, SlidersHorizontal, Castle, Leaf, Play, Square, Smile, Settings2 } from 'lucide-react';
+import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X, Maximize, Minimize, Compass, SlidersHorizontal, Castle, Leaf, Play, Square, Smile, Settings2, Palette, Folder, Users, Settings, PlusCircle, Search, Bell, Zap, Paintbrush, LayoutGrid, TrendingUp } from 'lucide-react';
 import { Game2D } from './components/Game2D';
 import { ReflectionsModal } from './components/ReflectionsModal';
 import { HelpModal } from './components/HelpModal';
@@ -69,6 +69,11 @@ export default function App() {
   const [stage, setStage] = useState<Stage>('NIEBLA');
   const [currentPhrase, setCurrentPhrase] = useState<string>("");
   const [selectedPhrases, setSelectedPhrases] = useState<string[]>([]);
+  const [allSelectedPhrases, setAllSelectedPhrases] = useState<Record<Stage, string[]>>({
+    NIEBLA: [],
+    EXPLORACION: [],
+    CLARIDAD: []
+  });
   const [introPhrase, setIntroPhrase] = useState("");
   
   // New states for the requested flow
@@ -203,6 +208,15 @@ export default function App() {
     setSelectedPhrases(prev => {
       if (!prev.includes(currentPhrase)) {
         return [...prev, currentPhrase];
+      }
+      return prev;
+    });
+    setAllSelectedPhrases(prev => {
+      if (!prev[stage].includes(currentPhrase)) {
+        return {
+          ...prev,
+          [stage]: [...prev[stage], currentPhrase]
+        };
       }
       return prev;
     });
@@ -904,33 +918,39 @@ export default function App() {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="w-full max-w-[500px] h-[500px] bg-[#1C1A14]/95 border border-[#3E2900] rounded-2xl p-8 flex flex-col shadow-[0_0_40px_rgba(255,162,0,0.15)]"
+                        className="w-full max-w-[440px] h-auto min-h-[400px] bg-[#16140F]/95 rounded-3xl flex flex-col shadow-[0_0_40px_rgba(255,162,0,0.15)] overflow-hidden pb-8 mx-auto border border-white/5 backdrop-blur-xl"
                       >
-                         <Footprints className="w-12 h-12 text-[#FFA800] mb-6 drop-shadow-[0_0_15px_rgba(255,168,0,0.3)] fill-current" />
-                         <h2 className="text-2xl font-bold text-white tracking-[0.1em] mb-8 text-center uppercase">Acciones</h2>
-                         <div className="w-full h-px bg-[#3E2900] mb-8"></div>
+                         <div className="flex flex-col items-center pt-12 pb-10">
+                             <div className="w-24 h-24 rounded-full bg-[#2A1D0B] flex items-center justify-center mb-6">
+                               <Footprints className="w-12 h-12 text-[#FFA800]" fill="currentColor" />
+                             </div>
+                             <h2 className="text-[26px] font-bold text-white mb-2">Acciones</h2>
+                             <p className="text-[#FFA800] text-sm font-bold tracking-[0.15em] uppercase">COMPLETADAS</p>
+                         </div>
                          
-                         <div className="w-full flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar mb-8">
+                         <div className="w-full flex-1 flex flex-col mb-8 bg-[#1B1812] py-4">
                            {selectedPhrases.length > 0 ? (
                              selectedPhrases.map((phrase, idx) => (
-                               <div key={idx} className="w-full bg-[#110D0A] border border-[#3E2900] rounded-lg p-4 flex gap-4 items-start">
-                                 <span className="text-[#FFA800] font-bold text-[15px]">{idx + 1}.</span>
-                                 <p className="text-[#E2E2D5] text-[15px] leading-relaxed font-medium">{phrase}</p>
+                               <div key={idx} className="w-full px-8 py-5 flex gap-4 items-center">
+                                 <span className="text-[#FFA800] font-bold text-lg">{idx + 1}.</span>
+                                 <p className="text-[#FFA800] text-lg font-medium">{phrase}</p>
                                </div>
                              ))
                            ) : (
-                             <div className="flex-1 flex items-center justify-center">
+                             <div className="flex-1 flex items-center justify-center py-6">
                                <p className="text-[#E2E2D5]/50 text-sm text-center">Aún no has completado acciones en la claridad.</p>
                              </div>
                            )}
                          </div>
 
-                         <button
-                           onClick={() => setAppState('PLAYING')}
-                           className="w-full py-4 rounded-[20px] bg-transparent border border-[#FFA800] text-[#FFA800] text-xs font-bold tracking-[0.15em] uppercase hover:bg-[#FFA800]/10 transition-colors mt-auto"
-                         >
-                           CERRAR
-                         </button>
+                         <div className="px-8 mt-auto flex justify-center">
+                           <button
+                             onClick={() => setAppState('PLAYING')}
+                             className="py-3 px-8 rounded-full border border-[#FFA800]/50 text-[#FFA800] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#FFA800]/10 transition-colors"
+                           >
+                             Cerrar
+                           </button>
+                         </div>
                       </motion.div>
                     )}
 
@@ -1063,6 +1083,41 @@ export default function App() {
                   </button>
                 </div>
               </motion.div>
+            ) : stage === 'CLARIDAD' ? (
+              <motion.div
+                key="card-view-claridad"
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="w-full max-w-[480px] rounded-2xl bg-[#1C1A14]/90 border border-[#FFA200]/50 shadow-[0_0_40px_rgba(255,162,0,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden backdrop-blur-md"
+              >
+                <div className="mb-6">
+                  <Sun className="w-12 h-12 text-[#FFB800]" strokeWidth={1.5} />
+                </div>
+                
+                <h2 className="text-[32px] font-bold text-[#FFA800] uppercase tracking-wide mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+                  CLARIDAD
+                </h2>
+
+                <p className="text-[16px] text-[#E2E2D5] leading-[1.6] max-w-[320px] font-light mb-12">
+                  {currentPhrase}
+                </p>
+
+                <div className={`flex flex-col gap-3 w-full max-w-[340px] mt-4 z-10`}>
+                  <button
+                    onClick={handleAcceptPhrase}
+                    className="w-full py-4 rounded bg-transparent border border-[#FFA800] text-[#FFA800] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#FFA800]/10 transition-colors"
+                  >
+                    ENTENDIDO
+                  </button>
+                  <button
+                    onClick={() => setAppState('PLAYING')}
+                    className="w-full py-4 rounded bg-transparent border border-[#FFA800]/30 text-[#FFA800]/70 text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#FFA800]/10 hover:border-[#FFA800]/50 hover:text-[#FFA800] transition-colors"
+                  >
+                    VOLVER
+                  </button>
+                </div>
+              </motion.div>
             ) : (
               <motion.div
                 key="card-view"
@@ -1106,32 +1161,195 @@ export default function App() {
           </div>
         )}
         {appState === 'END_SCREEN' && (
-          <div className="absolute inset-0 flex items-center justify-center z-50 p-4 bg-black/80 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={`${isMobile ? 'p-6' : 'p-12'} max-w-xl w-full rounded-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_80px_rgba(255,215,0,0.6)] flex flex-col items-center text-center gap-6`}
-            >
-              <Sparkles className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} text-[#FFD700]`} />
-              <h2 className={`${isMobile ? 'text-3xl' : 'text-4xl'} font-extrabold text-[#FFD700] font-serif`}>¡Haz encontrado la luz!</h2>
-              <p className={`${isMobile ? 'text-base' : 'text-xl'} text-[#FDE68A] leading-relaxed font-serif`}>
-                Has creado nuevas ideas y tienes la capacidad de hacerlas realidad.
-              </p>
-              <button
-                onClick={() => {
-                  setStage('NIEBLA');
-                  setPhraseSelectedForStage(false);
-                  setCurrentPhrase("");
-                  setSelectedPhrases([]);
-                  setPhraseTimers({});
-                  setPhraseTimerRunning({});
-                  setAppState('START_MENU');
-                }}
-                className="mt-8 px-8 py-4 rounded-full bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-extrabold text-lg hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_20px_rgba(255,215,0,0.5)] hover:shadow-[0_0_40px_rgba(255,215,0,0.8)] active:scale-95 uppercase tracking-wider"
-              >
-                Volver al Inicio
-              </button>
-            </motion.div>
+          <div className="absolute inset-0 flex flex-row z-50 bg-[#16140F]">
+            
+            {/* Sidebar */}
+            <div className="w-[280px] bg-[#1C1A14] h-full border-r border-[#2C2A25] flex flex-col shrink-0">
+              <div className="px-8 pt-8 pb-6 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full border border-[#FFA800]/30 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+                  {/* Using a placeholder for avatar */}
+                  <div className="w-full h-full bg-[#3A3528]" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-extrabold text-[#FFA800] tracking-wide uppercase" style={{ fontFamily: '"Inter", sans-serif' }}>Creatix</h1>
+                  <p className="text-[#888377] text-xs font-light">Santuario Creativo</p>
+                </div>
+              </div>
+              
+              <nav className="flex flex-col gap-1 px-4 mt-6">
+                <button className="flex items-center gap-4 px-4 py-3 text-[#FFA800] bg-gradient-to-r from-[#594411] to-transparent border-l-[3px] border-[#FFA800] rounded-r-lg text-sm font-medium">
+                  <Palette className="w-5 h-5 shrink-0" />
+                  Hub Creativo
+                </button>
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg">
+                  <Sparkles className="w-5 h-5 shrink-0" />
+                  Inspiración
+                </button>
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg">
+                  <Folder className="w-5 h-5 shrink-0" />
+                  Mis Proyectos
+                </button>
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg mt-4">
+                  <Users className="w-5 h-5 shrink-0" />
+                  Comunidad
+                </button>
+              </nav>
+
+              <div className="mt-auto px-4 pb-8 flex flex-col gap-4">
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg">
+                  <Settings className="w-5 h-5 shrink-0" />
+                  Ajustes
+                </button>
+                <button 
+                  onClick={() => {
+                    setStage('NIEBLA');
+                    setPhraseSelectedForStage(false);
+                    setCurrentPhrase("");
+                    setSelectedPhrases([]);
+                    setAllSelectedPhrases({ NIEBLA: [], EXPLORACION: [], CLARIDAD: [] });
+                    setPhraseTimers({});
+                    setPhraseTimerRunning({});
+                    setAppState('START_MENU');
+                  }}
+                  className="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-[#FFA800] text-[#3E2900] font-bold hover:bg-[#FFB822] transition-colors shadow-md shadow-[#FFA800]/20"
+                >
+                  <PlusCircle className="w-5 h-5 shrink-0" />
+                  Nueva Creación
+                </button>
+              </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-cover bg-center" style={{ backgroundImage: 'linear-gradient(to bottom, rgba(28, 26, 20, 0.4), rgba(28, 26, 20, 0.95)), url("https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80")' }}>
+              
+              {/* Top Bar */}
+              <div className="px-10 py-8 flex justify-between items-center z-10">
+                <div className="text-[#A8A397] text-sm">
+                  Explorando / <span className="text-[#FFA800] font-medium">Hub Creativo</span>
+                </div>
+                
+                <div className="flex items-center gap-6">
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-[#888377] absolute left-4 top-1/2 -translate-y-1/2" />
+                    <input 
+                      type="text" 
+                      placeholder="Buscar ideas..." 
+                      className="bg-[#10100E]/80 border border-[#3A3832] text-[#E2DED5] placeholder:text-[#6a665a] rounded-full pl-11 pr-6 py-2 text-sm w-64 focus:outline-none focus:border-[#FFA800]/50"
+                    />
+                  </div>
+                  <button className="text-[#A8A397] hover:text-[#E2DED5] transition-colors relative">
+                    <Bell className="w-5 h-5" />
+                    <span className="w-2 h-2 rounded-full bg-[#FFA800] absolute top-0 right-0" />
+                  </button>
+                  <button className="text-[#A8A397] hover:text-[#E2DED5] transition-colors bg-[#10100E]/80 p-2 rounded-full border border-[#3A3832]">
+                    <Zap className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Main Content Padding/Scroll */}
+              <div className="flex-1 overflow-y-auto px-10 pb-12 z-10 flex flex-col gap-8">
+                
+                {/* Progress/Summary Timeline */}
+                <div className="w-full h-16 rounded-full bg-[#1C1A14]/80 border border-[#3A3832] relative flex items-center px-4 backdrop-blur-md shadow-lg mb-4">
+                  {/* Progress track */}
+                  <div className="absolute left-10 right-10 h-1 bg-[#2C2A25] rounded-full overflow-hidden">
+                     <div className="h-full bg-gradient-to-r from-[#888377] via-[#95E052] to-[#FFA800] w-full relative">
+                        <div className="absolute inset-0 bg-white/20 blur-sm"></div>
+                     </div>
+                  </div>
+                  {/* Nodes */}
+                  <div className="w-full relative z-10 flex justify-between px-6">
+                     <div className="w-8 h-8 rounded-full bg-[#3A3528] border-2 border-[#888377] shadow-[0_0_10px_rgba(136,131,119,0.5)]"></div>
+                     <div className="w-8 h-8 rounded-full bg-[#3A3528] border-2 border-[#95E052] shadow-[0_0_10px_rgba(149,224,82,0.5)]"></div>
+                     <div className="w-8 h-8 rounded-full bg-[#3A3528] border-2 border-[#FFA800] shadow-[0_0_15px_rgba(255,168,0,0.8)]"></div>
+                  </div>
+                </div>
+
+                <div className="text-center mb-2 mt-4">
+                  <h2 className="text-3xl font-bold text-white mb-2 tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>
+                    Has finalizado el juego
+                  </h2>
+                  <p className="text-[#A8A397] font-light">Puedes seguir en libertad de crear. Aquí tienes tu registro creativo.</p>
+                </div>
+
+                {/* Cards Grid: Summary of the 3 phases */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 pb-10 mt-4 h-[400px]">
+                  {/* Niebla Summary */}
+                  <div className="bg-[#1C1A14]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#888377]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
+                    <div className="flex items-center gap-4 mb-6 shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-[#888377]/20 flex items-center justify-center border border-[#888377]/30 group-hover:bg-[#888377]/30 transition-colors">
+                        <Cloud className="w-5 h-5 text-[#888377]" />
+                      </div>
+                      <div>
+                        <h3 className="text-[#FFFFFF] text-xl font-bold">La Niebla</h3>
+                        <p className="text-[#888377] text-xs font-medium uppercase tracking-wider">Emociones</p>
+                      </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
+                      {allSelectedPhrases.NIEBLA.length > 0 ? (
+                        allSelectedPhrases.NIEBLA.map((phrase, i) => (
+                           <div key={i} className="bg-[#110D0A] border border-[#2C2A25] rounded-xl p-4 text-[#A8A397] text-sm leading-relaxed">
+                             {phrase}
+                           </div>
+                        ))
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-[#888377]/50 text-sm">Sin registros.</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Exploracion Summary */}
+                  <div className="bg-[#1C1A14]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#95E052]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
+                    <div className="flex items-center gap-4 mb-6 shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-[#95E052]/20 flex items-center justify-center border border-[#95E052]/30 group-hover:bg-[#95E052]/30 transition-colors">
+                        <Footprints className="w-5 h-5 text-[#95E052]" />
+                      </div>
+                      <div>
+                        <h3 className="text-[#FFFFFF] text-xl font-bold">Exploración</h3>
+                        <p className="text-[#95E052] text-xs font-medium uppercase tracking-wider">Acciones</p>
+                      </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
+                      {allSelectedPhrases.EXPLORACION.length > 0 ? (
+                        allSelectedPhrases.EXPLORACION.map((phrase, i) => (
+                           <div key={i} className="bg-[#110D0A] border border-[#2EB045]/20 rounded-xl p-4 text-[#95E052] text-sm leading-relaxed">
+                             {phrase}
+                           </div>
+                        ))
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-[#888377]/50 text-sm">Sin registros.</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Claridad Summary */}
+                  <div className="bg-[#1C1A14]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#FFA800]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
+                    <div className="flex items-center gap-4 mb-6 shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-[#FFA800]/20 flex items-center justify-center border border-[#FFA800]/30 group-hover:bg-[#FFA800]/30 transition-colors">
+                        <Sun className="w-5 h-5 text-[#FFA800]" />
+                      </div>
+                      <div>
+                        <h3 className="text-[#FFFFFF] text-xl font-bold">Claridad</h3>
+                        <p className="text-[#FFA800] text-xs font-medium uppercase tracking-wider">Ejercicios</p>
+                      </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
+                      {allSelectedPhrases.CLARIDAD.length > 0 ? (
+                        allSelectedPhrases.CLARIDAD.map((phrase, i) => (
+                           <div key={i} className="bg-[#110D0A] border border-[#FFA800]/30 rounded-xl p-4 text-[#FFA800] text-sm leading-relaxed">
+                             {phrase}
+                           </div>
+                        ))
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-[#888377]/50 text-sm">Sin registros.</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
         )}
       </AnimatePresence>

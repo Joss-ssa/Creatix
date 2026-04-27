@@ -65,21 +65,44 @@ export function Player({ stage }: { stage: string }) {
 }
 
 // --- Environment Components ---
-function Tree({ position, scale = 1, color = "#2d4c1e" }: { position: [number, number, number], scale?: number, color?: string }) {
+function Tree({ position, scale = 1, leafColor = "#2d4c1e", trunkColor = "#4a3018", isNiebla = false }: { position: [number, number, number], scale?: number, leafColor?: string, trunkColor?: string, isNiebla?: boolean }) {
   return (
-    <group position={position} scale={scale}>
-      <mesh position={[0, 1, 0]}>
-        <cylinderGeometry args={[0.3, 0.5, 2]} />
-        <meshStandardMaterial color="#4a3018" />
+    <group position={position} scale={isNiebla ? scale * 1.5 : scale}>
+      <mesh position={[0, 1.5, 0]}>
+        <cylinderGeometry args={isNiebla ? [0.6, 1.2, 3] : [0.4, 0.6, 3]} />
+        <meshStandardMaterial color={trunkColor} roughness={0.9} />
       </mesh>
-      <mesh position={[0, 3, 0]}>
-        <coneGeometry args={[2, 5, 7]} />
-        <meshStandardMaterial color={color} roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 5, 0]}>
-        <coneGeometry args={[1.5, 4, 7]} />
-        <meshStandardMaterial color={color} roughness={0.8} />
-      </mesh>
+      {isNiebla ? (
+        <>
+          <mesh position={[0, 4.5, 0]}>
+            <sphereGeometry args={[2.5, 12, 12]} />
+            <meshStandardMaterial color={leafColor} roughness={0.9} />
+          </mesh>
+          <mesh position={[1.5, 5, 0]}>
+            <sphereGeometry args={[2, 12, 12]} />
+            <meshStandardMaterial color={leafColor} roughness={0.9} />
+          </mesh>
+          <mesh position={[-1.5, 4.8, 0]}>
+            <sphereGeometry args={[2.2, 12, 12]} />
+            <meshStandardMaterial color={leafColor} roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 6.5, 0]}>
+            <sphereGeometry args={[1.8, 12, 12]} />
+            <meshStandardMaterial color={leafColor} roughness={0.9} />
+          </mesh>
+        </>
+      ) : (
+        <>
+          <mesh position={[0, 3, 0]}>
+            <coneGeometry args={[2.5, 5, 8]} />
+            <meshStandardMaterial color={leafColor} roughness={0.8} />
+          </mesh>
+          <mesh position={[0, 5, 0]}>
+            <coneGeometry args={[1.8, 4, 8]} />
+            <meshStandardMaterial color={leafColor} roughness={0.8} />
+          </mesh>
+        </>
+      )}
     </group>
   );
 }
@@ -93,7 +116,21 @@ function Bush({ position, scale = 1, color = "#3a5f27" }: { position: [number, n
   );
 }
 
-function Flower({ position, color }: { position: [number, number, number], color: string }) {
+function Flower({ position, color, isNiebla = false }: { position: [number, number, number], color: string, isNiebla?: boolean }) {
+  if (isNiebla) {
+    return (
+      <group position={position}>
+        <mesh position={[0, 0.3, 0]}>
+          <coneGeometry args={[0.3, 0.3, 8]} />
+          <meshBasicMaterial color="#ffea7a" toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 0.15, 0]}>
+          <cylinderGeometry args={[0.08, 0.1, 0.3]} />
+          <meshStandardMaterial color="#618991" />
+        </mesh>
+      </group>
+    );
+  }
   return (
     <group position={position}>
       <mesh position={[0, 0.2, 0]}>
@@ -108,13 +145,29 @@ function Flower({ position, color }: { position: [number, number, number], color
   );
 }
 
+function Firefly({ position }: { position: [number, number, number] }) {
+  const ref = useRef<any>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.position.y += Math.sin(state.clock.elapsedTime * 2 + position[0]) * 0.005;
+      ref.current.position.x += Math.cos(state.clock.elapsedTime * 1.5 + position[2]) * 0.005;
+    }
+  });
+  return (
+    <mesh ref={ref} position={position}>
+      <sphereGeometry args={[0.08, 4, 4]} />
+      <meshBasicMaterial color="#ffca4a" toneMapped={false} />
+    </mesh>
+  );
+}
+
 export function Environment({ stage }: { stage: string }) {
   const { scene } = useThree();
 
   useEffect(() => {
     if (stage === 'NIEBLA') {
-      scene.fog = new FogExp2(0xa0aab5, 0.025);
-      scene.background = new Color(0xa0aab5);
+      scene.fog = new FogExp2(0x172e42, 0.035);
+      scene.background = new Color(0x172e42);
     } else if (stage === 'EXPLORACION') {
       scene.fog = new FogExp2(0xffe4c4, 0.015);
       scene.background = new Color(0xffe4c4);
@@ -124,19 +177,50 @@ export function Environment({ stage }: { stage: string }) {
     }
   }, [stage, scene]);
 
-  const pathColor = "#e8c327"; // Yellow brick road
-  const grassColor = "#5cb827"; // Vibrant green
-  const treeColor = stage === 'NIEBLA' ? "#3a5f27" : "#4caf50";
+  const pathColor = stage === 'NIEBLA' ? "#122a36" : "#e8c327"; 
+  const grassColor = stage === 'NIEBLA' ? "#183f47" : "#5cb827"; 
+  const treeLeafColor = stage === 'NIEBLA' ? "#1f4860" : "#4caf50";
+  const trunkColor = stage === 'NIEBLA' ? "#0f1c24" : "#4a3018";
+  const bushColor = stage === 'NIEBLA' ? "#1a3b4a" : "#3a5f27";
 
   return (
     <>
-      <ambientLight intensity={stage === 'NIEBLA' ? 0.4 : 0.7} />
+      <ambientLight intensity={stage === 'NIEBLA' ? 0.35 : 0.7} color={stage === 'NIEBLA' ? "#4581a3" : "#ffffff"} />
       <directionalLight 
-        position={[20, 30, 10]} 
-        intensity={stage === 'CLARIDAD' ? 1.5 : stage === 'EXPLORACION' ? 1.2 : 0.8} 
-        color={stage === 'EXPLORACION' ? "#ffeedd" : "#ffffff"}
+        position={stage === 'NIEBLA' ? [0, 50, -80] : [20, 30, 10]} 
+        intensity={stage === 'CLARIDAD' ? 1.5 : stage === 'EXPLORACION' ? 1.2 : stage === 'NIEBLA' ? 0.8 : 0.8} 
+        color={stage === 'EXPLORACION' ? "#ffeedd" : stage === 'NIEBLA' ? "#8fccf2" : "#ffffff"}
       />
       
+      {stage === 'NIEBLA' && (
+        <>
+          {/* Moon */}
+          <Billboard position={[0, 40, -100]}>
+            <mesh>
+              <circleGeometry args={[12, 32]} />
+              <meshBasicMaterial color="#ffffff" toneMapped={false} />
+            </mesh>
+            <mesh position={[2, 2, 0.1]}>
+               <circleGeometry args={[11, 32]} />
+               <meshBasicMaterial color="#172e42" toneMapped={false} />
+            </mesh>
+          </Billboard>
+          {/* Stars */}
+          <Stars radius={100} depth={50} count={2000} factor={3} saturation={0} fade speed={0.5} />
+          {/* Fireflies */}
+          {[...Array(100)].map((_, i) => (
+             <Firefly 
+                key={i} 
+                position={[
+                   (Math.random() - 0.5) * 50, 
+                   0.5 + Math.random() * 10, 
+                   -Math.random() * 140
+                ]} 
+             />
+          ))}
+        </>
+      )}
+
       {stage === 'CLARIDAD' && (
         <>
           <Sky sunPosition={[100, 20, 100]} turbidity={0.1} rayleigh={0.5} />
@@ -147,15 +231,15 @@ export function Environment({ stage }: { stage: string }) {
       {/* Mountains */}
       <mesh position={[-40, -5, -100]} rotation={[-Math.PI / 2, 0, 0]}>
         <coneGeometry args={[50, 60, 16]} />
-        <meshStandardMaterial color="#3a7a3a" roughness={1} />
+        <meshStandardMaterial color={stage === 'NIEBLA' ? "#142d38" : "#3a7a3a"} roughness={1} />
       </mesh>
       <mesh position={[40, -5, -120]} rotation={[-Math.PI / 2, 0, 0]}>
         <coneGeometry args={[60, 80, 16]} />
-        <meshStandardMaterial color="#2a5a2a" roughness={1} />
+        <meshStandardMaterial color={stage === 'NIEBLA' ? "#10232e" : "#2a5a2a"} roughness={1} />
       </mesh>
       <mesh position={[0, -5, -150]} rotation={[-Math.PI / 2, 0, 0]}>
         <coneGeometry args={[80, 100, 16]} />
-        <meshStandardMaterial color="#4a8a4a" roughness={1} />
+        <meshStandardMaterial color={stage === 'NIEBLA' ? "#183340" : "#4a8a4a"} roughness={1} />
       </mesh>
 
       {/* Main Ground (Grass) */}
@@ -167,7 +251,7 @@ export function Environment({ stage }: { stage: string }) {
       {/* River */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.2, -30]}>
         <planeGeometry args={[300, 15]} />
-        <meshStandardMaterial color="#85c1e9" roughness={0.1} transparent opacity={0.8} />
+        <meshStandardMaterial color={stage === 'NIEBLA' ? "#28607a" : "#85c1e9"} roughness={0.1} transparent opacity={0.8} />
       </mesh>
 
       {/* The Path (Yellow Brick Road) */}
@@ -179,11 +263,11 @@ export function Environment({ stage }: { stage: string }) {
       {/* Bridge over River */}
       <mesh rotation={[-Math.PI / 2 + 0.1, 0, 0]} position={[0, 0.5, -26]}>
         <planeGeometry args={[8, 8]} />
-        <meshStandardMaterial color="#d4a017" roughness={0.9} />
+        <meshStandardMaterial color={stage === 'NIEBLA' ? "#1b2a30" : "#d4a017"} roughness={0.9} />
       </mesh>
       <mesh rotation={[-Math.PI / 2 - 0.1, 0, 0]} position={[0, 0.5, -34]}>
         <planeGeometry args={[8, 8]} />
-        <meshStandardMaterial color="#d4a017" roughness={0.9} />
+        <meshStandardMaterial color={stage === 'NIEBLA' ? "#1b2a30" : "#d4a017"} roughness={0.9} />
       </mesh>
 
       {/* Segment 2 */}
@@ -203,12 +287,12 @@ export function Environment({ stage }: { stage: string }) {
         const scale = 0.8 + Math.random() * 0.8;
 
         if (type > 0.6) {
-          return <Tree key={i} position={[x, 0, z]} scale={scale} color={treeColor} />;
+          return <Tree key={i} position={[x, 0, z]} scale={scale} leafColor={treeLeafColor} trunkColor={trunkColor} isNiebla={stage === 'NIEBLA'} />;
         } else if (type > 0.3) {
-          return <Bush key={i} position={[x, 0.5, z]} scale={scale} color={treeColor} />;
+          return <Bush key={i} position={[x, 0.5, z]} scale={scale} color={bushColor} />;
         } else {
           const flowerColor = Math.random() > 0.5 ? "#ff4444" : "#ffffff";
-          return <Flower key={i} position={[x * 0.7, 0, z]} color={flowerColor} />;
+          return <Flower key={i} position={[x * 0.7, 0, z]} color={stage === 'NIEBLA' ? "#3e803e" : flowerColor} />;
         }
       })}
     </>
