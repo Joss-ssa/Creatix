@@ -587,7 +587,7 @@ export default function App() {
                         onClick={() => setExploracionMenuTab('intro')}
                       >
                          <Compass className={`w-5 h-5 ${exploracionMenuTab === 'intro' ? 'text-[#FF9CB1]' : ''}`} />
-                         <span className="font-medium text-[13px] tracking-wide">Inicio</span>
+                         <span className="font-medium text-[13px] tracking-wide">Exploración</span>
                       </div>
                       <div 
                         className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${exploracionMenuTab === 'acciones' ? 'bg-[#2C1625] text-[#FF9CB1] border-l-2 border-[#FF9CB1]' : 'text-[#FFE5EC]/60 hover:text-[#FF9CB1] hover:bg-[#2A1629]'}`}
