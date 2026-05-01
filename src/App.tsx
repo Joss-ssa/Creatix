@@ -82,8 +82,12 @@ export default function App() {
     const baseList = stage === 'NIEBLA' ? NIEBLA_PHRASES : 
                      stage === 'EXPLORACION' ? EXPLORACION_ACTIONS : 
                      CLARIDAD_EXERCISES;
-    // Shuffle the list
-    setShuffledPhrasesList([...baseList].sort(() => Math.random() - 0.5));
+    // Shuffle the list only for EXPLORACION
+    if (stage === 'EXPLORACION') {
+      setShuffledPhrasesList([...baseList].sort(() => Math.random() - 0.5));
+    } else {
+      setShuffledPhrasesList(baseList);
+    }
   }, [stage, gameSessionId]);
   const [introPhrase, setIntroPhrase] = useState("");
   
@@ -94,6 +98,7 @@ export default function App() {
   const [showMHint, setShowMHint] = useState(false);
   const [hasShownControlsForStage, setHasShownControlsForStage] = useState(false);
   const [showReflectionsModal, setShowReflectionsModal] = useState(false);
+  const [userReflections, setUserReflections] = useState<{report: string, answers: Record<string, string>, timestamp: number}[]>([]);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -283,8 +288,6 @@ export default function App() {
           } else if (stage === 'CLARIDAD') {
             setClaridadMenuTab('controles');
             setAppState('STAGE_INTRO');
-          } else {
-            setShowControlsMenu(true);
           }
         }}
         onOpenReflections={() => setShowReflectionsModal(true)}
@@ -608,12 +611,6 @@ export default function App() {
                          <span className="font-medium text-[13px] tracking-wide">Reflexiones</span>
                       </div>
                     </div>
-                    <div className="px-6 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#2C1625] flex items-center justify-center text-[#FF9CB1] border border-[#FF9CB1]/30">
-                        <span className="text-xs font-serif italic">R</span>
-                      </div>
-                      <span className="text-[#FFE5EC]/60 text-xs tracking-wide">Reflexión Interior</span>
-                    </div>
                   </div>
                 )}
 
@@ -714,15 +711,23 @@ export default function App() {
                         <div className="w-full h-px bg-[#3D1C34] mb-8"></div>
                         
                         <div className="w-full flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar mb-8">
-                          {selectedPhrases.length > 0 ? (
-                            selectedPhrases.map((phrase, idx) => (
-                              <div key={idx} className="w-full bg-[#2A1629] border border-[#FFB3C6] rounded-lg p-4">
-                                <p className="text-[#FFE5EC] text-sm italic">"{phrase}"</p>
-                              </div>
-                            ))
+                          {selectedPhrases.length > 0 || userReflections.length > 0 ? (
+                            <>
+                              {selectedPhrases.map((phrase, idx) => (
+                                <div key={idx} className="w-full bg-[#2A1629] border border-[#FFB3C6]/50 rounded-lg p-4">
+                                  <p className="text-[#FFE5EC] text-sm italic">Acción: "{phrase}"</p>
+                                </div>
+                              ))}
+                              {userReflections.map((ref, idx) => (
+                                <div key={`ref-${idx}`} className="w-full bg-[#3D1C34] border border-[#FF9CB1] rounded-lg p-4">
+                                  <h4 className="text-[#FF9CB1] text-xs font-bold uppercase mb-2">Reflexión - {new Date(ref.timestamp).toLocaleTimeString()}</h4>
+                                  <p className="text-[#FFE5EC] text-sm mb-2 opacity-80">{ref.report}</p>
+                                </div>
+                              ))}
+                            </>
                           ) : (
                             <div className="flex-1 flex items-center justify-center flex-col gap-4">
-                              <p className="text-[#FFE5EC]/50 text-sm text-center">Aún no has elegido ninguna acción en este camino.</p>
+                              <p className="text-[#FFE5EC]/50 text-sm text-center">Aún no has elegido ninguna acción ni escrito reflexiones.</p>
                             </div>
                           )}
                         </div>
@@ -1023,12 +1028,28 @@ export default function App() {
                    <p className="text-[#FFF0F4] text-[15px] font-medium leading-relaxed italic drop-shadow-md">"{currentPhrase}"</p>
                 </div>
 
-                <div className="w-48 h-48 rounded-full border-[3px] border-[#FF9CB1] shadow-[0_0_25px_rgba(255,156,177,0.3),inset_0_0_25px_rgba(255,156,177,0.3)] flex items-center justify-center mb-10 relative">
+                <div className="w-48 h-48 rounded-full border-[3px] border-[#FF9CB1] shadow-[0_0_25px_rgba(255,156,177,0.3),inset_0_0_25px_rgba(255,156,177,0.3)] flex items-center justify-center mb-6 relative">
                   <div className="absolute inset-0 rounded-full border border-[#FF9CB1]/20 blur-[2px]"></div>
                   <div className="text-[56px] font-bold text-[#FF9CB1] tracking-tighter drop-shadow-md" style={{ fontFamily: '"Playfair Display", serif' }}>
                     {Math.floor(currentTimeLeft / 60)}:{(currentTimeLeft % 60).toString().padStart(2, '0')}
                   </div>
                 </div>
+
+                {!currentIsRunning && (
+                  <div className="flex justify-center gap-3 mb-8 w-full">
+                    {[1, 3, 5, 10].map(mins => (
+                      <button
+                        key={mins}
+                        onClick={() => {
+                          setPhraseTimers(prev => ({...prev, [currentPhrase]: mins * 60}));
+                        }}
+                        className="px-3 py-1.5 rounded bg-[#2C1625] text-[#FFB3C6] hover:bg-[#3D1C34] hover:text-[#FFF0F4] text-[10px] font-bold tracking-wider transition-colors border border-[#FFB3C6]/30"
+                      >
+                        {mins}M
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <div className="w-full flex flex-col gap-4">
                   <button
@@ -1341,7 +1362,10 @@ export default function App() {
       </AnimatePresence>
 
       {showReflectionsModal && (
-        <ReflectionsModal onClose={() => setShowReflectionsModal(false)} />
+        <ReflectionsModal 
+           onClose={() => setShowReflectionsModal(false)} 
+           onSaveReflections={(reflection) => setUserReflections(prev => [...prev, reflection])}
+        />
       )}
 
       {showHelpModal && (

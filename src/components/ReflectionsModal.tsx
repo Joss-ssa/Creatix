@@ -4,9 +4,10 @@ import { GoogleGenAI } from '@google/genai';
 
 interface ReflectionsModalProps {
   onClose: () => void;
+  onSaveReflections: (reflection: { report: string, answers: Record<string, string>, timestamp: number }) => void;
 }
 
-export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({ onClose }) => {
+export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({ onClose, onSaveReflections }) => {
   const [answers, setAnswers] = useState({
     q1: '',
     q2: '',
@@ -39,7 +40,13 @@ Sus respuestas:
         contents: prompt,
       });
 
-      setReport(response.text || "Gracias por compartir tus reflexiones. ¡Sigue adelante con esa misma energía!");
+      const finalReport = response.text || "Gracias por compartir tus reflexiones. ¡Sigue adelante con esa misma energía!";
+      setReport(finalReport);
+      onSaveReflections({
+        report: finalReport,
+        answers: { ...answers },
+        timestamp: Date.now()
+      });
     } catch (error) {
       console.error("Error generating report:", error);
       setReport("Gracias por compartir tus reflexiones. Ha habido un pequeño error al generar tu reporte, pero tus pensamientos son muy valiosos. ¡Sigue adelante!");

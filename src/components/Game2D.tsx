@@ -936,7 +936,8 @@ export const Game2D: React.FC<Game2DProps> = ({
 
           // Glowing Gold Border
           const isNiebla = stage === 'NIEBLA';
-          const defaultArchColor = isNiebla ? '#8BE8B9' : '#FFD700';
+          const isExploracion = stage === 'EXPLORACION';
+          const defaultArchColor = isNiebla ? '#8BE8B9' : (isExploracion ? '#FF9CB1' : '#FFD700');
 
           ctx.strokeStyle = isSelected ? '#FFFFFF' : defaultArchColor;
           ctx.lineWidth = 3;
@@ -952,12 +953,12 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.lineTo(20, archY + pillarW + 10);
           ctx.lineTo(-20, archY + pillarW + 10);
           ctx.closePath();
-          ctx.fillStyle = isSelected ? '#FFF8DC' : (isNiebla ? '#1B3024' : '#333333');
+          ctx.fillStyle = isSelected ? '#FFF8DC' : (isNiebla ? '#1B3024' : (isExploracion ? '#2C1625' : '#333333'));
           ctx.fill();
           ctx.stroke();
 
           // Add pillar bases
-          ctx.fillStyle = isSelected ? '#FFF8DC' : (isNiebla ? '#1B3024' : '#222222');
+          ctx.fillStyle = isSelected ? '#FFF8DC' : (isNiebla ? '#1B3024' : (isExploracion ? '#2A1629' : '#222222'));
           ctx.fillRect(archX - 15, -40, pillarW + 30, 40);
           ctx.strokeRect(archX - 15, -40, pillarW + 30, 40);
           ctx.fillRect(archX + archW - pillarW - 15, -40, pillarW + 30, 40);
@@ -1020,7 +1021,7 @@ export const Game2D: React.FC<Game2DProps> = ({
 
           // Magic Pulsing Dot (at the keystone)
           const pulse = (Math.sin(Date.now() / 150) + 1) / 2;
-          ctx.fillStyle = isSelected ? `rgba(255, 255, 255, ${0.6 + pulse * 0.4})` : (isNiebla ? `rgba(139, 232, 185, ${0.4 + pulse * 0.6})` : `rgba(241, 196, 15, ${0.4 + pulse * 0.6})`);
+          ctx.fillStyle = isSelected ? `rgba(255, 255, 255, ${0.6 + pulse * 0.4})` : (isNiebla ? `rgba(139, 232, 185, ${0.4 + pulse * 0.6})` : (isExploracion ? `rgba(255, 156, 177, ${0.4 + pulse * 0.6})` : `rgba(241, 196, 15, ${0.4 + pulse * 0.6})`));
           ctx.beginPath();
           ctx.arc(0, archY - 5, 10 + pulse * 5, 0, Math.PI*2);
           ctx.fill();
@@ -1252,12 +1253,13 @@ export const Game2D: React.FC<Game2DProps> = ({
       // 7. Interaction UI
       if (interactionText && appState === 'PLAYING') {
         const isNiebla = stage === 'NIEBLA';
+        const isExploracion = stage === 'EXPLORACION';
         const boxWidth = isMobile ? 320 : 400;
         const boxHeight = 50;
         const startX = canvas.width/2 - boxWidth/2;
         const startY = canvas.height - 120;
         
-        ctx.fillStyle = isNiebla ? 'rgba(15, 30, 22, 0.8)' : 'rgba(0, 0, 0, 0.75)';
+        ctx.fillStyle = isNiebla ? 'rgba(15, 30, 22, 0.8)' : (isExploracion ? 'rgba(25, 21, 34, 0.8)' : 'rgba(0, 0, 0, 0.75)');
         ctx.beginPath();
         ctx.roundRect(startX, startY, boxWidth, boxHeight, 25);
         ctx.fill();
@@ -1266,12 +1268,19 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.strokeStyle = '#1B3024';
           ctx.lineWidth = 2;
           ctx.stroke();
+        } else if (isExploracion) {
+          ctx.strokeStyle = '#3D1C34';
+          ctx.lineWidth = 2;
+          ctx.stroke();
         }
         
-        ctx.fillStyle = isNiebla ? '#8BE8B9' : 'white';
+        ctx.fillStyle = isNiebla ? '#8BE8B9' : (isExploracion ? '#FF9CB1' : 'white');
         ctx.font = 'bold 16px "Inter", sans-serif';
         if (isNiebla) {
            ctx.shadowColor = 'rgba(139, 232, 185, 0.4)';
+           ctx.shadowBlur = 10;
+        } else if (isExploracion) {
+           ctx.shadowColor = 'rgba(255, 156, 177, 0.4)';
            ctx.shadowBlur = 10;
         }
         ctx.textAlign = 'center';
