@@ -1205,12 +1205,13 @@ export const Game2D: React.FC<Game2DProps> = ({
       if (selectedPhrases.length > 0 && appState === 'PLAYING' && stage !== 'NIEBLA' && stage !== 'EXPLORACION') {
         const panelWidth = isMobile ? 220 : 320;
         
+        const panelColor = stage === 'NIEBLA' ? '#8BE8B9' : (stage === 'EXPLORACION' ? '#FF9CB1' : (stage === 'CLARIDAD' ? '#00E676' : '#FFD700'));
         // Draw panel background
         ctx.fillStyle = 'rgba(10, 15, 20, 0.85)';
         ctx.fillRect(0, 0, panelWidth, canvas.height);
         
         // Draw panel border
-        ctx.strokeStyle = '#FFD700';
+        ctx.strokeStyle = panelColor;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(panelWidth, 0);
@@ -1218,8 +1219,8 @@ export const Game2D: React.FC<Game2DProps> = ({
         ctx.stroke();
 
         // Title
-        ctx.fillStyle = '#FFD700';
-        ctx.font = `bold ${isMobile ? '16px' : '22px'} "Playfair Display", serif`;
+        ctx.fillStyle = panelColor;
+        ctx.font = `bold ${isMobile ? '16px' : '22px'} "Inter", sans-serif`;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
         let panelTitle = 'Selección:';
@@ -1242,9 +1243,9 @@ export const Game2D: React.FC<Game2DProps> = ({
         let currentY = 100;
         
         selectedPhrases.forEach((phrase, idx) => {
-          ctx.fillStyle = '#FFD700';
+          ctx.fillStyle = panelColor;
           ctx.fillText(`${idx + 1}.`, 20, currentY);
-          ctx.fillStyle = '#FFF8DC';
+          ctx.fillStyle = stage === 'CLARIDAD' ? '#F1F8E9' : '#FFF8DC';
           currentY = wrapText(ctx, phrase, 40, currentY, panelWidth - 60, isMobile ? 18 : 24);
           currentY += isMobile ? 10 : 15; // Spacing between phrases
         });

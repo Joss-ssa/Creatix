@@ -105,7 +105,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full relative overflow-y-auto w-full">
         <div className="absolute top-6 right-8 z-20 flex gap-6 items-center">
-          <button className="text-[#888377] hover:text-[#FFA800] transition-colors">
+          <button className="text-[#888377] hover:text-[#00E676] transition-colors">
             <Settings className="w-5 h-5" />
           </button>
           <button onClick={onClose} className="text-[#888377] hover:text-white transition-colors bg-[#2C2A25] p-2 rounded-full">
@@ -117,7 +117,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
           
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-[54px] font-bold text-[#FFECCC] mb-3 tracking-tight drop-shadow-md" style={{ fontFamily: '"Inter", sans-serif' }}>Ayuda Creativa</h1>
+            <h1 className="text-[54px] font-bold text-[#F1F8E9] mb-3 tracking-tight drop-shadow-md">Ayuda Creativa</h1>
             <p className="text-[#A8A397] text-lg font-light tracking-wide">Escribe tus ideas sueltas y deja que la magia te inspire.</p>
           </div>
 
@@ -133,7 +133,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
               <button
                 onClick={() => generateContent('all')}
                 disabled={loadingState.all || !ideaInput}
-                className="px-6 py-3 rounded-full bg-[#FFA800] text-[#3E2900] font-bold hover:bg-[#FFB822] hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,168,0,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-3 rounded-full bg-[#00E676] text-[#004D40] font-bold hover:bg-[#B9F6CA] hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,230,118,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {loadingState.all ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                 <span className="text-sm">Generar Magia</span>
@@ -147,13 +147,13 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
             {/* Ideas / Conceptos */}
             <div className="bg-[#16140F]/60 border border-[#3A3832] rounded-xl p-6 backdrop-blur-sm shadow-md flex flex-col relative group">
               <div className="flex items-center gap-3 mb-6 pr-8">
-                <Lightbulb className="w-5 h-5 text-[#95E052]" />
+                <Lightbulb className="w-5 h-5 text-[#00E676]" />
                 <h3 className="text-[#E2DED5] font-medium text-lg tracking-wide">Ideas / Conceptos</h3>
               </div>
               <button 
                 onClick={() => generateContent('ideas')} 
                 disabled={loadingState.all || loadingState.ideas || !ideaInput} 
-                className="absolute top-6 right-6 text-[#888377] hover:text-[#95E052] transition-colors disabled:opacity-50"
+                className="absolute top-6 right-6 text-[#888377] hover:text-[#00E676] transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${loadingState.ideas ? 'animate-spin' : ''}`} />
               </button>
@@ -169,13 +169,13 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
             {/* Paleta de Colores */}
             <div className="bg-[#16140F]/60 border border-[#3A3832] rounded-xl p-6 backdrop-blur-sm shadow-md flex flex-col relative group">
               <div className="flex items-center gap-3 mb-6 pr-8">
-                <Palette className="w-5 h-5 text-[#FFA800]" />
+                <Palette className="w-5 h-5 text-[#00E676]" />
                 <h3 className="text-[#E2DED5] font-medium text-lg tracking-wide">Paleta de Colores</h3>
               </div>
               <button 
                 onClick={() => generateContent('palette')} 
                 disabled={loadingState.all || loadingState.palette || !ideaInput} 
-                className="absolute top-6 right-6 text-[#888377] hover:text-[#FFA800] transition-colors disabled:opacity-50"
+                className="absolute top-6 right-6 text-[#888377] hover:text-[#00E676] transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${loadingState.palette ? 'animate-spin' : ''}`} />
               </button>
@@ -195,13 +195,13 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
             {/* Elementos Random */}
             <div className="bg-[#16140F]/60 border border-[#3A3832] rounded-xl p-6 backdrop-blur-sm shadow-md flex flex-col relative group">
               <div className="flex items-center gap-3 mb-6 pr-8">
-                <Puzzle className="w-5 h-5 text-[#95E052]" />
+                <Puzzle className="w-5 h-5 text-[#00E676]" />
                 <h3 className="text-[#E2DED5] font-medium text-lg tracking-wide">Elementos Random</h3>
               </div>
               <button 
                 onClick={() => generateContent('elements')} 
                 disabled={loadingState.all || loadingState.elements || !ideaInput} 
-                className="absolute top-6 right-6 text-[#888377] hover:text-[#95E052] transition-colors disabled:opacity-50"
+                className="absolute top-6 right-6 text-[#888377] hover:text-[#00E676] transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${loadingState.elements ? 'animate-spin' : ''}`} />
               </button>
