@@ -74,6 +74,17 @@ export default function App() {
     EXPLORACION: [],
     CLARIDAD: []
   });
+  const [shuffledPhrasesList, setShuffledPhrasesList] = useState<string[]>([]);
+  const [gameSessionId, setGameSessionId] = useState(0);
+
+  // Calculate base phrases for current stage
+  useEffect(() => {
+    const baseList = stage === 'NIEBLA' ? NIEBLA_PHRASES : 
+                     stage === 'EXPLORACION' ? EXPLORACION_ACTIONS : 
+                     CLARIDAD_EXERCISES;
+    // Shuffle the list
+    setShuffledPhrasesList([...baseList].sort(() => Math.random() - 0.5));
+  }, [stage, gameSessionId]);
   const [introPhrase, setIntroPhrase] = useState("");
   
   // New states for the requested flow
@@ -150,33 +161,26 @@ export default function App() {
   // M key listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'm' && appState === 'PLAYING') {
-        if (stage === 'NIEBLA') {
-          setNieblaMenuTab('controles');
-          setAppState('STAGE_INTRO');
-        } else if (stage === 'EXPLORACION') {
-          setExploracionMenuTab('controles');
-          setAppState('STAGE_INTRO');
-        } else if (stage === 'CLARIDAD') {
-          setClaridadMenuTab('controles');
-          setAppState('STAGE_INTRO');
-        } else {
-          setShowControlsMenu(prev => {
-            const next = !prev;
-            if (next) {
-              setShowMHint(false);
-            } else {
-              setShowMHint(true);
-              setHasShownControlsForStage(true); // Mark as shown if manually closed
-            }
-            return next;
-          });
+      if (e.key.toLowerCase() === 'm') {
+        if (appState === 'PLAYING') {
+          if (stage === 'NIEBLA') {
+            setNieblaMenuTab('controles');
+            setAppState('STAGE_INTRO');
+          } else if (stage === 'EXPLORACION') {
+            setExploracionMenuTab('controles');
+            setAppState('STAGE_INTRO');
+          } else if (stage === 'CLARIDAD') {
+            setClaridadMenuTab('controles');
+            setAppState('STAGE_INTRO');
+          }
+        } else if (appState === 'STAGE_INTRO') {
+          setAppState('PLAYING');
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [appState]);
+  }, [appState, stage]);
 
   // Timer logic
   useEffect(() => {
@@ -243,11 +247,6 @@ export default function App() {
     setAppState('STAGE_INTRO');
   };
 
-  const currentPhrasesList = 
-    stage === 'NIEBLA' ? NIEBLA_PHRASES : 
-    stage === 'EXPLORACION' ? EXPLORACION_ACTIONS : 
-    CLARIDAD_EXERCISES;
-
   const currentTimeLeft = currentPhrase && phraseTimers[currentPhrase] !== undefined ? phraseTimers[currentPhrase] : 300;
   const currentIsRunning = currentPhrase ? !!phraseTimerRunning[currentPhrase] : false;
 
@@ -269,7 +268,7 @@ export default function App() {
         stage={stage} 
         appState={appState}
         onPhraseSelect={handlePhraseSelect} 
-        phrases={currentPhrasesList}
+        phrases={shuffledPhrasesList}
         hasSelectedPhrase={phraseSelectedForStage}
         selectedPhrases={selectedPhrases}
         onEnterTunnel={handleEnterTunnel}
@@ -430,10 +429,6 @@ export default function App() {
                       <p className="text-[#34D399]/60 text-[11px] uppercase tracking-wider font-light mt-1">Modo Inmersivo</p>
                     </div>
                     <div className="flex flex-col flex-1">
-                      <div className="flex items-center gap-4 px-8 py-4 w-full text-[#34D399]/40 hover:text-[#34D399]/70 cursor-pointer transition-colors">
-                         <Compass className="w-5 h-5" />
-                         <span className="font-medium text-[13px] tracking-wide">Exploración</span>
-                      </div>
                       <div 
                         className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${nieblaMenuTab === 'intro' ? 'bg-[#0B2A1E] text-[#34D399]' : 'text-[#34D399]/40 hover:text-[#34D399]/70'}`}
                         onClick={() => setNieblaMenuTab('intro')}
@@ -455,16 +450,6 @@ export default function App() {
                          <Leaf className={`w-5 h-5 ${nieblaMenuTab === 'emociones' ? 'fill-current' : ''}`} />
                          <span className="font-medium text-[13px] tracking-wide">Emociones</span>
                       </div>
-                      <div className="flex items-center gap-4 px-8 py-4 w-full text-[#34D399]/40 hover:text-[#34D399]/70 cursor-pointer transition-colors">
-                         <Castle className="w-5 h-5" />
-                         <span className="font-medium text-[13px] tracking-wide">Santuario</span>
-                      </div>
-                    </div>
-                    <div className="px-6 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#0B2A1E] flex items-center justify-center text-[#34D399]">
-                        <span className="text-xs">&Psi;</span>
-                      </div>
-                      <span className="text-[#34D399]/60 text-xs tracking-wide">Espíritu del Bosque</span>
                     </div>
                   </div>
                 )}
@@ -1210,6 +1195,7 @@ export default function App() {
                     setPhraseTimers({});
                     setPhraseTimerRunning({});
                     setAppState('START_MENU');
+                    setGameSessionId(prev => prev + 1);
                   }}
                   className="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-[#FFA800] text-[#3E2900] font-bold hover:bg-[#FFB822] transition-colors shadow-md shadow-[#FFA800]/20"
                 >

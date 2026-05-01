@@ -935,9 +935,12 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.fill();
 
           // Glowing Gold Border
-          ctx.strokeStyle = isSelected ? '#FFFFFF' : '#FFD700';
+          const isNiebla = stage === 'NIEBLA';
+          const defaultArchColor = isNiebla ? '#8BE8B9' : '#FFD700';
+
+          ctx.strokeStyle = isSelected ? '#FFFFFF' : defaultArchColor;
           ctx.lineWidth = 3;
-          ctx.shadowColor = isSelected ? '#FFFFFF' : '#FFD700';
+          ctx.shadowColor = isSelected ? '#FFFFFF' : defaultArchColor;
           ctx.shadowBlur = isSelected ? 30 : 15;
           ctx.stroke();
           ctx.shadowBlur = 0;
@@ -949,12 +952,12 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.lineTo(20, archY + pillarW + 10);
           ctx.lineTo(-20, archY + pillarW + 10);
           ctx.closePath();
-          ctx.fillStyle = isSelected ? '#FFF8DC' : '#333333';
+          ctx.fillStyle = isSelected ? '#FFF8DC' : (isNiebla ? '#1B3024' : '#333333');
           ctx.fill();
           ctx.stroke();
 
           // Add pillar bases
-          ctx.fillStyle = isSelected ? '#FFF8DC' : '#222222';
+          ctx.fillStyle = isSelected ? '#FFF8DC' : (isNiebla ? '#1B3024' : '#222222');
           ctx.fillRect(archX - 15, -40, pillarW + 30, 40);
           ctx.strokeRect(archX - 15, -40, pillarW + 30, 40);
           ctx.fillRect(archX + archW - pillarW - 15, -40, pillarW + 30, 40);
@@ -1005,8 +1008,8 @@ export const Game2D: React.FC<Game2DProps> = ({
 
           // Phrase Text (in the center of the arch opening)
           if (z < 1500) { 
-            ctx.fillStyle = isSelected ? '#FFFFFF' : '#FFD700';
-            ctx.shadowColor = isSelected ? '#FFFFFF' : '#FFD700';
+            ctx.fillStyle = isSelected ? '#FFFFFF' : defaultArchColor;
+            ctx.shadowColor = isSelected ? '#FFFFFF' : defaultArchColor;
             ctx.shadowBlur = isSelected ? 20 : 10;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -1017,7 +1020,7 @@ export const Game2D: React.FC<Game2DProps> = ({
 
           // Magic Pulsing Dot (at the keystone)
           const pulse = (Math.sin(Date.now() / 150) + 1) / 2;
-          ctx.fillStyle = isSelected ? `rgba(255, 255, 255, ${0.6 + pulse * 0.4})` : `rgba(241, 196, 15, ${0.4 + pulse * 0.6})`;
+          ctx.fillStyle = isSelected ? `rgba(255, 255, 255, ${0.6 + pulse * 0.4})` : (isNiebla ? `rgba(139, 232, 185, ${0.4 + pulse * 0.6})` : `rgba(241, 196, 15, ${0.4 + pulse * 0.6})`);
           ctx.beginPath();
           ctx.arc(0, archY - 5, 10 + pulse * 5, 0, Math.PI*2);
           ctx.fill();
@@ -1037,7 +1040,7 @@ export const Game2D: React.FC<Game2DProps> = ({
               life: 100,
               maxLife: 100,
               size: Math.random() * 4 + 2,
-              color: isSelected ? '#FFFFFF' : '#FFD700'
+              color: isSelected ? '#FFFFFF' : defaultArchColor
             });
           }
 
@@ -1248,16 +1251,36 @@ export const Game2D: React.FC<Game2DProps> = ({
 
       // 7. Interaction UI
       if (interactionText && appState === 'PLAYING') {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        const isNiebla = stage === 'NIEBLA';
+        const boxWidth = isMobile ? 320 : 400;
+        const boxHeight = 50;
+        const startX = canvas.width/2 - boxWidth/2;
+        const startY = canvas.height - 120;
+        
+        ctx.fillStyle = isNiebla ? 'rgba(15, 30, 22, 0.8)' : 'rgba(0, 0, 0, 0.75)';
         ctx.beginPath();
-        ctx.roundRect(canvas.width/2 - 200, canvas.height - 120, 400, 50, 25);
+        ctx.roundRect(startX, startY, boxWidth, boxHeight, 25);
         ctx.fill();
         
-        ctx.fillStyle = 'white';
+        if (isNiebla) {
+          ctx.strokeStyle = '#1B3024';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        
+        ctx.fillStyle = isNiebla ? '#8BE8B9' : 'white';
         ctx.font = 'bold 16px "Inter", sans-serif';
+        if (isNiebla) {
+           ctx.shadowColor = 'rgba(139, 232, 185, 0.4)';
+           ctx.shadowBlur = 10;
+        }
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(interactionText, canvas.width/2, canvas.height - 95);
+
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
 
         if (keys.current['e'] && interactionAction) {
           keys.current['e'] = false; // debounce
