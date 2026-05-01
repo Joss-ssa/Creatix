@@ -577,7 +577,7 @@ export default function App() {
                 {(!isMobile || exploracionMenuTab === 'intro') && (
                   <div className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#191522]/95 border-r border-[#3D1C34] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
                     <div className="px-8 mb-12">
-                      <h2 className="text-[#FF9CB1] text-xl font-bold tracking-wide uppercase" style={{ fontFamily: '"Playfair Display", serif' }}>Creatividad</h2>
+                      <h2 className="text-[#FF9CB1] text-xl font-bold tracking-wide uppercase">Creatividad</h2>
                       <p className="text-[#FFE5EC]/60 text-[11px] uppercase tracking-wider font-light mt-1">Exploración</p>
                     </div>
 
@@ -630,7 +630,7 @@ export default function App() {
                           <Compass className="w-7 h-7 text-[#FF9CB1] drop-shadow-[0_0_10px_rgba(255,156,177,0.8)]" fill="currentColor" />
                         </div>
                         
-                        <h2 className="text-[28px] font-bold text-[#FF9CB1] mb-6 tracking-wide" style={{ fontFamily: '"Playfair Display", serif' }}>
+                        <h2 className="text-[28px] font-bold text-[#FF9CB1] mb-6 tracking-wide">
                           Camino Revelado
                         </h2>
                         
@@ -656,7 +656,7 @@ export default function App() {
                         transition={{ duration: 0.3 }}
                         className="w-full max-w-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
-                        <h2 className="text-3xl font-extrabold text-[#FF9CB1] tracking-[0.25em] mb-8 drop-shadow-[0_0_10px_rgba(255,156,177,0.4)]" style={{ fontFamily: '"Playfair Display", serif' }}>CONTROLES</h2>
+                        <h2 className="text-3xl font-extrabold text-[#FF9CB1] tracking-[0.25em] mb-8 drop-shadow-[0_0_10px_rgba(255,156,177,0.4)]">CONTROLES</h2>
                         <div className="w-full h-px bg-[#3D1C34] mb-8"></div>
                         
                         <div className="w-full flex flex-col gap-5 mb-10">
@@ -707,7 +707,7 @@ export default function App() {
                         className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <Footprints className="w-12 h-12 text-[#FF9CB1] mb-6 drop-shadow-[0_0_15px_rgba(255,156,177,0.3)] fill-current" />
-                        <h2 className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-8 text-center uppercase" style={{ fontFamily: '"Playfair Display", serif' }}>Acciones Elegidas</h2>
+                        <h2 className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-8 text-center uppercase">Acciones Elegidas</h2>
                         <div className="w-full h-px bg-[#3D1C34] mb-8"></div>
                         
                         <div className="w-full flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar mb-8">
@@ -751,7 +751,7 @@ export default function App() {
                         className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <Sparkles className="w-12 h-12 text-[#FF9CB1] mb-6 drop-shadow-[0_0_15px_rgba(255,156,177,0.3)]" />
-                        <h2 className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-4 text-center uppercase" style={{ fontFamily: '"Playfair Display", serif' }}>Reflexiones</h2>
+                        <h2 className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-4 text-center uppercase">Reflexiones</h2>
                         <p className="text-[#FFE5EC]/80 text-sm text-center mb-8">Tómate un momento para analizar las acciones y emociones que has experimentado en tu camino.</p>
                         <div className="w-full h-px bg-[#3D1C34] mb-8"></div>
                         
@@ -1030,7 +1030,7 @@ export default function App() {
 
                 <div className="w-48 h-48 rounded-full border-[3px] border-[#FF9CB1] shadow-[0_0_25px_rgba(255,156,177,0.3),inset_0_0_25px_rgba(255,156,177,0.3)] flex items-center justify-center mb-6 relative">
                   <div className="absolute inset-0 rounded-full border border-[#FF9CB1]/20 blur-[2px]"></div>
-                  <div className="text-[56px] font-bold text-[#FF9CB1] tracking-tighter drop-shadow-md" style={{ fontFamily: '"Playfair Display", serif' }}>
+                  <div className="text-[56px] font-bold text-[#FF9CB1] tracking-tighter drop-shadow-md">
                     {Math.floor(currentTimeLeft / 60)}:{(currentTimeLeft % 60).toString().padStart(2, '0')}
                   </div>
                 </div>
