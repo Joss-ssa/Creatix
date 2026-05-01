@@ -937,7 +937,7 @@ export const Game2D: React.FC<Game2DProps> = ({
           // Glowing Gold Border
           const isNiebla = stage === 'NIEBLA';
           const isExploracion = stage === 'EXPLORACION';
-          const defaultArchColor = isNiebla ? '#8BE8B9' : (isExploracion ? '#FF9CB1' : '#FFD700');
+          const defaultArchColor = isNiebla ? '#8BE8B9' : (isExploracion ? '#FF9CB1' : '#00E676');
 
           ctx.strokeStyle = isSelected ? '#FFFFFF' : defaultArchColor;
           ctx.lineWidth = 3;
@@ -1254,12 +1254,13 @@ export const Game2D: React.FC<Game2DProps> = ({
       if (interactionText && appState === 'PLAYING') {
         const isNiebla = stage === 'NIEBLA';
         const isExploracion = stage === 'EXPLORACION';
+        const isClaridad = stage === 'CLARIDAD';
         const boxWidth = isMobile ? 320 : 400;
         const boxHeight = 50;
         const startX = canvas.width/2 - boxWidth/2;
         const startY = canvas.height - 120;
         
-        ctx.fillStyle = isNiebla ? 'rgba(15, 30, 22, 0.8)' : (isExploracion ? 'rgba(25, 21, 34, 0.8)' : 'rgba(0, 0, 0, 0.75)');
+        ctx.fillStyle = isNiebla ? 'rgba(15, 30, 22, 0.8)' : (isExploracion ? 'rgba(25, 21, 34, 0.8)' : (isClaridad ? 'rgba(10, 25, 26, 0.95)' : 'rgba(0, 0, 0, 0.75)'));
         ctx.beginPath();
         ctx.roundRect(startX, startY, boxWidth, boxHeight, 25);
         ctx.fill();
@@ -1272,15 +1273,22 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.strokeStyle = '#3D1C34';
           ctx.lineWidth = 2;
           ctx.stroke();
+        } else if (isClaridad) {
+          ctx.strokeStyle = 'rgba(0, 230, 118, 0.5)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
         }
         
-        ctx.fillStyle = isNiebla ? '#8BE8B9' : (isExploracion ? '#FF9CB1' : 'white');
+        ctx.fillStyle = isNiebla ? '#8BE8B9' : (isExploracion ? '#FF9CB1' : (isClaridad ? '#00E676' : 'white'));
         ctx.font = 'bold 16px "Inter", sans-serif';
         if (isNiebla) {
            ctx.shadowColor = 'rgba(139, 232, 185, 0.4)';
            ctx.shadowBlur = 10;
         } else if (isExploracion) {
            ctx.shadowColor = 'rgba(255, 156, 177, 0.4)';
+           ctx.shadowBlur = 10;
+        } else if (isClaridad) {
+           ctx.shadowColor = 'rgba(0, 230, 118, 0.4)';
            ctx.shadowBlur = 10;
         }
         ctx.textAlign = 'center';
@@ -1367,14 +1375,14 @@ export const Game2D: React.FC<Game2DProps> = ({
           {/* Movement Arrows (Left Side) */}
           <div className="absolute bottom-12 left-12 flex flex-col gap-4 z-40">
             <button 
-              className="w-16 h-16 bg-black/40 border-2 border-[#FFD700]/50 rounded-xl flex items-center justify-center active:bg-[#FFD700]/20 active:scale-95 transition-all"
+              className="w-16 h-16 bg-black/40 border-2 border-[#00E676]/50 rounded-xl flex items-center justify-center active:bg-[#FFD700]/20 active:scale-95 transition-all"
               onTouchStart={(e) => { e.preventDefault(); touchControls.current.moveForward = true; }}
               onTouchEnd={(e) => { e.preventDefault(); touchControls.current.moveForward = false; }}
             >
               <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[20px] border-b-[#FFD700]"></div>
             </button>
             <button 
-              className="w-16 h-16 bg-black/40 border-2 border-[#FFD700]/50 rounded-xl flex items-center justify-center active:bg-[#FFD700]/20 active:scale-95 transition-all"
+              className="w-16 h-16 bg-black/40 border-2 border-[#00E676]/50 rounded-xl flex items-center justify-center active:bg-[#FFD700]/20 active:scale-95 transition-all"
               onTouchStart={(e) => { e.preventDefault(); touchControls.current.moveBackward = true; }}
               onTouchEnd={(e) => { e.preventDefault(); touchControls.current.moveBackward = false; }}
             >
@@ -1385,7 +1393,7 @@ export const Game2D: React.FC<Game2DProps> = ({
           {/* Camera Joystick (Right Side) */}
           <div 
             ref={joystickRef}
-            className="absolute bottom-12 right-12 w-32 h-32 bg-black/40 border-2 border-[#FFD700]/30 rounded-full flex items-center justify-center z-40"
+            className="absolute bottom-12 right-12 w-32 h-32 bg-black/40 border-2 border-[#00E676]/30 rounded-full flex items-center justify-center z-40"
             onTouchStart={handleJoystickStart}
             onTouchMove={handleJoystickMove}
             onTouchEnd={handleJoystickEnd}
@@ -1416,7 +1424,7 @@ export const Game2D: React.FC<Game2DProps> = ({
           <div className="absolute top-8 right-8 flex flex-col gap-3 z-40 items-end">
              {stage === 'EXPLORACION' && (
                <button 
-                 className="px-4 py-2 bg-black/60 border border-[#FFD700] text-[#FFD700] rounded-lg text-xs font-bold uppercase tracking-wider active:bg-[#FFD700]/20"
+                 className="px-4 py-2 bg-black/60 border border-[#00E676] text-[#FFD700] rounded-lg text-xs font-bold uppercase tracking-wider active:bg-[#FFD700]/20"
                  onTouchStart={(e) => {
                    e.preventDefault();
                    onOpenReflections?.();
@@ -1437,7 +1445,7 @@ export const Game2D: React.FC<Game2DProps> = ({
                </button>
              )}
              <button 
-               className="px-4 py-2 bg-black/40 border border-[#FFD700]/50 text-white/80 rounded-lg text-xs font-bold uppercase tracking-wider active:bg-white/10"
+               className="px-4 py-2 bg-black/40 border border-[#00E676]/50 text-white/80 rounded-lg text-xs font-bold uppercase tracking-wider active:bg-white/10"
                onTouchStart={(e) => {
                  e.preventDefault();
                  onOpenMenu?.();

@@ -82,8 +82,8 @@ export default function App() {
     const baseList = stage === 'NIEBLA' ? NIEBLA_PHRASES : 
                      stage === 'EXPLORACION' ? EXPLORACION_ACTIONS : 
                      CLARIDAD_EXERCISES;
-    // Shuffle the list only for EXPLORACION
-    if (stage === 'EXPLORACION') {
+    // Shuffle the list for EXPLORACION and CLARIDAD
+    if (stage === 'EXPLORACION' || stage === 'CLARIDAD') {
       setShuffledPhrasesList([...baseList].sort(() => Math.random() - 0.5));
     } else {
       setShuffledPhrasesList(baseList);
@@ -262,7 +262,7 @@ export default function App() {
       {isMobile && (
         <button
           onClick={toggleFullscreen}
-          className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#2A1408]/80 border-x-2 border-b-2 border-[#FFD700] text-[#FFD700] px-6 py-2 rounded-b-xl shadow-[0_4px_15px_rgba(255,215,0,0.3)] flex items-center justify-center z-50 backdrop-blur-sm active:bg-[#4A2810] transition-colors"
+          className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#2A1408]/80 border-x-2 border-b-2 border-[#00E676] text-[#00E676] px-6 py-2 rounded-b-xl shadow-[0_4px_15px_rgba(0,230,118,0.3)] flex items-center justify-center z-50 backdrop-blur-sm active:bg-[#4A2810] transition-colors"
         >
           {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
         </button>
@@ -344,8 +344,8 @@ export default function App() {
       {/* M Hint Overlay */}
       {showMHint && appState === 'PLAYING' && !isMobile && (
         <div className="absolute bottom-8 right-8 z-30 flex flex-col gap-3 items-end">
-          <div className={`bg-black/60 border rounded-lg px-5 py-3 text-white text-sm backdrop-blur-sm ${stage === 'NIEBLA' ? 'border-[#8BE8B9]/50 shadow-[0_0_15px_rgba(139,232,185,0.2)]' : stage === 'EXPLORACION' ? 'border-[#FF9CB1]/50 shadow-[0_0_15px_rgba(255,156,177,0.2)]' : 'border-[#FFA800]/50 shadow-[0_0_15px_rgba(255,168,0,0.2)]'}`}>
-            Presiona <span className={`font-bold text-base mx-1 ${stage === 'NIEBLA' ? 'text-[#8BE8B9]' : stage === 'EXPLORACION' ? 'text-[#FF9CB1]' : 'text-[#FFA800]'}`}>M</span> para activar el menú
+          <div className={`bg-black/60 border rounded-lg px-5 py-3 text-white text-sm backdrop-blur-sm ${stage === 'NIEBLA' ? 'border-[#8BE8B9]/50 shadow-[0_0_15px_rgba(139,232,185,0.2)]' : stage === 'EXPLORACION' ? 'border-[#FF9CB1]/50 shadow-[0_0_15px_rgba(255,156,177,0.2)]' : 'border-[#00E676]/50 shadow-[0_0_15px_rgba(0,230,118,0.2)]'}`}>
+            Presiona <span className={`font-bold text-base mx-1 ${stage === 'NIEBLA' ? 'text-[#8BE8B9]' : stage === 'EXPLORACION' ? 'text-[#FF9CB1]' : 'text-[#00E676]'}`}>M</span> para activar el menú
           </div>
           {stage === 'EXPLORACION' && (
             <div className="bg-black/60 border border-[#FF9CB1]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(255,156,177,0.2)] backdrop-blur-sm">
@@ -354,15 +354,15 @@ export default function App() {
           )}
           {stage === 'CLARIDAD' && (
             <div className="flex flex-col items-end gap-2">
-              <div className="bg-black/60 border border-[#FFA800]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(255,168,0,0.2)] backdrop-blur-sm">
-                Presiona <span className="font-bold text-[#FFA800] text-base mx-1">C</span> para ayuda creativa
+              <div className="bg-black/60 border border-[#00E676]/50 rounded-lg px-5 py-3 text-white text-sm shadow-[0_0_15px_rgba(0,230,118,0.2)] backdrop-blur-sm">
+                Presiona <span className="font-bold text-[#00E676] text-base mx-1">C</span> para ayuda creativa
               </div>
               <button 
                 onClick={() => {
                   setShowHelpModal(true);
                   document.exitPointerLock();
                 }}
-                className="bg-gradient-to-r from-[#D98A00] to-[#FFA800] text-[#3E2900] font-bold rounded-lg px-5 py-3 text-sm shadow-[0_0_15px_rgba(255,168,0,0.5)] flex items-center gap-2 hover:scale-105 transition-transform"
+                className="bg-gradient-to-r from-[#00C853] to-[#00E676] text-[#004D40] font-bold rounded-lg px-5 py-3 text-sm shadow-[0_0_15px_rgba(0,230,118,0.5)] flex items-center gap-2 hover:scale-105 transition-transform"
               >
                 <HelpCircle className="w-5 h-5" />
                 Ayuda Creativa
@@ -783,44 +783,44 @@ export default function App() {
               <div className="absolute inset-0 flex z-30 bg-black/40 backdrop-blur-sm">
                 {/* Left Sidebar Menu for CLARIDAD */}
                 {(!isMobile || claridadMenuTab === 'intro') && (
-                  <div className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#1C1A14]/95 border-r border-[#3E2900] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
+                  <div className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#0A191A]/95 border-r border-[#004D40] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
                     <div className="px-8 mb-12">
-                      <h2 className="text-[#FFA800] text-xl font-bold tracking-wide uppercase" style={{ fontFamily: '"Playfair Display", serif' }}>Creatividad</h2>
-                      <p className="text-[#E2E2D5]/60 text-[11px] uppercase tracking-wider font-light mt-1">Claridad</p>
+                      <h2 className="text-[#00E676] text-xl font-bold tracking-wide uppercase">Creatividad</h2>
+                      <p className="text-[#F1F8E9]/60 text-[11px] uppercase tracking-wider font-light mt-1">Claridad</p>
                     </div>
 
                     <div className="flex flex-col flex-1 gap-2">
                        <div 
-                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'intro' ? 'bg-[#3E2900]/50 text-[#FFA800] border-l-2 border-[#FFA800]' : 'text-[#E2E2D5]/60 hover:text-[#FFA800] hover:bg-[#3E2900]/30'}`}
+                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'intro' ? 'bg-[#004D40]/50 text-[#00E676] border-l-2 border-[#00E676]' : 'text-[#F1F8E9]/60 hover:text-[#00E676] hover:bg-[#004D40]/30'}`}
                         onClick={() => setClaridadMenuTab('intro')}
                       >
-                         <Sun className={`w-5 h-5 ${claridadMenuTab === 'intro' ? 'text-[#FFA800]' : ''}`} />
+                         <Sun className={`w-5 h-5 ${claridadMenuTab === 'intro' ? 'text-[#00E676]' : ''}`} />
                          <span className="text-sm font-medium tracking-wide">Inicio</span>
                        </div>
                        
                        <div 
-                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'ejercicios' ? 'bg-[#3E2900]/50 text-[#FFA800] border-l-2 border-[#FFA800]' : 'text-[#E2E2D5]/60 hover:text-[#FFA800] hover:bg-[#3E2900]/30'}`}
+                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'ejercicios' ? 'bg-[#004D40]/50 text-[#00E676] border-l-2 border-[#00E676]' : 'text-[#F1F8E9]/60 hover:text-[#00E676] hover:bg-[#004D40]/30'}`}
                         onClick={() => setClaridadMenuTab('ejercicios')}
                       >
-                         <Footprints className={`w-5 h-5 ${claridadMenuTab === 'ejercicios' ? 'text-[#FFA800]' : ''}`} />
+                         <Footprints className={`w-5 h-5 ${claridadMenuTab === 'ejercicios' ? 'text-[#00E676]' : ''}`} />
                          <span className="text-sm font-medium tracking-wide">Acciones</span>
                        </div>
                        
                        <div 
-                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'controles' ? 'bg-[#3E2900]/50 text-[#FFA800] border-l-2 border-[#FFA800]' : 'text-[#E2E2D5]/60 hover:text-[#FFA800] hover:bg-[#3E2900]/30'}`}
+                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'controles' ? 'bg-[#004D40]/50 text-[#00E676] border-l-2 border-[#00E676]' : 'text-[#F1F8E9]/60 hover:text-[#00E676] hover:bg-[#004D40]/30'}`}
                         onClick={() => setClaridadMenuTab('controles')}
                       >
-                         <Settings2 className={`w-5 h-5 ${claridadMenuTab === 'controles' ? 'text-[#FFA800]' : ''}`} />
+                         <Settings2 className={`w-5 h-5 ${claridadMenuTab === 'controles' ? 'text-[#00E676]' : ''}`} />
                          <span className="text-sm font-medium tracking-wide">Controles</span>
                        </div>
                     </div>
 
                     <div className="mt-auto pt-8">
                        <div 
-                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'ayuda' ? 'bg-[#3E2900]/50 text-[#FFA800] border-l-2 border-[#FFA800]' : 'text-[#E2E2D5]/60 hover:text-[#FFA800] hover:bg-[#3E2900]/30'}`}
+                        className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'ayuda' ? 'bg-[#004D40]/50 text-[#00E676] border-l-2 border-[#00E676]' : 'text-[#F1F8E9]/60 hover:text-[#00E676] hover:bg-[#004D40]/30'}`}
                         onClick={() => setClaridadMenuTab('ayuda')}
                       >
-                         <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-[10px] font-bold leading-none ${claridadMenuTab === 'ayuda' ? 'border-[#FFA800] text-[#FFA800]' : 'border-[#E2E2D5]/30 text-[#E2E2D5]/60'}`}>
+                         <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-[10px] font-bold leading-none ${claridadMenuTab === 'ayuda' ? 'border-[#00E676] text-[#00E676]' : 'border-[#F1F8E9]/30 text-[#F1F8E9]/60'}`}>
                            R
                          </div>
                          <span className="text-sm font-medium tracking-wide">Reflexión Interior</span>
@@ -838,23 +838,23 @@ export default function App() {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="w-full max-w-[480px] rounded-2xl bg-[#1C1A14] border border-[#FFA200]/50 shadow-[0_0_40px_rgba(255,162,0,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden"
+                        className="w-full max-w-[480px] rounded-2xl bg-[#0A191A] border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden"
                       >
                         <div className="mb-6 w-16 h-16 rounded-full bg-[#242C1B] border border-[#78A840] shadow-[0_0_25px_rgba(120,168,64,0.3)] flex items-center justify-center">
                           <Footprints className="w-8 h-8 text-[#86B84A] fill-current" />
                         </div>
                         
-                        <h2 className="text-[32px] font-bold text-[#FFA800] uppercase tracking-wide mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+                        <h2 className="text-[32px] font-bold text-[#00E676] uppercase tracking-wide mb-6">
                           CLARIDAD
                         </h2>
 
-                        <p className="text-[16px] text-[#E2E2D5] leading-[1.6] max-w-[320px] font-light mb-12">
+                        <p className="text-[16px] text-[#F1F8E9] leading-[1.6] max-w-[320px] font-light mb-12">
                           El camino está claro. ¡Disfruta de la creatividad y haz cosas nuevas con todo lo que has aprendido!
                         </p>
 
                         <button
                           onClick={() => setAppState('PLAYING')}
-                          className="w-full max-w-[340px] py-4 rounded-full bg-[#FFAB00] text-[#3E2900] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#EAA000] hover:shadow-[0_0_20px_rgba(255,171,0,0.3)] transition-all duration-300"
+                          className="w-full max-w-[340px] py-4 rounded-full bg-[#00E676] text-[#004D40] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#69F0AE] hover:shadow-[0_0_20px_rgba(0,230,118,0.3)] transition-all duration-300"
                         >
                           ENTENDIDO
                         </button>
@@ -869,10 +869,10 @@ export default function App() {
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="w-full max-w-[480px] flex flex-col"
                       >
-                        <div className="bg-[#1C1A14]/90 border border-[#FFA800]/40 rounded-[20px] shadow-[0_0_50px_rgba(255,168,0,0.15)] backdrop-blur-xl relative overflow-hidden flex flex-col p-8">
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-[#FFA800] opacity-40 blur-[2px]"></div>
+                        <div className="bg-[#0A191A]/90 border border-[#00E676]/40 rounded-[20px] shadow-[0_0_50px_rgba(0,230,118,0.15)] backdrop-blur-xl relative overflow-hidden flex flex-col p-8">
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-[#00E676] opacity-40 blur-[2px]"></div>
                           
-                          <h2 className="text-[32px] font-extrabold text-[#FFA800] uppercase tracking-widest text-center mb-10 drop-shadow-[0_0_15px_rgba(255,168,0,0.4)]" style={{ fontFamily: '"Inter", sans-serif' }}>CONTROLES</h2>
+                          <h2 className="text-[32px] font-extrabold text-[#00E676] uppercase tracking-widest text-center mb-10 drop-shadow-[0_0_15px_rgba(0,230,118,0.4)]">CONTROLES</h2>
 
                           <div className="flex flex-col gap-4 mb-10 w-full">
                             {[
@@ -883,9 +883,9 @@ export default function App() {
                               { label: 'Interactuar', key: 'E' },
                               { label: 'Mirar / Apuntar', key: 'Mouse' }
                             ].map((ctrl, i) => (
-                              <div key={i} className="flex items-center justify-between bg-[#110D0A]/60 border border-[#3E2900] rounded-xl p-5 shadow-inner">
-                                <span className="text-[#E2E2D5] text-[16px] font-medium tracking-wide">{ctrl.label}</span>
-                                <div className="border border-[#FFA800]/30 bg-[#2C190A]/80 text-[#FFA800] text-xs font-bold tracking-wider px-3.5 py-1.5 rounded">
+                              <div key={i} className="flex items-center justify-between bg-[#0A191A]/60 border border-[#004D40] rounded-xl p-5 shadow-inner">
+                                <span className="text-[#F1F8E9] text-[16px] font-medium tracking-wide">{ctrl.label}</span>
+                                <div className="border border-[#00E676]/30 bg-[#004D40]/80 text-[#00E676] text-xs font-bold tracking-wider px-3.5 py-1.5 rounded">
                                   {ctrl.key}
                                 </div>
                               </div>
@@ -894,7 +894,7 @@ export default function App() {
 
                           <button
                             onClick={() => setAppState('PLAYING')}
-                            className="w-full py-4 rounded-full border border-[#FFA800]/50 text-[#FFA800] text-[13px] font-bold tracking-[0.2em] uppercase hover:bg-[#FFA800]/10 transition-colors flex items-center justify-center gap-2 mx-auto max-w-[200px]"
+                            className="w-full py-4 rounded-full border border-[#00E676]/50 text-[#00E676] text-[13px] font-bold tracking-[0.2em] uppercase hover:bg-[#00E676]/10 transition-colors flex items-center justify-center gap-2 mx-auto max-w-[200px]"
                           >
                             <span className="font-light text-lg pb-[2px]">&times;</span> CERRAR
                           </button>
@@ -908,27 +908,27 @@ export default function App() {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="w-full max-w-[440px] h-auto min-h-[400px] bg-[#16140F]/95 rounded-3xl flex flex-col shadow-[0_0_40px_rgba(255,162,0,0.15)] overflow-hidden pb-8 mx-auto border border-white/5 backdrop-blur-xl"
+                        className="w-full max-w-[440px] h-auto min-h-[400px] bg-[#16140F]/95 rounded-3xl flex flex-col shadow-[0_0_40px_rgba(0,230,118,0.15)] overflow-hidden pb-8 mx-auto border border-white/5 backdrop-blur-xl"
                       >
                          <div className="flex flex-col items-center pt-12 pb-10">
                              <div className="w-24 h-24 rounded-full bg-[#2A1D0B] flex items-center justify-center mb-6">
-                               <Footprints className="w-12 h-12 text-[#FFA800]" fill="currentColor" />
+                               <Footprints className="w-12 h-12 text-[#00E676]" fill="currentColor" />
                              </div>
                              <h2 className="text-[26px] font-bold text-white mb-2">Acciones</h2>
-                             <p className="text-[#FFA800] text-sm font-bold tracking-[0.15em] uppercase">COMPLETADAS</p>
+                             <p className="text-[#00E676] text-sm font-bold tracking-[0.15em] uppercase">COMPLETADAS</p>
                          </div>
                          
                          <div className="w-full flex-1 flex flex-col mb-8 bg-[#1B1812] py-4">
                            {selectedPhrases.length > 0 ? (
                              selectedPhrases.map((phrase, idx) => (
                                <div key={idx} className="w-full px-8 py-5 flex gap-4 items-center">
-                                 <span className="text-[#FFA800] font-bold text-lg">{idx + 1}.</span>
-                                 <p className="text-[#FFA800] text-lg font-medium">{phrase}</p>
+                                 <span className="text-[#00E676] font-bold text-lg">{idx + 1}.</span>
+                                 <p className="text-[#00E676] text-lg font-medium">{phrase}</p>
                                </div>
                              ))
                            ) : (
                              <div className="flex-1 flex items-center justify-center py-6">
-                               <p className="text-[#E2E2D5]/50 text-sm text-center">Aún no has completado acciones en la claridad.</p>
+                               <p className="text-[#F1F8E9]/50 text-sm text-center">Aún no has completado acciones en la claridad.</p>
                              </div>
                            )}
                          </div>
@@ -936,7 +936,7 @@ export default function App() {
                          <div className="px-8 mt-auto flex justify-center">
                            <button
                              onClick={() => setAppState('PLAYING')}
-                             className="py-3 px-8 rounded-full border border-[#FFA800]/50 text-[#FFA800] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#FFA800]/10 transition-colors"
+                             className="py-3 px-8 rounded-full border border-[#00E676]/50 text-[#00E676] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#00E676]/10 transition-colors"
                            >
                              Cerrar
                            </button>
@@ -950,18 +950,18 @@ export default function App() {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="w-full max-w-[500px] p-8 bg-[#1C1A14]/95 border border-[#3E2900] rounded-xl flex flex-col items-center justify-center shadow-[0_0_40px_rgba(255,162,0,0.15)]"
+                        className="w-full max-w-[500px] p-8 bg-[#0A191A]/95 border border-[#004D40] rounded-xl flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,230,118,0.15)]"
                       >
-                         <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-[#FFA800]" style={{ fontFamily: '"Playfair Display", serif' }}>
+                         <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-[#00E676]">
                            Reflexión Interior
                          </h3>
-                         <p className="text-[#E2E2D5] text-center mb-8 px-4 text-sm leading-relaxed">
+                         <p className="text-[#F1F8E9] text-center mb-8 px-4 text-sm leading-relaxed">
                            Estás en el claro abierto. Utiliza este espacio para reflexionar, buscar inspiración o crear libremente. 
-                           Presiona <span className="text-[#FFA800] font-bold">C</span> en cualquier momento para obtener una chispa de inspiración.
+                           Presiona <span className="text-[#00E676] font-bold">C</span> en cualquier momento para obtener una chispa de inspiración.
                          </p>
                          <button
                            onClick={() => setAppState('PLAYING')}
-                           className="w-full py-3 bg-[#FFA800] hover:bg-[#FFA800]/80 text-[#3E2900] font-bold tracking-wider text-sm rounded shadow-[0_0_15px_rgba(255,168,0,0.4)] transition-all"
+                           className="w-full py-3 bg-[#00E676] hover:bg-[#00E676]/80 text-[#004D40] font-bold tracking-wider text-sm rounded shadow-[0_0_15px_rgba(0,230,118,0.4)] transition-all"
                          >
                            CONTINUAR
                          </button>
@@ -1095,30 +1095,30 @@ export default function App() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-full max-w-[480px] rounded-2xl bg-[#1C1A14]/90 border border-[#FFA200]/50 shadow-[0_0_40px_rgba(255,162,0,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden backdrop-blur-md"
+                className="w-full max-w-[480px] rounded-2xl bg-[#0A191A]/90 border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden backdrop-blur-md"
               >
                 <div className="mb-6">
-                  <Sun className="w-12 h-12 text-[#FFB800]" strokeWidth={1.5} />
+                  <Sun className="w-12 h-12 text-[#00E676]" strokeWidth={1.5} />
                 </div>
                 
-                <h2 className="text-[32px] font-bold text-[#FFA800] uppercase tracking-wide mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+                <h2 className="text-[32px] font-bold text-[#00E676] uppercase tracking-wide mb-6">
                   CLARIDAD
                 </h2>
 
-                <p className="text-[16px] text-[#E2E2D5] leading-[1.6] max-w-[320px] font-light mb-12">
+                <p className="text-[16px] text-[#F1F8E9] leading-[1.6] max-w-[320px] font-light mb-12">
                   {currentPhrase}
                 </p>
 
                 <div className={`flex flex-col gap-3 w-full max-w-[340px] mt-4 z-10`}>
                   <button
                     onClick={handleAcceptPhrase}
-                    className="w-full py-4 rounded bg-transparent border border-[#FFA800] text-[#FFA800] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#FFA800]/10 transition-colors"
+                    className="w-full py-4 rounded bg-transparent border border-[#00E676] text-[#00E676] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#00E676]/10 transition-colors"
                   >
                     ENTENDIDO
                   </button>
                   <button
                     onClick={() => setAppState('PLAYING')}
-                    className="w-full py-4 rounded bg-transparent border border-[#FFA800]/30 text-[#FFA800]/70 text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#FFA800]/10 hover:border-[#FFA800]/50 hover:text-[#FFA800] transition-colors"
+                    className="w-full py-4 rounded bg-transparent border border-[#00E676]/30 text-[#00E676]/70 text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-[#00E676]/10 hover:border-[#00E676]/50 hover:text-[#00E676] transition-colors"
                   >
                     VOLVER
                   </button>
@@ -1130,34 +1130,34 @@ export default function App() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className={`${isMobile ? 'p-4 pt-10 max-w-xs' : 'p-10 pt-16 max-w-md'} w-full rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#FFD700] shadow-[0_0_50px_rgba(255,215,0,0.5)] flex flex-col items-center text-center ${isMobile ? 'gap-4' : 'gap-6'} relative overflow-hidden`}
+                className={`${isMobile ? 'p-4 pt-10 max-w-xs' : 'p-10 pt-16 max-w-md'} w-full rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#00E676] shadow-[0_0_50px_rgba(0,230,118,0.5)] flex flex-col items-center text-center ${isMobile ? 'gap-4' : 'gap-6'} relative overflow-hidden`}
               >
                 {isMobile && (
                   <button
                     onClick={() => setAppState('PLAYING')}
-                    className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#2A1408] border-x-2 border-b-2 border-[#FFD700] text-[#FFD700] px-6 py-1.5 rounded-b-xl shadow-md flex items-center justify-center z-50"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#2A1408] border-x-2 border-b-2 border-[#00E676] text-[#00E676] px-6 py-1.5 rounded-b-xl shadow-md flex items-center justify-center z-50"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 )}
                 {/* Inner decorative border */}
-                <div className="absolute inset-4 border-2 border-[#FFD700]/60 rounded-t-[134px] rounded-b-xl pointer-events-none shadow-[inset_0_0_15px_rgba(255,215,0,0.3)]"></div>
+                <div className="absolute inset-4 border-2 border-[#00E676]/60 rounded-t-[134px] rounded-b-xl pointer-events-none shadow-[inset_0_0_15px_rgba(0,230,118,0.3)]"></div>
 
-                <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-medium leading-relaxed font-serif italic text-[#FFD700] drop-shadow-[0_0_10px_rgba(255,215,0,0.6)] relative z-10 mt-4`}>
+                <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-medium leading-relaxed font-serif italic text-[#00E676] drop-shadow-[0_0_10px_rgba(0,230,118,0.6)] relative z-10 mt-4`}>
                   "{currentPhrase}"
                 </p>
 
                 <div className={`flex flex-col ${isMobile ? 'gap-2' : 'gap-3'} w-full mt-4 relative z-10`}>
                   <button
                     onClick={handleAcceptPhrase}
-                    className={`w-full ${isMobile ? 'px-4 py-3 text-sm' : 'px-8 py-4 text-lg'} rounded-full bg-gradient-to-r from-[#B8860B] to-[#FFD700] text-[#2A1408] font-extrabold hover:from-[#FFD700] hover:to-[#FFF8DC] transition-all shadow-[0_0_20px_rgba(255,215,0,0.6)] hover:shadow-[0_0_40px_rgba(255,215,0,0.9)] active:scale-95 flex items-center justify-center gap-2 uppercase tracking-wider`}
+                    className={`w-full ${isMobile ? 'px-4 py-3 text-sm' : 'px-8 py-4 text-lg'} rounded-full bg-gradient-to-r from-[#00C853] to-[#00E676] text-[#00332C] font-extrabold hover:from-[#00E676] hover:to-[#F1F8E9] transition-all shadow-[0_0_20px_rgba(0,230,118,0.6)] hover:shadow-[0_0_40px_rgba(0,230,118,0.9)] active:scale-95 flex items-center justify-center gap-2 uppercase tracking-wider`}
                   >
                     <span>{stage === 'CLARIDAD' ? 'Vamos a crear' : 'Así me siento'}</span>
                     <ArrowRight className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setAppState('PLAYING')}
-                    className={`w-full ${isMobile ? 'px-4 py-3 text-sm' : 'px-8 py-4 text-lg'} rounded-full bg-[#3D2314] text-[#FDE68A] font-bold hover:bg-[#4A2810] transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 border border-[#FFD700]/30 uppercase tracking-wider`}
+                    className={`w-full ${isMobile ? 'px-4 py-3 text-sm' : 'px-8 py-4 text-lg'} rounded-full bg-[#004D40] text-[#B9F6CA] font-bold hover:bg-[#0A5F59] transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 border border-[#00E676]/30 uppercase tracking-wider`}
                   >
                     <span>Cerrar</span>
                   </button>
@@ -1170,39 +1170,39 @@ export default function App() {
           <div className="absolute inset-0 flex flex-row z-50 bg-[#16140F]">
             
             {/* Sidebar */}
-            <div className="w-[280px] bg-[#1C1A14] h-full border-r border-[#2C2A25] flex flex-col shrink-0">
+            <div className="w-[280px] bg-[#0A191A] h-full border-r border-[#2C2A25] flex flex-col shrink-0">
               <div className="px-8 pt-8 pb-6 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full border border-[#FFA800]/30 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+                <div className="w-10 h-10 rounded-full border border-[#00E676]/30 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
                   {/* Using a placeholder for avatar */}
-                  <div className="w-full h-full bg-[#3A3528]" />
+                  <div className="w-full h-full bg-[#004D40]" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-extrabold text-[#FFA800] tracking-wide uppercase" style={{ fontFamily: '"Inter", sans-serif' }}>Creatix</h1>
+                  <h1 className="text-xl font-extrabold text-[#00E676] tracking-wide uppercase" style={{ fontFamily: '"Inter", sans-serif' }}>Creatix</h1>
                   <p className="text-[#888377] text-xs font-light">Santuario Creativo</p>
                 </div>
               </div>
               
               <nav className="flex flex-col gap-1 px-4 mt-6">
-                <button className="flex items-center gap-4 px-4 py-3 text-[#FFA800] bg-gradient-to-r from-[#594411] to-transparent border-l-[3px] border-[#FFA800] rounded-r-lg text-sm font-medium">
+                <button className="flex items-center gap-4 px-4 py-3 text-[#00E676] bg-gradient-to-r from-[#004D40] to-transparent border-l-[3px] border-[#00E676] rounded-r-lg text-sm font-medium">
                   <Palette className="w-5 h-5 shrink-0" />
                   Hub Creativo
                 </button>
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg">
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg">
                   <Sparkles className="w-5 h-5 shrink-0" />
                   Inspiración
                 </button>
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg">
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg">
                   <Folder className="w-5 h-5 shrink-0" />
                   Mis Proyectos
                 </button>
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg mt-4">
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg mt-4">
                   <Users className="w-5 h-5 shrink-0" />
                   Comunidad
                 </button>
               </nav>
 
               <div className="mt-auto px-4 pb-8 flex flex-col gap-4">
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#E2DED5] transition-colors text-sm font-medium rounded-lg">
+                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg">
                   <Settings className="w-5 h-5 shrink-0" />
                   Ajustes
                 </button>
@@ -1218,7 +1218,7 @@ export default function App() {
                     setAppState('START_MENU');
                     setGameSessionId(prev => prev + 1);
                   }}
-                  className="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-[#FFA800] text-[#3E2900] font-bold hover:bg-[#FFB822] transition-colors shadow-md shadow-[#FFA800]/20"
+                  className="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-[#00E676] text-[#004D40] font-bold hover:bg-[#B9F6CA] transition-colors shadow-md shadow-[#00E676]/20"
                 >
                   <PlusCircle className="w-5 h-5 shrink-0" />
                   Nueva Creación
@@ -1232,7 +1232,7 @@ export default function App() {
               {/* Top Bar */}
               <div className="px-10 py-8 flex justify-between items-center z-10">
                 <div className="text-[#A8A397] text-sm">
-                  Explorando / <span className="text-[#FFA800] font-medium">Hub Creativo</span>
+                  Explorando / <span className="text-[#00E676] font-medium">Hub Creativo</span>
                 </div>
                 
                 <div className="flex items-center gap-6">
@@ -1241,14 +1241,14 @@ export default function App() {
                     <input 
                       type="text" 
                       placeholder="Buscar ideas..." 
-                      className="bg-[#10100E]/80 border border-[#3A3832] text-[#E2DED5] placeholder:text-[#6a665a] rounded-full pl-11 pr-6 py-2 text-sm w-64 focus:outline-none focus:border-[#FFA800]/50"
+                      className="bg-[#10100E]/80 border border-[#3A3832] text-[#F1F8E9] placeholder:text-[#6a665a] rounded-full pl-11 pr-6 py-2 text-sm w-64 focus:outline-none focus:border-[#00E676]/50"
                     />
                   </div>
-                  <button className="text-[#A8A397] hover:text-[#E2DED5] transition-colors relative">
+                  <button className="text-[#A8A397] hover:text-[#F1F8E9] transition-colors relative">
                     <Bell className="w-5 h-5" />
-                    <span className="w-2 h-2 rounded-full bg-[#FFA800] absolute top-0 right-0" />
+                    <span className="w-2 h-2 rounded-full bg-[#00E676] absolute top-0 right-0" />
                   </button>
-                  <button className="text-[#A8A397] hover:text-[#E2DED5] transition-colors bg-[#10100E]/80 p-2 rounded-full border border-[#3A3832]">
+                  <button className="text-[#A8A397] hover:text-[#F1F8E9] transition-colors bg-[#10100E]/80 p-2 rounded-full border border-[#3A3832]">
                     <Zap className="w-4 h-4" />
                   </button>
                 </div>
@@ -1258,18 +1258,18 @@ export default function App() {
               <div className="flex-1 overflow-y-auto px-10 pb-12 z-10 flex flex-col gap-8">
                 
                 {/* Progress/Summary Timeline */}
-                <div className="w-full h-16 rounded-full bg-[#1C1A14]/80 border border-[#3A3832] relative flex items-center px-4 backdrop-blur-md shadow-lg mb-4">
+                <div className="w-full h-16 rounded-full bg-[#0A191A]/80 border border-[#3A3832] relative flex items-center px-4 backdrop-blur-md shadow-lg mb-4">
                   {/* Progress track */}
                   <div className="absolute left-10 right-10 h-1 bg-[#2C2A25] rounded-full overflow-hidden">
-                     <div className="h-full bg-gradient-to-r from-[#888377] via-[#95E052] to-[#FFA800] w-full relative">
+                     <div className="h-full bg-gradient-to-r from-[#888377] via-[#95E052] to-[#00E676] w-full relative">
                         <div className="absolute inset-0 bg-white/20 blur-sm"></div>
                      </div>
                   </div>
                   {/* Nodes */}
                   <div className="w-full relative z-10 flex justify-between px-6">
-                     <div className="w-8 h-8 rounded-full bg-[#3A3528] border-2 border-[#888377] shadow-[0_0_10px_rgba(136,131,119,0.5)]"></div>
-                     <div className="w-8 h-8 rounded-full bg-[#3A3528] border-2 border-[#95E052] shadow-[0_0_10px_rgba(149,224,82,0.5)]"></div>
-                     <div className="w-8 h-8 rounded-full bg-[#3A3528] border-2 border-[#FFA800] shadow-[0_0_15px_rgba(255,168,0,0.8)]"></div>
+                     <div className="w-8 h-8 rounded-full bg-[#004D40] border-2 border-[#888377] shadow-[0_0_10px_rgba(136,131,119,0.5)]"></div>
+                     <div className="w-8 h-8 rounded-full bg-[#004D40] border-2 border-[#95E052] shadow-[0_0_10px_rgba(149,224,82,0.5)]"></div>
+                     <div className="w-8 h-8 rounded-full bg-[#004D40] border-2 border-[#00E676] shadow-[0_0_15px_rgba(0,230,118,0.8)]"></div>
                   </div>
                 </div>
 
@@ -1283,7 +1283,7 @@ export default function App() {
                 {/* Cards Grid: Summary of the 3 phases */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 pb-10 mt-4 h-[400px]">
                   {/* Niebla Summary */}
-                  <div className="bg-[#1C1A14]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#888377]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
+                  <div className="bg-[#0A191A]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#888377]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
                     <div className="flex items-center gap-4 mb-6 shrink-0">
                       <div className="w-12 h-12 rounded-full bg-[#888377]/20 flex items-center justify-center border border-[#888377]/30 group-hover:bg-[#888377]/30 transition-colors">
                         <Cloud className="w-5 h-5 text-[#888377]" />
@@ -1296,7 +1296,7 @@ export default function App() {
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
                       {allSelectedPhrases.NIEBLA.length > 0 ? (
                         allSelectedPhrases.NIEBLA.map((phrase, i) => (
-                           <div key={i} className="bg-[#110D0A] border border-[#2C2A25] rounded-xl p-4 text-[#A8A397] text-sm leading-relaxed">
+                           <div key={i} className="bg-[#0A191A] border border-[#2C2A25] rounded-xl p-4 text-[#A8A397] text-sm leading-relaxed">
                              {phrase}
                            </div>
                         ))
@@ -1307,7 +1307,7 @@ export default function App() {
                   </div>
 
                   {/* Exploracion Summary */}
-                  <div className="bg-[#1C1A14]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#95E052]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
+                  <div className="bg-[#0A191A]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#95E052]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
                     <div className="flex items-center gap-4 mb-6 shrink-0">
                       <div className="w-12 h-12 rounded-full bg-[#95E052]/20 flex items-center justify-center border border-[#95E052]/30 group-hover:bg-[#95E052]/30 transition-colors">
                         <Footprints className="w-5 h-5 text-[#95E052]" />
@@ -1320,7 +1320,7 @@ export default function App() {
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
                       {allSelectedPhrases.EXPLORACION.length > 0 ? (
                         allSelectedPhrases.EXPLORACION.map((phrase, i) => (
-                           <div key={i} className="bg-[#110D0A] border border-[#2EB045]/20 rounded-xl p-4 text-[#95E052] text-sm leading-relaxed">
+                           <div key={i} className="bg-[#0A191A] border border-[#2EB045]/20 rounded-xl p-4 text-[#95E052] text-sm leading-relaxed">
                              {phrase}
                            </div>
                         ))
@@ -1331,20 +1331,20 @@ export default function App() {
                   </div>
 
                   {/* Claridad Summary */}
-                  <div className="bg-[#1C1A14]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#FFA800]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
+                  <div className="bg-[#0A191A]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#00E676]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
                     <div className="flex items-center gap-4 mb-6 shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-[#FFA800]/20 flex items-center justify-center border border-[#FFA800]/30 group-hover:bg-[#FFA800]/30 transition-colors">
-                        <Sun className="w-5 h-5 text-[#FFA800]" />
+                      <div className="w-12 h-12 rounded-full bg-[#00E676]/20 flex items-center justify-center border border-[#00E676]/30 group-hover:bg-[#00E676]/30 transition-colors">
+                        <Sun className="w-5 h-5 text-[#00E676]" />
                       </div>
                       <div>
                         <h3 className="text-[#FFFFFF] text-xl font-bold">Claridad</h3>
-                        <p className="text-[#FFA800] text-xs font-medium uppercase tracking-wider">Ejercicios</p>
+                        <p className="text-[#00E676] text-xs font-medium uppercase tracking-wider">Ejercicios</p>
                       </div>
                     </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
                       {allSelectedPhrases.CLARIDAD.length > 0 ? (
                         allSelectedPhrases.CLARIDAD.map((phrase, i) => (
-                           <div key={i} className="bg-[#110D0A] border border-[#FFA800]/30 rounded-xl p-4 text-[#FFA800] text-sm leading-relaxed">
+                           <div key={i} className="bg-[#0A191A] border border-[#00E676]/30 rounded-xl p-4 text-[#00E676] text-sm leading-relaxed">
                              {phrase}
                            </div>
                         ))
