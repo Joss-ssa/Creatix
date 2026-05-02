@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React, { useState } from 'react';
 import { X, Send, Loader2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
@@ -7,8 +8,26 @@ interface ReflectionsModalProps {
   onSaveReflections: (reflection: { report: string, answers: Record<string, string>, timestamp: number }) => void;
 }
 
+
+const itemV: any = {
+  hidden: { opacity: 0, y: 20, scale: 0.9 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100 } },
+  exit: { opacity: 0, y: -10, scale: 0.95, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100 } }
+};
+const listV: any = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  exit: { opacity: 0, transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+};
+
 export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({ onClose, onSaveReflections }) => {
-  const [answers, setAnswers] = useState({
+
+const modalV: any = {
+  hidden: { opacity: 0, scale: 0.95, y: 40 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.08, delayChildren: 0.1 } },
+  exit: { opacity: 0, scale: 0.95, y: 20, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.05, staggerDirection: -1 } }
+};
+    const [answers, setAnswers] = useState({
     q1: '',
     q2: '',
     q3: '',
@@ -57,7 +76,7 @@ Sus respuestas:
 
   if (report) {
     return (
-      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-500">
+      <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6">
         {/* Modal Container: Image 2 Structure with Image 1 Colors/Aesthetics */}
         <div className="bg-[#13111C] border border-white/10 rounded-[40px] p-8 sm:p-12 max-w-2xl w-full max-h-[90vh] overflow-y-auto flex flex-col items-center relative shadow-[0_0_60px_rgba(255,77,121,0.1)]">
           
@@ -70,9 +89,9 @@ Sus respuestas:
 
           {/* Top Pill Title */}
           <div className="border border-[#FF4D79] rounded-full px-8 py-3 mb-10 shadow-[0_0_20px_rgba(255,77,121,0.2)] bg-[#FF4D79]/5">
-            <h2 className="text-xl sm:text-2xl font-bold font-sans text-[#FF4D79] m-0 leading-none tracking-wide text-center uppercase">
+            <motion.h2 variants={itemV} className="text-xl sm:text-2xl font-bold font-sans text-[#FF4D79] m-0 leading-none tracking-wide text-center uppercase">
               Análisis de la Información
-            </h2>
+            </motion.h2>
           </div>
 
           <div className="w-full flex-1 relative flex flex-col items-center justify-center min-h-[200px] mb-12 px-6 sm:px-12">
@@ -81,9 +100,9 @@ Sus respuestas:
               “
             </div>
             
-            <p className="text-lg sm:text-xl font-medium font-sans text-[#E2E2ED] leading-relaxed text-center z-10 pt-6 pb-6 w-full">
+            <motion.p variants={itemV} className="text-lg sm:text-xl font-medium font-sans text-[#E2E2ED] leading-relaxed text-center z-10 pt-6 pb-6 w-full">
               {report}
-            </p>
+            </motion.p>
             
             {/* Bottom Right Quote Icon */}
             <div className="absolute bottom-0 right-0 text-6xl font-serif text-[#2CD4CE] leading-none select-none opacity-80 mix-blend-screen drop-shadow-[0_0_10px_rgba(44,212,206,0.5)]">
@@ -92,19 +111,19 @@ Sus respuestas:
           </div>
 
           {/* Bottom Button */}
-          <button
+          <motion.button variants={itemV}
             onClick={onClose}
             className="w-full sm:w-auto px-12 py-4 rounded-full border border-[#FF4D79] bg-transparent text-[#FF4D79] hover:bg-[#FF4D79] hover:text-[#13111C] font-bold text-sm tracking-[0.25em] transition-all duration-300 shadow-[0_0_20px_rgba(255,77,121,0.1)] hover:shadow-[0_0_30px_rgba(255,77,121,0.4)] active:scale-95 uppercase"
           >
             Continuar mi viaje
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4 animate-in fade-in duration-300">
+    <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
       <div className="bg-[#191522] border-2 border-[#FF9CB1] rounded-2xl p-4 sm:p-8 max-w-2xl w-full max-h-[95vh] overflow-y-auto shadow-[0_0_40px_rgba(255,156,177,0.4)] text-[#FFE5EC] relative">
         <button 
           onClick={onClose}
@@ -113,12 +132,12 @@ Sus respuestas:
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#FF9CB1] mb-6 font-serif text-center">Pensamientos y Reflexiones</h2>
+        <motion.h2 variants={itemV} className="text-2xl sm:text-3xl font-extrabold text-[#FF9CB1] mb-6 font-serif text-center">Pensamientos y Reflexiones</motion.h2>
 
         <div className="space-y-4 sm:space-y-6">
           <div className="space-y-1 sm:space-y-2">
-            <label className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué hiciste?</label>
-            <textarea 
+            <motion.label variants={itemV} className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué hiciste?</motion.label>
+            <motion.textarea variants={itemV} 
               value={answers.q1}
               onChange={e => setAnswers({...answers, q1: e.target.value})}
               className="w-full bg-[#2A1629] border border-[#3D1C34] rounded-lg p-3 text-white focus:outline-none focus:border-[#FF9CB1] resize-none h-20 sm:h-24 text-sm sm:text-base"
@@ -126,8 +145,8 @@ Sus respuestas:
             />
           </div>
           <div className="space-y-1 sm:space-y-2">
-            <label className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué viste?</label>
-            <textarea 
+            <motion.label variants={itemV} className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué viste?</motion.label>
+            <motion.textarea variants={itemV} 
               value={answers.q2}
               onChange={e => setAnswers({...answers, q2: e.target.value})}
               className="w-full bg-[#2A1629] border border-[#3D1C34] rounded-lg p-3 text-white focus:outline-none focus:border-[#FF9CB1] resize-none h-20 sm:h-24 text-sm sm:text-base"
@@ -135,8 +154,8 @@ Sus respuestas:
             />
           </div>
           <div className="space-y-1 sm:space-y-2">
-            <label className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué sentiste?</label>
-            <textarea 
+            <motion.label variants={itemV} className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué sentiste?</motion.label>
+            <motion.textarea variants={itemV} 
               value={answers.q3}
               onChange={e => setAnswers({...answers, q3: e.target.value})}
               className="w-full bg-[#2A1629] border border-[#3D1C34] rounded-lg p-3 text-white focus:outline-none focus:border-[#FF9CB1] resize-none h-20 sm:h-24 text-sm sm:text-base"
@@ -144,8 +163,8 @@ Sus respuestas:
             />
           </div>
           <div className="space-y-1 sm:space-y-2">
-            <label className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Te recuerda algo?</label>
-            <textarea 
+            <motion.label variants={itemV} className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Te recuerda algo?</motion.label>
+            <motion.textarea variants={itemV} 
               value={answers.q4}
               onChange={e => setAnswers({...answers, q4: e.target.value})}
               className="w-full bg-[#2A1629] border border-[#3D1C34] rounded-lg p-3 text-white focus:outline-none focus:border-[#FF9CB1] resize-none h-20 sm:h-24 text-sm sm:text-base"
@@ -153,8 +172,8 @@ Sus respuestas:
             />
           </div>
           <div className="space-y-1 sm:space-y-2">
-            <label className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué ideas tuviste?</label>
-            <textarea 
+            <motion.label variants={itemV} className="block text-base sm:text-lg font-medium text-[#FFB3C6]">¿Qué ideas tuviste?</motion.label>
+            <motion.textarea variants={itemV} 
               value={answers.q5}
               onChange={e => setAnswers({...answers, q5: e.target.value})}
               className="w-full bg-[#2A1629] border border-[#3D1C34] rounded-lg p-3 text-white focus:outline-none focus:border-[#FF9CB1] resize-none h-20 sm:h-24 text-sm sm:text-base"
@@ -162,16 +181,16 @@ Sus respuestas:
             />
           </div>
 
-          <button
+          <motion.button variants={itemV}
             onClick={handleSubmit}
             disabled={isLoading || !Object.values(answers).some(a => a.length > 0)}
             className="w-full py-4 rounded-xl bg-gradient-to-r from-[#FFB3C6] to-[#FF9CB1] text-[#2A1629] font-extrabold text-lg hover:from-[#FF9CB1] hover:to-[#FFE5EC] transition-all shadow-[0_0_20px_rgba(255,156,177,0.5)] disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-wider"
           >
             {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
             Enviar Reflexiones
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

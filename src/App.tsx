@@ -61,6 +61,44 @@ type AppState = 'START_MENU' | 'STAGE_INTRO' | 'PLAYING' | 'CARD_VIEW' | 'END_SC
 
 // --- Main Application ---
 
+
+const typoVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100 } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.2 } }
+};
+
+
+const pageV: any = {
+  hidden: { opacity: 0, scale: 0.8, y: 30, filter: 'blur(10px)' },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    y: 0, 
+    filter: 'blur(0px)',
+    transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.08, delayChildren: 0.1 }
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.9, 
+    y: 20, 
+    filter: 'blur(5px)',
+    transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.05, staggerDirection: -1 }
+  }
+};
+
+const itemV: any = {
+  hidden: { opacity: 0, y: 20, scale: 0.9 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100 } },
+  exit: { opacity: 0, y: -10, scale: 0.95, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100 } }
+};
+
+const sidebarV: any = {
+  hidden: { x: -80, opacity: 0, scale: 0.95 },
+  visible: { x: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.08, delayChildren: 0.1 } },
+  exit: { x: -80, opacity: 0, scale: 0.95, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.05, staggerDirection: -1 } }
+};
+
 export default function App() {
   const [appState, setAppState] = useState<AppState>('START_MENU');
   const [nieblaMenuTab, setNieblaMenuTab] = useState<'intro' | 'controles' | 'emociones'>('intro');
@@ -301,15 +339,15 @@ export default function App() {
             <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-[#2C1625] border border-[#FF9CB1]/30 flex items-center justify-center mb-6 shadow-inner`}>
               <Footprints className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} text-[#FF9CB1] fill-current`} />
             </div>
-            <h2 className="text-[28px] font-bold text-[#FF9CB1] tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>Acciones</h2>
-            <p className="text-[11px] text-[#FFE5EC]/60 font-semibold tracking-[0.2em] uppercase mt-2">A TOMAR</p>
+            <motion.h2 variants={itemV} className="text-[28px] font-bold text-[#FF9CB1] tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>Acciones</motion.h2>
+            <motion.p variants={itemV} className="text-[11px] text-[#FFE5EC]/60 font-semibold tracking-[0.2em] uppercase mt-2">A TOMAR</motion.p>
           </div>
           
           <div className="flex-1 flex flex-col gap-4 w-full">
             {selectedPhrases.map((phrase, idx) => (
               <div key={idx} className="bg-[#2A1629] rounded p-5 flex gap-4 w-full items-start">
                 <span className="text-[#FF9CB1] font-bold text-[15px]">{idx + 1}.</span>
-                <p className="text-[#FF9CB1] text-[15px] leading-relaxed font-medium">{phrase}</p>
+                <motion.p variants={itemV} className="text-[#FF9CB1] text-[15px] leading-relaxed font-medium">{phrase}</motion.p>
               </div>
             ))}
           </div>
@@ -327,8 +365,8 @@ export default function App() {
             <div className={`rounded-full bg-[#355946] flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(53,89,70,0.5)] border border-[#48755D] ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}`}>
               <Leaf className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-[#A1C6B2] fill-current`} />
             </div>
-            <h2 className="text-[#FFFFFF] text-lg font-medium tracking-wide">Emociones</h2>
-            <p className="text-[#A1C6B2] text-xs font-bold tracking-widest uppercase mt-1">Identificadas</p>
+            <motion.h2 variants={itemV} className="text-[#FFFFFF] text-lg font-medium tracking-wide">Emociones</motion.h2>
+            <motion.p variants={itemV} className="text-[#A1C6B2] text-xs font-bold tracking-widest uppercase mt-1">Identificadas</motion.p>
           </div>
           <div className="flex flex-col w-full overflow-y-auto custom-scrollbar flex-1 pb-8">
             {selectedPhrases.map((phrase, idx) => (
@@ -385,20 +423,18 @@ export default function App() {
             ></div>
             <motion.div
               key="start"
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              variants={pageV} initial="hidden" animate="visible" exit="exit"
               className={`${isMobile ? 'px-6 py-12' : 'px-16 py-24'} max-w-[600px] w-full rounded-2xl bg-[#0B0F0C]/40 backdrop-blur-xl border border-white/5 flex flex-col items-center text-center relative z-10 shadow-[0_0_50px_rgba(0,0,0,0.8)]`}
             >
-              <h1 className={`${isMobile ? 'text-4xl' : 'text-5xl'} font-bold text-[#8BE8B9] tracking-[0.15em] mb-8 drop-shadow-[0_0_20px_rgba(139,232,185,0.4)]`} style={{ fontFamily: '"Inter", sans-serif' }}>
+              <motion.h1 variants={itemV} className={`${isMobile ? 'text-4xl' : 'text-5xl'} font-bold text-[#8BE8B9] tracking-[0.15em] mb-8 drop-shadow-[0_0_20px_rgba(139,232,185,0.4)]`} style={{ fontFamily: '"Inter", sans-serif' }}>
                 CREATIX
-              </h1>
+              </motion.h1>
               
               <div className="w-12 h-[1px] bg-white/10 mb-10"></div>
               
-              <p className={`${isMobile ? 'text-sm' : 'text-[15px]'} text-[#D1D5DB] font-light leading-relaxed mb-16 max-w-[320px]`}>
+              <motion.p variants={itemV} className={`${isMobile ? 'text-sm' : 'text-[15px]'} text-[#D1D5DB] font-light leading-relaxed mb-16 max-w-[320px]`}>
                 Atraviesa la niebla, la claridad te espera al otro lado.
-              </p>
+              </motion.p>
               
               <button
                 onClick={() => setAppState('STAGE_INTRO')}
@@ -426,10 +462,10 @@ export default function App() {
 
                 {/* Sidebar (Desktop only) */}
                 {!isMobile && (
-                  <div className="relative z-10 w-[280px] h-full bg-[#050B08]/95 border-r border-[#0F1E16] flex flex-col py-10 flex-shrink-0">
+                  <motion.div variants={sidebarV} initial="hidden" animate="visible" exit="exit" className="relative z-10 w-[280px] h-full bg-[#050B08]/95 border-r border-[#0F1E16] flex flex-col py-10 flex-shrink-0">
                     <div className="px-8 mb-14">
-                      <h2 className="text-[#34D399] text-xl font-bold tracking-wide uppercase">Creatividad</h2>
-                      <p className="text-[#34D399]/60 text-[11px] uppercase tracking-wider font-light mt-1">Modo Inmersivo</p>
+                      <motion.h2 variants={itemV} className="text-[#34D399] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
+                      <motion.p variants={itemV} className="text-[#34D399]/60 text-[11px] uppercase tracking-wider font-light mt-1">Modo Inmersivo</motion.p>
                     </div>
                     <div className="flex flex-col flex-1">
                       <div 
@@ -454,7 +490,7 @@ export default function App() {
                          <span className="font-medium text-[13px] tracking-wide">Emociones</span>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Main Content Area */}
@@ -463,17 +499,14 @@ export default function App() {
                     {nieblaMenuTab === 'intro' && (
                       <motion.div
                         key="niebla-intro"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[440px] aspect-square max-h-[440px] rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center justify-center text-center px-10 py-8 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
                       >
                         <Cloud className="w-16 h-16 text-[#8BE8B9] mb-8 drop-shadow-[0_0_15px_rgba(139,232,185,0.3)] fill-current" />
-                        <h2 className="text-3xl font-bold text-white tracking-[0.2em] mb-6">NIEBLA</h2>
-                        <p className="text-[#A3B3AA] text-[15px] leading-relaxed max-w-[300px] font-light mb-12">
+                        <motion.h2 variants={itemV} className="text-3xl font-bold text-white tracking-[0.2em] mb-6">NIEBLA</motion.h2>
+                        <motion.p variants={itemV} className="text-[#A3B3AA] text-[15px] leading-relaxed max-w-[300px] font-light mb-12">
                           Estás en la niebla. Lee un arco para entender cómo te sientes y así poder abrir el túnel.
-                        </p>
+                        </motion.p>
                         <button
                           onClick={() => setAppState('PLAYING')}
                           className="px-10 py-3.5 rounded-full bg-[#2A5A43] text-[#8BE8B9] text-xs font-semibold tracking-wide hover:bg-[#326B50] hover:text-white transition-colors"
@@ -486,13 +519,10 @@ export default function App() {
                     {nieblaMenuTab === 'controles' && (
                       <motion.div
                         key="niebla-controles"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[480px] rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center p-10 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
                       >
-                        <h2 className="text-3xl font-bold text-[#8BE8B9] tracking-[0.25em] mb-8 drop-shadow-[0_0_10px_rgba(139,232,185,0.4)]">CONTROLES</h2>
+                        <motion.h2 variants={itemV} className="text-3xl font-bold text-[#8BE8B9] tracking-[0.25em] mb-8 drop-shadow-[0_0_10px_rgba(139,232,185,0.4)]">CONTROLES</motion.h2>
                         <div className="w-full h-px bg-[#1B3024] mb-8"></div>
                         
                         <div className="w-full flex flex-col gap-5 mb-10">
@@ -536,26 +566,23 @@ export default function App() {
                     {nieblaMenuTab === 'emociones' && (
                       <motion.div
                         key="niebla-emociones"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center p-10 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
                       >
                         <Leaf className="w-12 h-12 text-[#8BE8B9] mb-6 drop-shadow-[0_0_15px_rgba(139,232,185,0.3)] fill-current" />
-                        <h2 className="text-2xl font-bold text-white tracking-[0.1em] mb-8 text-center">EMOCIONES IDENTIFICADAS</h2>
+                        <motion.h2 variants={itemV} className="text-2xl font-bold text-white tracking-[0.1em] mb-8 text-center">EMOCIONES IDENTIFICADAS</motion.h2>
                         <div className="w-full h-px bg-[#1B3024] mb-8"></div>
                         
                         <div className="w-full flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar mb-8">
                           {selectedPhrases.length > 0 ? (
                             selectedPhrases.map((phrase, idx) => (
                               <div key={idx} className="w-full bg-[#0A100D] border border-[#1B3024] rounded-lg p-4">
-                                <p className="text-[#A3B3AA] text-sm italic">"{phrase}"</p>
+                                <motion.p variants={itemV} className="text-[#A3B3AA] text-sm italic">"{phrase}"</motion.p>
                               </div>
                             ))
                           ) : (
                             <div className="flex-1 flex items-center justify-center">
-                              <p className="text-[#A3B3AA]/50 text-sm text-center">Aún no has identificado ninguna emoción en la niebla.</p>
+                              <motion.p variants={itemV} className="text-[#A3B3AA]/50 text-sm text-center">Aún no has identificado ninguna emoción en la niebla.</motion.p>
                             </div>
                           )}
                         </div>
@@ -575,10 +602,10 @@ export default function App() {
               <div className="absolute inset-0 flex z-30 bg-black/40 backdrop-blur-sm">
                 {/* Left Sidebar Menu for EXPLORACION */}
                 {(!isMobile || exploracionMenuTab === 'intro') && (
-                  <div className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#191522]/95 border-r border-[#3D1C34] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
+                  <motion.div variants={sidebarV} initial="hidden" animate="visible" exit="exit" className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#191522]/95 border-r border-[#3D1C34] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
                     <div className="px-8 mb-12">
-                      <h2 className="text-[#FF9CB1] text-xl font-bold tracking-wide uppercase">Creatividad</h2>
-                      <p className="text-[#FFE5EC]/60 text-[11px] uppercase tracking-wider font-light mt-1">Exploración</p>
+                      <motion.h2 variants={itemV} className="text-[#FF9CB1] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
+                      <motion.p variants={itemV} className="text-[#FFE5EC]/60 text-[11px] uppercase tracking-wider font-light mt-1">Exploración</motion.p>
                     </div>
 
                     <div className="flex flex-col flex-1 gap-2">
@@ -611,7 +638,7 @@ export default function App() {
                          <span className="font-medium text-[13px] tracking-wide">Reflexiones</span>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Main Content Area */}
@@ -620,9 +647,7 @@ export default function App() {
                     {exploracionMenuTab === 'intro' && (
                       <motion.div
                         key="stage-intro-exploracion"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[440px] rounded-3xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center text-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#2C1625] to-[#2A1629] border border-[#FFB3C6] shadow-[0_0_30px_rgba(255,156,177,0.15)] flex items-center justify-center mb-8 relative">
@@ -630,13 +655,13 @@ export default function App() {
                           <Compass className="w-7 h-7 text-[#FF9CB1] drop-shadow-[0_0_10px_rgba(255,156,177,0.8)]" fill="currentColor" />
                         </div>
                         
-                        <h2 className="text-[28px] font-bold text-[#FF9CB1] mb-6 tracking-wide">
+                        <motion.h2 variants={itemV} className="text-[28px] font-bold text-[#FF9CB1] mb-6 tracking-wide">
                           Camino Revelado
-                        </h2>
+                        </motion.h2>
                         
-                        <p className="text-[#FFE5EC] text-[15px] leading-[1.7] font-light max-w-[340px] mb-12 opacity-90">
+                        <motion.p variants={itemV} className="text-[#FFE5EC] text-[15px] leading-[1.7] font-light max-w-[340px] mb-12 opacity-90">
                           La densa niebla se disipa lentamente. Ante ti se revela un arco ancestral. Cruza el túnel luminoso para adentrarte en la siguiente fase de tu exploración.
-                        </p>
+                        </motion.p>
 
                         <button
                           onClick={() => setAppState('PLAYING')}
@@ -650,13 +675,10 @@ export default function App() {
                     {exploracionMenuTab === 'controles' && (
                       <motion.div
                         key="exploracion-controles"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
-                        <h2 className="text-3xl font-extrabold text-[#FF9CB1] tracking-[0.25em] mb-8 drop-shadow-[0_0_10px_rgba(255,156,177,0.4)]">CONTROLES</h2>
+                        <motion.h2 variants={itemV} className="text-3xl font-extrabold text-[#FF9CB1] tracking-[0.25em] mb-8 drop-shadow-[0_0_10px_rgba(255,156,177,0.4)]">CONTROLES</motion.h2>
                         <div className="w-full h-px bg-[#3D1C34] mb-8"></div>
                         
                         <div className="w-full flex flex-col gap-5 mb-10">
@@ -700,14 +722,11 @@ export default function App() {
                     {exploracionMenuTab === 'acciones' && (
                       <motion.div
                         key="exploracion-acciones"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <Footprints className="w-12 h-12 text-[#FF9CB1] mb-6 drop-shadow-[0_0_15px_rgba(255,156,177,0.3)] fill-current" />
-                        <h2 className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-8 text-center uppercase">Acciones Elegidas</h2>
+                        <motion.h2 variants={itemV} className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-8 text-center uppercase">Acciones Elegidas</motion.h2>
                         <div className="w-full h-px bg-[#3D1C34] mb-8"></div>
                         
                         <div className="w-full flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar mb-8">
@@ -715,19 +734,19 @@ export default function App() {
                             <>
                               {selectedPhrases.map((phrase, idx) => (
                                 <div key={idx} className="w-full bg-[#2A1629] border border-[#FFB3C6]/50 rounded-lg p-4">
-                                  <p className="text-[#FFE5EC] text-sm italic">Acción: "{phrase}"</p>
+                                  <motion.p variants={itemV} className="text-[#FFE5EC] text-sm italic">Acción: "{phrase}"</motion.p>
                                 </div>
                               ))}
                               {userReflections.map((ref, idx) => (
                                 <div key={`ref-${idx}`} className="w-full bg-[#3D1C34] border border-[#FF9CB1] rounded-lg p-4">
                                   <h4 className="text-[#FF9CB1] text-xs font-bold uppercase mb-2">Reflexión - {new Date(ref.timestamp).toLocaleTimeString()}</h4>
-                                  <p className="text-[#FFE5EC] text-sm mb-2 opacity-80">{ref.report}</p>
+                                  <motion.p variants={itemV} className="text-[#FFE5EC] text-sm mb-2 opacity-80">{ref.report}</motion.p>
                                 </div>
                               ))}
                             </>
                           ) : (
                             <div className="flex-1 flex items-center justify-center flex-col gap-4">
-                              <p className="text-[#FFE5EC]/50 text-sm text-center">Aún no has elegido ninguna acción ni escrito reflexiones.</p>
+                              <motion.p variants={itemV} className="text-[#FFE5EC]/50 text-sm text-center">Aún no has elegido ninguna acción ni escrito reflexiones.</motion.p>
                             </div>
                           )}
                         </div>
@@ -744,15 +763,12 @@ export default function App() {
                     {exploracionMenuTab === 'reflexiones' && (
                       <motion.div
                         key="exploracion-reflexiones"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <Sparkles className="w-12 h-12 text-[#FF9CB1] mb-6 drop-shadow-[0_0_15px_rgba(255,156,177,0.3)]" />
-                        <h2 className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-4 text-center uppercase">Reflexiones</h2>
-                        <p className="text-[#FFE5EC]/80 text-sm text-center mb-8">Tómate un momento para analizar las acciones y emociones que has experimentado en tu camino.</p>
+                        <motion.h2 variants={itemV} className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-4 text-center uppercase">Reflexiones</motion.h2>
+                        <motion.p variants={itemV} className="text-[#FFE5EC]/80 text-sm text-center mb-8">Tómate un momento para analizar las acciones y emociones que has experimentado en tu camino.</motion.p>
                         <div className="w-full h-px bg-[#3D1C34] mb-8"></div>
                         
                         <div className="flex-1 flex flex-col items-center justify-center mb-8">
@@ -783,10 +799,10 @@ export default function App() {
               <div className="absolute inset-0 flex z-30 bg-black/40 backdrop-blur-sm">
                 {/* Left Sidebar Menu for CLARIDAD */}
                 {(!isMobile || claridadMenuTab === 'intro') && (
-                  <div className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#0A191A]/95 border-r border-[#004D40] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
+                  <motion.div variants={sidebarV} initial="hidden" animate="visible" exit="exit" className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#0A191A]/95 border-r border-[#004D40] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
                     <div className="px-8 mb-12">
-                      <h2 className="text-[#00E676] text-xl font-bold tracking-wide uppercase">Creatividad</h2>
-                      <p className="text-[#F1F8E9]/60 text-[11px] uppercase tracking-wider font-light mt-1">Claridad</p>
+                      <motion.h2 variants={itemV} className="text-[#00E676] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
+                      <motion.p variants={itemV} className="text-[#F1F8E9]/60 text-[11px] uppercase tracking-wider font-light mt-1">Claridad</motion.p>
                     </div>
 
                     <div className="flex flex-col flex-1 gap-2">
@@ -826,7 +842,7 @@ export default function App() {
                          <span className="text-sm font-medium tracking-wide">Reflexión Interior</span>
                        </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Right Content Area for CLARIDAD */}
@@ -835,22 +851,20 @@ export default function App() {
                     {claridadMenuTab === 'intro' && (
                       <motion.div
                         key="claridad-intro"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[480px] rounded-2xl bg-[#0A191A] border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden"
                       >
                         <div className="mb-6 w-16 h-16 rounded-full bg-[#242C1B] border border-[#78A840] shadow-[0_0_25px_rgba(120,168,64,0.3)] flex items-center justify-center">
                           <Footprints className="w-8 h-8 text-[#86B84A] fill-current" />
                         </div>
                         
-                        <h2 className="text-[32px] font-bold text-[#00E676] uppercase tracking-wide mb-6">
+                        <motion.h2 variants={itemV} className="text-[32px] font-bold text-[#00E676] uppercase tracking-wide mb-6">
                           CLARIDAD
-                        </h2>
+                        </motion.h2>
 
-                        <p className="text-[16px] text-[#F1F8E9] leading-[1.6] max-w-[320px] font-light mb-12">
+                        <motion.p variants={itemV} className="text-[16px] text-[#F1F8E9] leading-[1.6] max-w-[320px] font-light mb-12">
                           El camino está claro. ¡Disfruta de la creatividad y haz cosas nuevas con todo lo que has aprendido!
-                        </p>
+                        </motion.p>
 
                         <button
                           onClick={() => setAppState('PLAYING')}
@@ -864,15 +878,13 @@ export default function App() {
                     {claridadMenuTab === 'controles' && (
                       <motion.div
                         key="claridad-controles"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[480px] flex flex-col"
                       >
                         <div className="bg-[#0A191A]/90 border border-[#00E676]/40 rounded-[20px] shadow-[0_0_50px_rgba(0,230,118,0.15)] backdrop-blur-xl relative overflow-hidden flex flex-col p-8">
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-[#00E676] opacity-40 blur-[2px]"></div>
                           
-                          <h2 className="text-[32px] font-extrabold text-[#00E676] uppercase tracking-widest text-center mb-10 drop-shadow-[0_0_15px_rgba(0,230,118,0.4)]">CONTROLES</h2>
+                          <motion.h2 variants={itemV} className="text-[32px] font-extrabold text-[#00E676] uppercase tracking-widest text-center mb-10 drop-shadow-[0_0_15px_rgba(0,230,118,0.4)]">CONTROLES</motion.h2>
 
                           <div className="flex flex-col gap-4 mb-10 w-full">
                             {[
@@ -905,17 +917,15 @@ export default function App() {
                     {claridadMenuTab === 'ejercicios' && (
                       <motion.div
                         key="claridad-ejercicios"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[440px] h-auto min-h-[400px] bg-[#16140F]/95 rounded-3xl flex flex-col shadow-[0_0_40px_rgba(0,230,118,0.15)] overflow-hidden pb-8 mx-auto border border-white/5 backdrop-blur-xl"
                       >
                          <div className="flex flex-col items-center pt-12 pb-10">
                              <div className="w-24 h-24 rounded-full bg-[#2A1D0B] flex items-center justify-center mb-6">
                                <Footprints className="w-12 h-12 text-[#00E676]" fill="currentColor" />
                              </div>
-                             <h2 className="text-[26px] font-bold text-white mb-2">Acciones</h2>
-                             <p className="text-[#00E676] text-sm font-bold tracking-[0.15em] uppercase">COMPLETADAS</p>
+                             <motion.h2 variants={itemV} className="text-[26px] font-bold text-white mb-2">Acciones</motion.h2>
+                             <motion.p variants={itemV} className="text-[#00E676] text-sm font-bold tracking-[0.15em] uppercase">COMPLETADAS</motion.p>
                          </div>
                          
                          <div className="w-full flex-1 flex flex-col mb-8 bg-[#1B1812] py-4">
@@ -923,12 +933,12 @@ export default function App() {
                              selectedPhrases.map((phrase, idx) => (
                                <div key={idx} className="w-full px-8 py-5 flex gap-4 items-center">
                                  <span className="text-[#00E676] font-bold text-lg">{idx + 1}.</span>
-                                 <p className="text-[#00E676] text-lg font-medium">{phrase}</p>
+                                 <motion.p variants={itemV} className="text-[#00E676] text-lg font-medium">{phrase}</motion.p>
                                </div>
                              ))
                            ) : (
                              <div className="flex-1 flex items-center justify-center py-6">
-                               <p className="text-[#F1F8E9]/50 text-sm text-center">Aún no has completado acciones en la claridad.</p>
+                               <motion.p variants={itemV} className="text-[#F1F8E9]/50 text-sm text-center">Aún no has completado acciones en la claridad.</motion.p>
                              </div>
                            )}
                          </div>
@@ -947,18 +957,16 @@ export default function App() {
                     {claridadMenuTab === 'ayuda' && (
                       <motion.div
                         key="claridad-ayuda"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        variants={pageV} initial="hidden" animate="visible" exit="exit"
                         className="w-full max-w-[500px] p-8 bg-[#0A191A]/95 border border-[#004D40] rounded-xl flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,230,118,0.15)]"
                       >
-                         <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-[#00E676]">
+                         <motion.h3 variants={itemV} className="text-xl font-bold tracking-widest uppercase mb-4 text-[#00E676]">
                            Reflexión Interior
-                         </h3>
-                         <p className="text-[#F1F8E9] text-center mb-8 px-4 text-sm leading-relaxed">
+                         </motion.h3>
+                         <motion.p variants={itemV} className="text-[#F1F8E9] text-center mb-8 px-4 text-sm leading-relaxed">
                            Estás en el claro abierto. Utiliza este espacio para reflexionar, buscar inspiración o crear libremente. 
                            Presiona <span className="text-[#00E676] font-bold">C</span> en cualquier momento para obtener una chispa de inspiración.
-                         </p>
+                         </motion.p>
                          <button
                            onClick={() => setAppState('PLAYING')}
                            className="w-full py-3 bg-[#00E676] hover:bg-[#00E676]/80 text-[#004D40] font-bold tracking-wider text-sm rounded shadow-[0_0_15px_rgba(0,230,118,0.4)] transition-all"
@@ -979,16 +987,14 @@ export default function App() {
             {stage === 'NIEBLA' ? (
               <motion.div
                 key="card-view-niebla"
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                variants={pageV} initial="hidden" animate="visible" exit="exit"
                 className="w-full max-w-[400px] rounded-[32px] bg-gradient-to-b from-[#557360] to-[#24312A] border border-white/5 flex flex-col items-center text-center px-8 py-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
               >
                 <Leaf className="w-10 h-10 text-[#8BE8B9] mb-6 fill-current opacity-90" />
                 
-                <h3 className="text-2xl font-bold text-[#F3F4F6] mb-12 px-2 leading-snug tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>
+                <motion.h3 variants={itemV} className="text-2xl font-bold text-[#F3F4F6] mb-12 px-2 leading-snug tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>
                   "{currentPhrase}"
-                </h3>
+                </motion.h3>
                 
                 <div className="flex flex-col gap-4 w-full">
                   <button
@@ -1009,9 +1015,7 @@ export default function App() {
             ) : stage === 'EXPLORACION' ? (
               <motion.div
                 key="card-view-exploracion"
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                variants={pageV} initial="hidden" animate="visible" exit="exit"
                 className="w-full max-w-[340px] rounded-3xl bg-[#191522]/95 backdrop-blur-xl border border-white/5 flex flex-col items-center px-6 py-8 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
               >
                 <div className="w-full flex justify-end mb-8">
@@ -1024,8 +1028,8 @@ export default function App() {
                 </div>
 
                 <div className="text-center px-2 w-full mb-8">
-                   <p className="text-[#FF9CB1]/70 text-[10px] font-bold tracking-[0.2em] uppercase mb-3">Acción Elegida</p>
-                   <p className="text-[#FFF0F4] text-[15px] font-medium leading-relaxed italic drop-shadow-md">"{currentPhrase}"</p>
+                   <motion.p variants={itemV} className="text-[#FF9CB1]/70 text-[10px] font-bold tracking-[0.2em] uppercase mb-3">Acción Elegida</motion.p>
+                   <motion.p variants={itemV} className="text-[#FFF0F4] text-[15px] font-medium leading-relaxed italic drop-shadow-md">"{currentPhrase}"</motion.p>
                 </div>
 
                 <div className="w-48 h-48 rounded-full border-[3px] border-[#FF9CB1] shadow-[0_0_25px_rgba(255,156,177,0.3),inset_0_0_25px_rgba(255,156,177,0.3)] flex items-center justify-center mb-6 relative">
@@ -1092,22 +1096,20 @@ export default function App() {
             ) : stage === 'CLARIDAD' ? (
               <motion.div
                 key="card-view-claridad"
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                variants={pageV} initial="hidden" animate="visible" exit="exit"
                 className="w-full max-w-[480px] rounded-2xl bg-[#0A191A]/90 border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden backdrop-blur-md"
               >
                 <div className="mb-6">
                   <Sun className="w-12 h-12 text-[#00E676]" strokeWidth={1.5} />
                 </div>
                 
-                <h2 className="text-[32px] font-bold text-[#00E676] uppercase tracking-wide mb-6">
+                <motion.h2 variants={itemV} className="text-[32px] font-bold text-[#00E676] uppercase tracking-wide mb-6">
                   CLARIDAD
-                </h2>
+                </motion.h2>
 
-                <p className="text-[16px] text-[#F1F8E9] leading-[1.6] max-w-[320px] font-light mb-12">
+                <motion.p variants={itemV} className="text-[16px] text-[#F1F8E9] leading-[1.6] max-w-[320px] font-light mb-12">
                   {currentPhrase}
-                </p>
+                </motion.p>
 
                 <div className={`flex flex-col gap-3 w-full max-w-[340px] mt-4 z-10`}>
                   <button
@@ -1127,9 +1129,7 @@ export default function App() {
             ) : (
               <motion.div
                 key="card-view"
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                variants={pageV} initial="hidden" animate="visible" exit="exit"
                 className={`${isMobile ? 'p-4 pt-10 max-w-xs' : 'p-10 pt-16 max-w-md'} w-full rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#00E676] shadow-[0_0_50px_rgba(0,230,118,0.5)] flex flex-col items-center text-center ${isMobile ? 'gap-4' : 'gap-6'} relative overflow-hidden`}
               >
                 {isMobile && (
@@ -1143,9 +1143,9 @@ export default function App() {
                 {/* Inner decorative border */}
                 <div className="absolute inset-4 border-2 border-[#00E676]/60 rounded-t-[134px] rounded-b-xl pointer-events-none shadow-[inset_0_0_15px_rgba(0,230,118,0.3)]"></div>
 
-                <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-medium leading-relaxed font-serif italic text-[#00E676] drop-shadow-[0_0_10px_rgba(0,230,118,0.6)] relative z-10 mt-4`}>
+                <motion.p variants={itemV} className={`${isMobile ? 'text-lg' : 'text-2xl'} font-medium leading-relaxed font-serif italic text-[#00E676] drop-shadow-[0_0_10px_rgba(0,230,118,0.6)] relative z-10 mt-4`}>
                   "{currentPhrase}"
-                </p>
+                </motion.p>
 
                 <div className={`flex flex-col ${isMobile ? 'gap-2' : 'gap-3'} w-full mt-4 relative z-10`}>
                   <button
@@ -1177,8 +1177,8 @@ export default function App() {
                   <div className="w-full h-full bg-[#004D40]" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-extrabold text-[#00E676] tracking-wide uppercase" style={{ fontFamily: '"Inter", sans-serif' }}>Creatix</h1>
-                  <p className="text-[#888377] text-xs font-light">Santuario Creativo</p>
+                  <motion.h1 variants={itemV} className="text-xl font-extrabold text-[#00E676] tracking-wide uppercase" style={{ fontFamily: '"Inter", sans-serif' }}>Creatix</motion.h1>
+                  <motion.p variants={itemV} className="text-[#888377] text-xs font-light">Santuario Creativo</motion.p>
                 </div>
               </div>
               
@@ -1274,10 +1274,10 @@ export default function App() {
                 </div>
 
                 <div className="text-center mb-2 mt-4">
-                  <h2 className="text-3xl font-bold text-white mb-2 tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>
+                  <motion.h2 variants={itemV} className="text-3xl font-bold text-white mb-2 tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>
                     Has finalizado el juego
-                  </h2>
-                  <p className="text-[#A8A397] font-light">Puedes seguir en libertad de crear. Aquí tienes tu registro creativo.</p>
+                  </motion.h2>
+                  <motion.p variants={itemV} className="text-[#A8A397] font-light">Puedes seguir en libertad de crear. Aquí tienes tu registro creativo.</motion.p>
                 </div>
 
                 {/* Cards Grid: Summary of the 3 phases */}
@@ -1289,8 +1289,8 @@ export default function App() {
                         <Cloud className="w-5 h-5 text-[#888377]" />
                       </div>
                       <div>
-                        <h3 className="text-[#FFFFFF] text-xl font-bold">La Niebla</h3>
-                        <p className="text-[#888377] text-xs font-medium uppercase tracking-wider">Emociones</p>
+                        <motion.h3 variants={itemV} className="text-[#FFFFFF] text-xl font-bold">La Niebla</motion.h3>
+                        <motion.p variants={itemV} className="text-[#888377] text-xs font-medium uppercase tracking-wider">Emociones</motion.p>
                       </div>
                     </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
@@ -1313,8 +1313,8 @@ export default function App() {
                         <Footprints className="w-5 h-5 text-[#95E052]" />
                       </div>
                       <div>
-                        <h3 className="text-[#FFFFFF] text-xl font-bold">Exploración</h3>
-                        <p className="text-[#95E052] text-xs font-medium uppercase tracking-wider">Acciones</p>
+                        <motion.h3 variants={itemV} className="text-[#FFFFFF] text-xl font-bold">Exploración</motion.h3>
+                        <motion.p variants={itemV} className="text-[#95E052] text-xs font-medium uppercase tracking-wider">Acciones</motion.p>
                       </div>
                     </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
@@ -1337,8 +1337,8 @@ export default function App() {
                         <Sun className="w-5 h-5 text-[#00E676]" />
                       </div>
                       <div>
-                        <h3 className="text-[#FFFFFF] text-xl font-bold">Claridad</h3>
-                        <p className="text-[#00E676] text-xs font-medium uppercase tracking-wider">Ejercicios</p>
+                        <motion.h3 variants={itemV} className="text-[#FFFFFF] text-xl font-bold">Claridad</motion.h3>
+                        <motion.p variants={itemV} className="text-[#00E676] text-xs font-medium uppercase tracking-wider">Ejercicios</motion.p>
                       </div>
                     </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">

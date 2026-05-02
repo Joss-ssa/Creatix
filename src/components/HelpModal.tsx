@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React, { useState } from 'react';
 import { X, Sparkles, Loader2, Settings, Lightbulb, Palette, Puzzle, RefreshCw } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
@@ -6,8 +7,26 @@ interface HelpModalProps {
   onClose: () => void;
 }
 
+
+const itemV: any = {
+  hidden: { opacity: 0, y: 20, scale: 0.9 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100 } },
+  exit: { opacity: 0, y: -10, scale: 0.95, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100 } }
+};
+const listV: any = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  exit: { opacity: 0, transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+};
+
 export const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
-  const [ideaInput, setIdeaInput] = useState('');
+
+const modalV: any = {
+  hidden: { opacity: 0, scale: 0.95, y: 40 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.08, delayChildren: 0.1 } },
+  exit: { opacity: 0, scale: 0.95, y: 20, transition: { type: "spring", bounce: 0, damping: 20, stiffness: 100, staggerChildren: 0.05, staggerDirection: -1 } }
+};
+    const [ideaInput, setIdeaInput] = useState('');
   const [loadingState, setLoadingState] = useState({
     all: false,
     ideas: false,
@@ -100,7 +119,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-row bg-black/70 backdrop-blur-md overflow-hidden">
+    <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex flex-row bg-black/70 backdrop-blur-md overflow-hidden">
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full relative overflow-y-auto w-full">
@@ -117,8 +136,8 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
           
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-[54px] font-bold text-[#F1F8E9] mb-3 tracking-tight drop-shadow-md">Ayuda Creativa</h1>
-            <p className="text-[#A8A397] text-lg font-light tracking-wide">Escribe tus ideas sueltas y deja que la magia te inspire.</p>
+            <motion.h1 variants={itemV} className="text-[54px] font-bold text-[#F1F8E9] mb-3 tracking-tight drop-shadow-md">Ayuda Creativa</motion.h1>
+            <motion.p variants={itemV} className="text-[#A8A397] text-lg font-light tracking-wide">Escribe tus ideas sueltas y deja que la magia te inspire.</motion.p>
           </div>
 
           {/* Text Input Area */}
@@ -148,7 +167,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
             <div className="bg-[#16140F]/60 border border-[#3A3832] rounded-xl p-6 backdrop-blur-sm shadow-md flex flex-col relative group">
               <div className="flex items-center gap-3 mb-6 pr-8">
                 <Lightbulb className="w-5 h-5 text-[#00E676]" />
-                <h3 className="text-[#E2DED5] font-medium text-lg tracking-wide">Ideas / Conceptos</h3>
+                <motion.h3 variants={itemV} className="text-[#E2DED5] font-medium text-lg tracking-wide">Ideas / Conceptos</motion.h3>
               </div>
               <button 
                 onClick={() => generateContent('ideas')} 
@@ -170,7 +189,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
             <div className="bg-[#16140F]/60 border border-[#3A3832] rounded-xl p-6 backdrop-blur-sm shadow-md flex flex-col relative group">
               <div className="flex items-center gap-3 mb-6 pr-8">
                 <Palette className="w-5 h-5 text-[#00E676]" />
-                <h3 className="text-[#E2DED5] font-medium text-lg tracking-wide">Paleta de Colores</h3>
+                <motion.h3 variants={itemV} className="text-[#E2DED5] font-medium text-lg tracking-wide">Paleta de Colores</motion.h3>
               </div>
               <button 
                 onClick={() => generateContent('palette')} 
@@ -196,7 +215,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
             <div className="bg-[#16140F]/60 border border-[#3A3832] rounded-xl p-6 backdrop-blur-sm shadow-md flex flex-col relative group">
               <div className="flex items-center gap-3 mb-6 pr-8">
                 <Puzzle className="w-5 h-5 text-[#00E676]" />
-                <h3 className="text-[#E2DED5] font-medium text-lg tracking-wide">Elementos Random</h3>
+                <motion.h3 variants={itemV} className="text-[#E2DED5] font-medium text-lg tracking-wide">Elementos Random</motion.h3>
               </div>
               <button 
                 onClick={() => generateContent('elements')} 
@@ -221,7 +240,7 @@ idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|
           
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
