@@ -1010,12 +1010,18 @@ export const Game2D: React.FC<Game2DProps> = ({
           }
         }
         else if (obj.type === 'end_mountain' || obj.type === 'start_tunnel') {
-          const isEnd = obj.type === 'end_mountain';
-          const tunnelW = 800; // Narrower to look like doors
-          const tunnelH = 1200; // Taller
-          const archThickness = 80;
+          const dxOrig = obj.x - playerState.current.x;
+          const dzOrig = obj.z - playerState.current.z;
+          const viewAngle = Math.atan2(dxOrig, dzOrig);
+          // Scale based on the angle from player to the door to prevent billboarding
+          ctx.scale(Math.abs(Math.cos(viewAngle)), 1);
 
-          const drawArchPath = (expand: number = 0) => {
+          const isEnd = obj.type === 'end_mountain';
+          const tunnelW = 1000;
+          const tunnelH = 1100;
+          const stoneSize = 140;
+          
+          const drawArchPath = (expand = 0) => {
             const w = tunnelW / 2 + expand;
             const h = tunnelH + expand;
             const archRadius = w;
@@ -1029,45 +1035,252 @@ export const Game2D: React.FC<Game2DProps> = ({
             ctx.closePath();
           };
 
-          // Draw Outer Frame
-          drawArchPath(archThickness);
-          ctx.fillStyle = '#2a2d34';
-          ctx.fill();
+          const drawStoneArchPath = (innerOffset, outerOffset) => {
+            const innerW = tunnelW / 2 + innerOffset;
+            const innerH = tunnelH + innerOffset;
+            const innerRad = innerW;
+            const innerStraight = innerH - innerRad;
+
+            const outerW = tunnelW / 2 + outerOffset;
+            const outerH = tunnelH + outerOffset;
+            const outerRad = outerW;
+            const outerStraight = outerH - outerRad;
+
+            ctx.beginPath();
+            // Outer path (clockwise)
+            ctx.moveTo(-outerW, 0);
+            ctx.lineTo(-outerW, -outerStraight);
+            ctx.arc(0, -outerStraight, outerRad, Math.PI, 0);
+            ctx.lineTo(outerW, 0);
+            
+            // Inner path (counter-clockwise)
+            ctx.lineTo(innerW, 0);
+            ctx.arc(0, -innerStraight, innerRad, 0, Math.PI, true);
+            ctx.lineTo(-innerW, -innerStraight);
+            ctx.lineTo(-innerW, 0);
+            ctx.closePath();
+          };
+
+          // 1. Draw Stone Frame Background
+          ctx.save();
+          drawStoneArchPath(0, stoneSize);
           
-          ctx.lineWidth = 6;
-          ctx.strokeStyle = '#FFD700'; // Gold trim
+          // Stone Texture
+          const stoneGrad = ctx.createLinearGradient(-tunnelW/2 - stoneSize, -tunnelH - stoneSize, tunnelW/2 + stoneSize, 0);
+          stoneGrad.addColorStop(0, '#55585b');
+          stoneGrad.addColorStop(0.5, '#7a7d80');
+          stoneGrad.addColorStop(1, '#4a4d50');
+          ctx.fillStyle = stoneGrad;
+          ctx.fill();
+
+          // Draw Stone Blocks (voussoirs & pillars)
+          ctx.strokeStyle = '#2a2c2e';
+          ctx.lineCap = 'butt';
+          ctx.lineJoin = 'miter';
+          ctx.lineWidth = 8;
           ctx.stroke();
 
-          // Draw the Doors (Always closed, static)
-          ctx.save();
-          drawArchPath(0);
-          ctx.clip();
-          
-          // Wood background (Rich brown)
-          ctx.fillStyle = '#4A2E1B';
-          ctx.fill();
-          
-          // Center gap
-          ctx.strokeStyle = '#111';
-          ctx.lineWidth = 8;
+          // Left pillar blocks
+          const straightH = tunnelH - (tunnelW / 2);
+          const blockH = straightH / 3;
           ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(0, -tunnelH);
+          for(let i=1; i<3; i++) {
+             ctx.moveTo(-tunnelW/2, -i * blockH);
+             ctx.lineTo(-tunnelW/2 - stoneSize, -i * blockH - 10);
+             
+             ctx.moveTo(tunnelW/2, -i * blockH);
+             ctx.lineTo(tunnelW/2 + stoneSize, -i * blockH - 10);
+          }
+          // Arch stones
+          const innerRad = tunnelW/2;
+          const outerRad = innerRad + stoneSize;
+          const numArchStones = 7;
+          for(let i=1; i<numArchStones; i++) {
+             const angle = Math.PI + (Math.PI * i / numArchStones);
+             const cosA = Math.cos(angle);
+             const sinA = Math.sin(angle);
+             ctx.moveTo(innerRad * cosA, -straightH + innerRad * sinA);
+             ctx.lineTo(outerRad * cosA, -straightH + outerRad * sinA);
+          }
           ctx.stroke();
           
-          // Simple handles
-          ctx.fillStyle = '#FFD700';
-          ctx.beginPath();
-          ctx.arc(-40, -tunnelH * 0.5, 15, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(40, -tunnelH * 0.5, 15, 0, Math.PI * 2);
-          ctx.fill();
+          // Inner shadow on stones
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+          ctx.stroke();
           
+          ctx.restore();
+
+          // 2. Draw Wooden Doors inside the arch
+          ctx.save();
+          drawArchPath(0);
+          ctx.clip(); // Ensure doors stay within the inner arch
+          ctx.fillStyle = '#111';
+          ctx.fill(); // Base dark
+          
+          // Wood Panels
+          const woodGrad = ctx.createLinearGradient(-tunnelW/2, 0, tunnelW/2, 0);
+          woodGrad.addColorStop(0, '#3a1f11');
+          woodGrad.addColorStop(0.2, '#5a301a');
+          woodGrad.addColorStop(0.5, '#2c150a'); // Center split shadow
+          woodGrad.addColorStop(0.8, '#5a301a');
+          woodGrad.addColorStop(1, '#3a1f11');
+          ctx.fillStyle = woodGrad;
+          ctx.fill();
+
+          // Vertical Wood Planks details
+          ctx.strokeStyle = '#1e0e06';
+          ctx.lineWidth = 4;
+          const numPlanks = 8; // 4 per door
+          const plankW = tunnelW / numPlanks;
+          ctx.beginPath();
+          for(let i=1; i<numPlanks; i++) {
+            if (i === numPlanks/2) continue; // Skip center split
+            ctx.moveTo(-tunnelW/2 + i * plankW, 0);
+            ctx.lineTo(-tunnelW/2 + i * plankW, -tunnelH - 100);
+          }
+          ctx.stroke();
+
+          // Wood Grain highlights
+          ctx.strokeStyle = '#6a3b22';
+          ctx.lineWidth = 1;
+          for(let i=0; i<30; i++) {
+            const px = -tunnelW/2 + Math.random() * tunnelW;
+            ctx.beginPath();
+            ctx.moveTo(px, 0);
+            ctx.lineTo(px, -tunnelH - 100);
+            ctx.globalAlpha = 0.3;
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1.0;
+
+          // Rusty Metal Frame & Straps
+          const metalColor = '#3a3a3a';
+          const rustColor = '#5e3a23';
+          
+          // Inner Vertical Straps (at center)
+          const strapW = 60;
+          ctx.fillStyle = metalColor;
+          ctx.fillRect(-strapW, -tunnelH-50, strapW*2, tunnelH+50);
+          
+          // Center split
+          ctx.fillStyle = '#0a0502';
+          ctx.fillRect(-6, -tunnelH-50, 12, tunnelH+50);
+
+          // Hinge function
+          const drawHinge = (x, y, isRight) => {
+             ctx.save();
+             ctx.translate(x, y);
+             if (isRight) ctx.scale(-1, 1);
+             
+             // Main horizontal bar
+             ctx.fillStyle = metalColor;
+             ctx.fillRect(0, -25, 220, 50);
+             
+             // Ornate curls
+             ctx.beginPath();
+             ctx.moveTo(200, -25);
+             ctx.bezierCurveTo(250, -80, 160, -100, 180, -60);
+             ctx.lineTo(180, -25);
+             ctx.fill();
+             
+             ctx.beginPath();
+             ctx.moveTo(200, 25);
+             ctx.bezierCurveTo(250, 80, 160, 100, 180, 60);
+             ctx.lineTo(180, 25);
+             ctx.fill();
+             
+             // Edge piece
+             ctx.fillRect(-30, -60, 40, 120);
+
+             // Studs on hinge
+             ctx.fillStyle = '#8a7d65';
+             const drawStud = (sx, sy) => {
+                ctx.beginPath();
+                ctx.arc(sx, sy, 8, 0, Math.PI*2);
+                ctx.fill();
+             };
+             drawStud(40, 0);
+             drawStud(100, 0);
+             drawStud(160, 0);
+             drawStud(-10, -40);
+             drawStud(-10, 40);
+             drawStud(-10, 0);
+             
+             ctx.restore();
+          };
+
+          // Top hinges
+          drawHinge(-tunnelW/2 + 20, -straightH + 50, false);
+          drawHinge( tunnelW/2 - 20, -straightH + 50, true);
+          
+          // Bottom hinges
+          drawHinge(-tunnelW/2 + 20, -150, false);
+          drawHinge( tunnelW/2 - 20, -150, true);
+
+          // Ring Handles
+          const drawRing = (x, y) => {
+             // Attach plate
+             ctx.fillStyle = rustColor;
+             ctx.beginPath();
+             ctx.arc(x, y, 30, 0, Math.PI*2);
+             ctx.fill();
+             ctx.fillStyle = metalColor;
+             ctx.beginPath();
+             ctx.arc(x, y, 22, 0, Math.PI*2);
+             ctx.fill();
+             
+             // Ring
+             ctx.strokeStyle = '#7a6d55';
+             ctx.lineWidth = 14;
+             ctx.beginPath();
+             ctx.arc(x, y + 40, 45, 0, Math.PI*2);
+             ctx.stroke();
+             
+             // Ring highlight
+             ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+             ctx.lineWidth = 4;
+             ctx.beginPath();
+             ctx.arc(x, y + 40, 45, Math.PI, Math.PI*1.5);
+             ctx.stroke();
+          };
+          
+          drawRing(-tunnelW/4, -straightH/2 + 50);
+          drawRing( tunnelW/4, -straightH/2 + 50);
+
+          // Vertical Studs along center straps
+          ctx.fillStyle = '#8a7d65'; // Brass/dull gold color
+          for(let y = 0; y < tunnelH; y += 120) {
+             ctx.beginPath(); ctx.arc(-35, -y - 60, 9, 0, Math.PI*2); ctx.fill();
+             ctx.beginPath(); ctx.arc(35, -y - 60, 9, 0, Math.PI*2); ctx.fill();
+          }
+
+          // Bottom & Top metal strapping studs
+          ctx.fillStyle = metalColor;
+          ctx.fillRect(-tunnelW/2, -40, tunnelW, 40); // Bottom strap
+          
+          // Arch metal strap
+          ctx.lineWidth = 40;
+          ctx.beginPath();
+          ctx.arc(0, -straightH, tunnelW/2 - 20, Math.PI, 0);
+          ctx.stroke();
+
+          ctx.fillStyle = '#8a7d65';
+          for(let x = -tunnelW/2 + 40; x < tunnelW/2; x += 100) {
+             ctx.beginPath(); ctx.arc(x, -20, 9, 0, Math.PI*2); ctx.fill();
+          }
+          const numArchStuds = 9;
+          for(let i=0; i<=numArchStuds; i++) {
+             const angle = Math.PI + (Math.PI * i / numArchStuds);
+             ctx.beginPath(); 
+             ctx.arc((tunnelW/2-20)*Math.cos(angle), -straightH + (tunnelW/2-20)*Math.sin(angle), 9, 0, Math.PI*2); 
+             ctx.fill();
+          }
+
           // Glowing effect when ready to enter
           if (isEnd && hasSelectedPhrase) {
             const glowGrad = ctx.createRadialGradient(0, -tunnelH/2, 0, 0, -tunnelH/2, tunnelW/2);
-            glowGrad.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
+            glowGrad.addColorStop(0, 'rgba(0, 230, 118, 0.4)');
             glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = glowGrad;
             ctx.fillRect(-tunnelW/2, -tunnelH, tunnelW, tunnelH);

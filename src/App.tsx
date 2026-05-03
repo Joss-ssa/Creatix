@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X, Maximize, Minimize, Compass, SlidersHorizontal, Castle, Leaf, Play, Square, Smile, Settings2, Palette, Folder, Users, Settings, PlusCircle, Search, Bell, Zap, Paintbrush, LayoutGrid, TrendingUp } from 'lucide-react';
+import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X, Maximize, Minimize, Compass, SlidersHorizontal, Castle, Leaf, Play, Square, Smile, Settings2, Palette, Folder, Users, Settings, PlusCircle, Search, Bell, Zap, Paintbrush, LayoutGrid, TrendingUp, RotateCcw } from 'lucide-react';
 import { Game2D } from './components/Game2D';
 import { ReflectionsModal } from './components/ReflectionsModal';
 import { HelpModal } from './components/HelpModal';
@@ -139,11 +139,13 @@ export default function App() {
   const [userReflections, setUserReflections] = useState<{report: string, answers: Record<string, string>, timestamp: number}[]>([]);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+      setIsPortrait(window.innerHeight > window.innerWidth);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -296,6 +298,18 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-black font-sans selection:bg-sky-200 overflow-hidden relative">
       
+      {/* Portrait Block Overlay */}
+      {isMobile && isPortrait && (
+        <div className="absolute inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-8 text-center">
+          <RotateCcw className="w-16 h-16 text-[#00E676] mb-6 animate-pulse" />
+          <h2 className="text-2xl font-bold text-white mb-4">Gira tu dispositivo</h2>
+          <p className="text-[#A8A397] text-sm">
+            Esta experiencia está diseñada para disfrutarse en formato horizontal (apaisado).
+            Por favor, gira tu dispositivo para continuar.
+          </p>
+        </div>
+      )}
+
       {/* Fullscreen Tab for Mobile */}
       {isMobile && (
         <button
@@ -334,7 +348,7 @@ export default function App() {
 
       {/* EXPLORACION Active Overlay */}
       {selectedPhrases.length > 0 && appState === 'PLAYING' && stage === 'EXPLORACION' && (
-        <div className={`absolute left-0 top-0 bottom-0 z-20 flex flex-col bg-[#191522] border-r border-[#3D1C34] shadow-[20px_0_40px_rgba(0,0,0,0.8)] ${isMobile ? 'w-full px-6 py-10' : 'w-[280px] py-12 px-8'} overflow-y-auto custom-scrollbar`}>
+        <div className={`absolute left-0 top-0 bottom-0 z-20 flex flex-col bg-[#191522] border-r border-[#3D1C34] shadow-[20px_0_40px_rgba(0,0,0,0.8)] ${isMobile ? 'w-[240px] px-4 py-6' : 'w-[280px] py-12 px-8'} overflow-y-auto custom-scrollbar`}>
           <div className="flex flex-col items-center mb-12 w-full mt-8">
             <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-[#2C1625] border border-[#FF9CB1]/30 flex items-center justify-center mb-6 shadow-inner`}>
               <Footprints className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} text-[#FF9CB1] fill-current`} />
@@ -567,7 +581,7 @@ export default function App() {
                       <motion.div
                         key="niebla-emociones"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center p-10 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
+                        className="w-full max-w-[480px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center p-6 sm:p-10 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
                       >
                         <Leaf className="w-12 h-12 text-[#8BE8B9] mb-6 drop-shadow-[0_0_15px_rgba(139,232,185,0.3)] fill-current" />
                         <motion.h2 variants={itemV} className="text-2xl font-bold text-white tracking-[0.1em] mb-8 text-center">EMOCIONES IDENTIFICADAS</motion.h2>
@@ -602,7 +616,7 @@ export default function App() {
               <div className="absolute inset-0 flex z-30 bg-black/40 backdrop-blur-sm">
                 {/* Left Sidebar Menu for EXPLORACION */}
                 {(!isMobile || exploracionMenuTab === 'intro') && (
-                  <motion.div variants={sidebarV} initial="hidden" animate="visible" exit="exit" className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#191522]/95 border-r border-[#3D1C34] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
+                  <motion.div variants={sidebarV} initial="hidden" animate="visible" exit="exit" className={`${isMobile ? 'w-[240px]' : 'w-[280px]'} h-full bg-[#191522]/95 border-r border-[#3D1C34] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
                     <div className="px-8 mb-12">
                       <motion.h2 variants={itemV} className="text-[#FF9CB1] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
                       <motion.p variants={itemV} className="text-[#FFE5EC]/60 text-[11px] uppercase tracking-wider font-light mt-1">Exploración</motion.p>
@@ -723,7 +737,7 @@ export default function App() {
                       <motion.div
                         key="exploracion-acciones"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
+                        className="w-full max-w-[480px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-6 sm:p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <Footprints className="w-12 h-12 text-[#FF9CB1] mb-6 drop-shadow-[0_0_15px_rgba(255,156,177,0.3)] fill-current" />
                         <motion.h2 variants={itemV} className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-8 text-center uppercase">Acciones Elegidas</motion.h2>
@@ -764,7 +778,7 @@ export default function App() {
                       <motion.div
                         key="exploracion-reflexiones"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[480px] min-h-[480px] rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
+                        className="w-full max-w-[480px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center p-6 sm:p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <Sparkles className="w-12 h-12 text-[#FF9CB1] mb-6 drop-shadow-[0_0_15px_rgba(255,156,177,0.3)]" />
                         <motion.h2 variants={itemV} className="text-2xl font-extrabold text-[#FF9CB1] tracking-[0.1em] mb-4 text-center uppercase">Reflexiones</motion.h2>
@@ -799,7 +813,7 @@ export default function App() {
               <div className="absolute inset-0 flex z-30 bg-black/40 backdrop-blur-sm">
                 {/* Left Sidebar Menu for CLARIDAD */}
                 {(!isMobile || claridadMenuTab === 'intro') && (
-                  <motion.div variants={sidebarV} initial="hidden" animate="visible" exit="exit" className={`${isMobile ? 'w-full' : 'w-[280px]'} h-full bg-[#0A191A]/95 border-r border-[#004D40] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
+                  <motion.div variants={sidebarV} initial="hidden" animate="visible" exit="exit" className={`${isMobile ? 'w-[240px]' : 'w-[280px]'} h-full bg-[#0A191A]/95 border-r border-[#004D40] flex flex-col py-8 shadow-[20px_0_40px_rgba(0,0,0,0.8)] z-20`}>
                     <div className="px-8 mb-12">
                       <motion.h2 variants={itemV} className="text-[#00E676] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
                       <motion.p variants={itemV} className="text-[#F1F8E9]/60 text-[11px] uppercase tracking-wider font-light mt-1">Claridad</motion.p>
@@ -918,7 +932,7 @@ export default function App() {
                       <motion.div
                         key="claridad-ejercicios"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[440px] h-auto min-h-[400px] bg-[#16140F]/95 rounded-3xl flex flex-col shadow-[0_0_40px_rgba(0,230,118,0.15)] overflow-hidden pb-8 mx-auto border border-white/5 backdrop-blur-xl"
+                        className="w-full max-w-[440px] h-auto max-h-[90vh] overflow-y-auto bg-[#16140F]/95 rounded-3xl flex flex-col shadow-[0_0_40px_rgba(0,230,118,0.15)] pb-8 mx-auto border border-white/5 backdrop-blur-xl"
                       >
                          <div className="flex flex-col items-center pt-12 pb-10">
                              <div className="w-24 h-24 rounded-full bg-[#2A1D0B] flex items-center justify-center mb-6">
@@ -1187,25 +1201,9 @@ export default function App() {
                   <Palette className="w-5 h-5 shrink-0" />
                   Hub Creativo
                 </button>
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg">
-                  <Sparkles className="w-5 h-5 shrink-0" />
-                  Inspiración
-                </button>
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg">
-                  <Folder className="w-5 h-5 shrink-0" />
-                  Mis Proyectos
-                </button>
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg mt-4">
-                  <Users className="w-5 h-5 shrink-0" />
-                  Comunidad
-                </button>
               </nav>
 
               <div className="mt-auto px-4 pb-8 flex flex-col gap-4">
-                <button className="flex items-center gap-4 px-4 py-3 text-[#A8A397] hover:text-[#F1F8E9] transition-colors text-sm font-medium rounded-lg">
-                  <Settings className="w-5 h-5 shrink-0" />
-                  Ajustes
-                </button>
                 <button 
                   onClick={() => {
                     setStage('NIEBLA');
@@ -1233,24 +1231,6 @@ export default function App() {
               <div className="px-10 py-8 flex justify-between items-center z-10">
                 <div className="text-[#A8A397] text-sm">
                   Explorando / <span className="text-[#00E676] font-medium">Hub Creativo</span>
-                </div>
-                
-                <div className="flex items-center gap-6">
-                  <div className="relative">
-                    <Search className="w-4 h-4 text-[#888377] absolute left-4 top-1/2 -translate-y-1/2" />
-                    <input 
-                      type="text" 
-                      placeholder="Buscar ideas..." 
-                      className="bg-[#10100E]/80 border border-[#3A3832] text-[#F1F8E9] placeholder:text-[#6a665a] rounded-full pl-11 pr-6 py-2 text-sm w-64 focus:outline-none focus:border-[#00E676]/50"
-                    />
-                  </div>
-                  <button className="text-[#A8A397] hover:text-[#F1F8E9] transition-colors relative">
-                    <Bell className="w-5 h-5" />
-                    <span className="w-2 h-2 rounded-full bg-[#00E676] absolute top-0 right-0" />
-                  </button>
-                  <button className="text-[#A8A397] hover:text-[#F1F8E9] transition-colors bg-[#10100E]/80 p-2 rounded-full border border-[#3A3832]">
-                    <Zap className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
 

@@ -108,7 +108,7 @@ const modalV: any = {
           
           {/* Header */}
           <div className="text-center mb-12">
-            <motion.h1 variants={itemV} className="text-[54px] font-bold text-[#F1F8E9] mb-3 tracking-tight drop-shadow-md">Ayuda Creativa</motion.h1>
+            <motion.h1 variants={itemV} className="text-4xl sm:text-[54px] font-bold text-[#F1F8E9] mb-3 tracking-tight drop-shadow-md">Ayuda Creativa</motion.h1>
             <motion.p variants={itemV} className="text-[#A8A397] text-lg font-light tracking-wide">Escribe tus ideas sueltas y deja que la magia te inspire.</motion.p>
           </div>
 
@@ -117,7 +117,7 @@ const modalV: any = {
             <textarea 
               value={ideaInput}
               onChange={e => setIdeaInput(e.target.value)}
-              className="w-full bg-transparent p-6 text-[#E2DED5] placeholder:text-[#6a665a] focus:outline-none resize-none h-[180px] text-base font-light rounded-2xl"
+              className="w-full bg-transparent p-4 sm:p-6 text-[#E2DED5] placeholder:text-[#6a665a] focus:outline-none resize-none h-[120px] sm:h-[180px] text-base font-light rounded-2xl"
               placeholder="Escribe aquí... (ej. Un bosque lluvioso pero con luces de neón amarillas)"
             />
             <div className="absolute bottom-5 right-5">
