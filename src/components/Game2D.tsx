@@ -109,15 +109,15 @@ export const Game2D: React.FC<Game2DProps> = ({
     // Stage styling (Dark Magical Forest vs Blue Glowing Forest vs Twilight Forest vs Sunny Cliff)
     const isFog = stage === 'NIEBLA';
     const isExploration = stage === 'EXPLORACION';
-    const isConstruction = stage === 'CONSTRUCCION';
+    const isClaridad = stage === 'CLARIDAD';
 
-    const skyTop = isFog ? '#020B1A' : (isExploration ? '#8AB4F8' : (isConstruction ? '#1DA2D8' : '#040B14'));
-    const skyMid = isFog ? '#0A2540' : (isExploration ? '#D7B4F3' : (isConstruction ? '#4DA6FF' : '#0A2E3F'));
-    const skyBot = isFog ? '#1A6B8C' : (isExploration ? '#FFB6C1' : (isConstruction ? '#87CEEB' : '#1A4A5A'));
+    const skyTop = isFog ? '#020B1A' : (isExploration ? '#8AB4F8' : (isClaridad ? '#1DA2D8' : '#040B14'));
+    const skyMid = isFog ? '#0A2540' : (isExploration ? '#D7B4F3' : (isClaridad ? '#4DA6FF' : '#0A2E3F'));
+    const skyBot = isFog ? '#1A6B8C' : (isExploration ? '#FFB6C1' : (isClaridad ? '#87CEEB' : '#1A4A5A'));
     
-    const groundBase = isFog ? '#020B12' : (isExploration ? '#2A4B5C' : (isConstruction ? '#8CC63F' : '#02050A'));
-    const pathColor = isFog ? '#151A20' : (isExploration ? '#7A7A9A' : (isConstruction ? '#9ACD32' : '#111111'));
-    const fogColor = isFog ? 'rgba(10, 50, 75, ' : (isExploration ? 'rgba(215, 180, 243, ' : (isConstruction ? 'rgba(255, 255, 255, ' : 'rgba(10, 46, 63, '));
+    const groundBase = isFog ? '#020B12' : (isExploration ? '#2A4B5C' : (isClaridad ? '#8CC63F' : '#02050A'));
+    const pathColor = isFog ? '#151A20' : (isExploration ? '#7A7A9A' : (isClaridad ? '#808080' : '#111111'));
+    const fogColor = isFog ? 'rgba(10, 50, 75, ' : (isExploration ? 'rgba(215, 180, 243, ' : (isClaridad ? 'rgba(255, 255, 255, ' : 'rgba(10, 46, 63, '));
 
     const objects: any[] = [];
     let particles: Particle[] = [];
@@ -159,57 +159,6 @@ export const Game2D: React.FC<Game2DProps> = ({
       z: maxZ
     });
 
-    if (isConstruction) {
-      // Add a fox sleeping on the left cliff edge
-      objects.push({
-        type: 'fox',
-        x: getPathX(2000) - 220, // Left edge of the cliff
-        y: 0,
-        z: 2000,
-        scale: 1.5
-      });
-      
-      // Mountains in the background (mostly on the right, or far left across the river)
-      for (let i = 0; i < 40; i++) {
-        const isLeft = Math.random() > 0.5;
-        const mX = getPathX(Math.random() * maxZ) + (isLeft ? -5000 - Math.random() * 3000 : 2000 + Math.random() * 3000);
-        objects.push({
-          type: 'mountain',
-          x: mX,
-          y: 0,
-          z: Math.random() * maxZ,
-          scale: 4 + Math.random() * 6
-        });
-      }
-      
-      // Clouds in the sky
-      for (let i = 0; i < 60; i++) {
-        objects.push({
-          type: 'cloud',
-          x: (Math.random() - 0.5) * 8000,
-          y: -1500 - Math.random() * 1500, // High up in the sky
-          z: Math.random() * maxZ,
-          scale: 2 + Math.random() * 4
-        });
-      }
-    }
-
-    // Background Silhouette Trees for Depth
-    for (let i = 0; i < 300; i++) {
-       const zPos = Math.random() * maxZ;
-       const pathX = getPathX(zPos);
-       const isLeft = Math.random() > 0.5;
-       const treeOffset = isLeft ? -1000 - Math.random() * 3000 : 1000 + Math.random() * 3000;
-       
-       objects.push({
-         type: 'bg_tree',
-         x: pathX + treeOffset,
-         y: 0,
-         z: zPos,
-         scale: 1.5 + Math.random() * 3,
-       });
-    }
-
     // Generate Dense Forest Trees & Flowers
     for (let i = 0; i < 600; i++) {
       const zPos = Math.random() * maxZ;
@@ -219,16 +168,13 @@ export const Game2D: React.FC<Game2DProps> = ({
       // Trees line the path closely
       let treeOffset = isLeft ? -300 - Math.random() * 1000 : 300 + Math.random() * 1000;
       
-      // In Phase 3, the river is on the left, so only place trees on the right
-      if (isConstruction && isLeft) {
-        treeOffset = 300 + Math.random() * 1500; // Force to right side
-      } else if (isExploration) {
+      if (isExploration) {
         // In Phase 2, push trees further away so they don't block the path
         treeOffset = isLeft ? -450 - Math.random() * 1000 : 450 + Math.random() * 1000;
       }
 
       objects.push({
-        type: isExploration ? 'thick_tree' : (isConstruction ? 'birch_tree' : 'tree'),
+        type: isExploration ? 'thick_tree' : 'tree',
         x: pathX + treeOffset,
         y: 0,
         z: zPos,
@@ -241,10 +187,7 @@ export const Game2D: React.FC<Game2DProps> = ({
       if (Math.random() > 0.1) { // High density
         let flowerOffset = isLeft ? -100 - Math.random() * 500 : 100 + Math.random() * 500;
         
-        // In Phase 3, limit left side flowers to the edge of the cliff
-        if (isConstruction && isLeft) {
-           flowerOffset = -50 - Math.random() * 100;
-        } else if (isExploration) {
+        if (isExploration) {
            // In Phase 2, push mushrooms further away so they don't block the path
            flowerOffset = isLeft ? -250 - Math.random() * 500 : 250 + Math.random() * 500;
         }
@@ -257,7 +200,7 @@ export const Game2D: React.FC<Game2DProps> = ({
         } else if (isExploration) {
             colors = ['#FF4040']; // Red for mushrooms
             type = Math.random() > 0.5 ? 'red_mushroom' : 'small_flower';
-        } else if (isConstruction) {
+        } else if (isClaridad) {
             colors = ['#FFFFFF', '#FFD700', '#FF69B4', '#FFA500']; // White, yellow, pink, orange flowers
             type = 'small_flower';
         } else {
@@ -290,7 +233,7 @@ export const Game2D: React.FC<Game2DProps> = ({
 
     // Ambient Fireflies / Pollen
     for (let i = 0; i < 300; i++) {
-      const colors = isFog ? ['#00FFFF', '#E0FFFF', '#FFFACD'] : (isExploration ? ['#FFD700', '#FFA500'] : (isConstruction ? ['#FFFFFF', '#FFD700', '#87CEEB'] : ['#00FFFF', '#FF1493', '#FFD700']));
+      const colors = isFog ? ['#00FFFF', '#E0FFFF', '#FFFACD'] : (isExploration ? ['#FFD700', '#FFA500'] : (isClaridad ? ['#FFFFFF', '#FFD700', '#87CEEB'] : ['#00FFFF', '#FF1493', '#FFD700']));
       particles.push({
         x: (Math.random() - 0.5) * 4000,
         y: -Math.random() * 1500,
@@ -410,7 +353,7 @@ export const Game2D: React.FC<Game2DProps> = ({
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Draw Sun for Phase 3
-      if (isConstruction) {
+      if (isClaridad) {
         const sunX = canvas.width * 0.2;
         const sunY = canvas.height * 0.2;
         
@@ -431,56 +374,40 @@ export const Game2D: React.FC<Game2DProps> = ({
       // Draw ground large enough to cover the bottom
       ctx.fillRect(0, horizonY, canvas.width, canvas.height * 2);
 
+      // 5. Fog Overlay
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      const horizonRatio = Math.max(0, Math.min(1, (horizonY) / canvas.height));
+      
+      if (isClaridad) {
+        // Bright dense haze at the horizon to blend sky and ground
+        let topRatio = Math.max(0, horizonRatio - 0.25);
+        let botRatio = Math.min(1, horizonRatio + 0.25);
+        gradient.addColorStop(0, fogColor + '0.0)');
+        gradient.addColorStop(topRatio, fogColor + '0.1)');
+        gradient.addColorStop(horizonRatio - 0.05, fogColor + '1.0)');
+        gradient.addColorStop(horizonRatio + 0.05, fogColor + '1.0)');
+        gradient.addColorStop(botRatio, fogColor + '0.1)');
+        gradient.addColorStop(1, fogColor + '0.0)');
+      } else if (isExploration) {
+        // Mystical purple haze
+        gradient.addColorStop(0, fogColor + '0.2)');
+        gradient.addColorStop(horizonRatio, fogColor + '0.7)');
+        gradient.addColorStop(1, fogColor + '0.1)');
+      } else {
+        // Thick dense fog
+        gradient.addColorStop(0, fogColor + '0.5)');
+        gradient.addColorStop(horizonRatio, fogColor + '0.9)');
+        gradient.addColorStop(1, fogColor + '0.4)');
+      }
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      
       // 3. Winding Path (Illuminated if phrase selected)
       const pathWidth = 200;
       const step = 200; 
       const maxDrawZ = Math.min(playerState.current.z + drawDistance, maxZ);
       const startDrawZ = Math.max(0, playerState.current.z - drawDistance);
-
-      // Draw River and Cliff for Phase 3
-      if (isConstruction) {
-        // River
-        ctx.fillStyle = '#00BFFF'; // Vibrant cyan/blue river
-        for (let z = startDrawZ; z <= maxDrawZ; z += step) {
-          const p1L = project(getPathX(z) - 5000, 800, z); // Wider river, lower down
-          const p1R = project(getPathX(z) - 400, 800, z);
-          const p2L = project(getPathX(z + step) - 5000, 800, z + step);
-          const p2R = project(getPathX(z + step) - 400, 800, z + step);
-
-          if (p1L.z > 1 || p2L.z > 1) {
-            ctx.beginPath();
-            ctx.moveTo(p1L.x, p1L.y);
-            ctx.lineTo(p1R.x, p1R.y);
-            ctx.lineTo(p2R.x, p2R.y);
-            ctx.lineTo(p2L.x, p2L.y);
-            ctx.fill();
-          }
-        }
-        
-        // Cliff Wall (Grassy/Rocky)
-        const cliffGrad = ctx.createLinearGradient(0, canvas.height/2, 0, canvas.height);
-        cliffGrad.addColorStop(0, '#8CC63F'); // Grass top
-        cliffGrad.addColorStop(0.1, '#4A5D23'); // Darker grass/dirt
-        cliffGrad.addColorStop(0.5, '#4F5D65'); // Gray rock
-        cliffGrad.addColorStop(1, '#2F3E46'); // Dark gray rock base
-        ctx.fillStyle = cliffGrad;
-        
-        for (let z = startDrawZ; z <= maxDrawZ; z += step) {
-          const pTop = project(getPathX(z) - pathWidth - 50, 0, z);
-          const pBot = project(getPathX(z) - 400, 800, z);
-          const pTopNext = project(getPathX(z + step) - pathWidth - 50, 0, z + step);
-          const pBotNext = project(getPathX(z + step) - 400, 800, z + step);
-
-          if (pTop.z > 1 || pTopNext.z > 1) {
-            ctx.beginPath();
-            ctx.moveTo(pTop.x, pTop.y);
-            ctx.lineTo(pBot.x, pBot.y);
-            ctx.lineTo(pBotNext.x, pBotNext.y);
-            ctx.lineTo(pTopNext.x, pTopNext.y);
-            ctx.fill();
-          }
-        }
-      }
 
       // Draw Path Polygons
       for (let z = startDrawZ; z <= maxDrawZ; z += step) {
@@ -549,7 +476,12 @@ export const Game2D: React.FC<Game2DProps> = ({
         ctx.scale(scale, scale);
 
         const fogIntensity = Math.min(1, z / drawDistance);
-        ctx.globalAlpha = isConstruction ? 1 - (fogIntensity * 0.1) : (isExploration ? 1 : 1 - (fogIntensity * 0.6)); // Reduced fog intensity
+        if (obj.type === 'arch' || obj.type === 'particle') {
+          ctx.globalAlpha = 1; // path elements remain crystal clear
+        } else {
+          // Fade trees out completely at the horizon into the haze
+          ctx.globalAlpha = isClaridad ? 1 - (fogIntensity * 1.0) : (isExploration ? 1 - (fogIntensity * 0.9) : 1 - (fogIntensity * 1.0));
+        }
 
         if (obj.type === 'tree') {
           const s = obj.scale;
@@ -661,7 +593,7 @@ export const Game2D: React.FC<Game2DProps> = ({
         }
         else if (obj.type === 'bg_tree') {
           const s = obj.scale;
-          ctx.fillStyle = isFog ? '#020B1A' : (isExploration ? 'rgba(138, 180, 248, 0.3)' : (isConstruction ? '#3CB371' : '#010305'));
+          ctx.fillStyle = isFog ? '#020B1A' : (isExploration ? 'rgba(138, 180, 248, 0.3)' : (isClaridad ? '#3CB371' : '#010305'));
           ctx.beginPath();
           ctx.moveTo(-15 * s, 0);
           ctx.lineTo(-5 * s, -2000 * s);
@@ -669,21 +601,41 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.lineTo(15 * s, 0);
           ctx.fill();
           
-          if (isConstruction) {
+          if (isClaridad) {
              ctx.beginPath();
              ctx.arc(0, -1800 * s, 100 * s, 0, Math.PI * 2);
              ctx.fill();
           }
         }
-        else if (obj.type === 'flower') {
-          const s = obj.scale;
-          ctx.fillStyle = obj.color;
-          ctx.shadowColor = obj.color;
-          ctx.shadowBlur = 15;
+        else if (obj.type === 'flower' || obj.type === 'pink_flower') {
+          const s = obj.scale * (obj.type === 'pink_flower' ? 2 : 1);
+          // Leaves
+          ctx.fillStyle = '#228B22';
           ctx.beginPath();
-          ctx.arc(0, -10 * s, 15 * s, 0, Math.PI*2);
+          ctx.ellipse(-8 * s, -6 * s, 5 * s, 3 * s, Math.PI/4, 0, Math.PI * 2);
+          ctx.ellipse(8 * s, -6 * s, 5 * s, 3 * s, -Math.PI/4, 0, Math.PI * 2);
           ctx.fill();
-          ctx.shadowBlur = 0;
+          // Stem
+          ctx.strokeStyle = '#006400';
+          ctx.lineWidth = 2 * s;
+          ctx.beginPath();
+          ctx.moveTo(0, 0); ctx.lineTo(0, -15 * s); ctx.stroke();
+          
+          // Flower petals
+          ctx.fillStyle = obj.color;
+          ctx.beginPath();
+          for(let p=0; p<5; p++) {
+             const ang = (Math.PI * 2 / 5) * p;
+             ctx.moveTo(0, -15 * s);
+             ctx.arc(Math.cos(ang)*5*s, -15*s + Math.sin(ang)*5*s, 4*s, 0, Math.PI*2);
+          }
+          ctx.fill();
+          
+          // Center
+          ctx.fillStyle = obj.type === 'pink_flower' ? '#FFD700' : '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(0, -15 * s, 3 * s, 0, Math.PI*2);
+          ctx.fill();
         }
         else if (obj.type === 'glowing_plant') {
           const s = obj.scale;
@@ -778,60 +730,61 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.lineTo(-15 * s, -170 * s);
           ctx.fill();
         }
-        else if (obj.type === 'birch_tree') {
-          const s = obj.scale;
+        else if (obj.type === 'lush_tree') {
+          const s = obj.scale * 1.5; // Bigger
           
-          // Trunk
-          ctx.fillStyle = '#F5F5F5'; // White/light gray bark
+          // Trunk - thick, dark brown/green tint
+          const colorOffset = obj.darkness * 20;
+          const trunkGrad = ctx.createLinearGradient(-40 * s, 0, 40 * s, 0);
+          trunkGrad.addColorStop(0, `rgb(${30 + colorOffset}, ${25 + colorOffset}, ${20 + colorOffset})`);
+          trunkGrad.addColorStop(0.5, `rgb(${55 + colorOffset}, ${45 + colorOffset}, ${35 + colorOffset})`);
+          trunkGrad.addColorStop(1, `rgb(${20 + colorOffset}, ${15 + colorOffset}, ${10 + colorOffset})`);
+          
+          ctx.fillStyle = trunkGrad;
           ctx.beginPath();
-          ctx.fillRect(-12 * s, -1200 * s, 24 * s, 1200 * s);
-          
-          // Trunk shadow (right side)
-          ctx.fillStyle = '#D3D3D3';
-          ctx.beginPath();
-          ctx.fillRect(0, -1200 * s, 12 * s, 1200 * s);
-          
-          // Black spots on bark
-          ctx.fillStyle = '#2C3539';
-          for (let i = 1; i < 12; i++) {
-             const spotY = -100 * s * i - (Math.abs(Math.sin(obj.x * i)) * 30 * s);
-             const spotH = 5 * s + Math.abs(Math.cos(obj.z * i)) * 8 * s;
-             const spotW = 10 * s + Math.abs(Math.sin(obj.x)) * 10 * s;
-             const isRight = Math.sin(obj.z * i) > 0;
-             ctx.fillRect(isRight ? 0 : -12 * s, spotY, spotW, spotH);
-          }
+          ctx.moveTo(-45 * s, 0);
+          ctx.lineTo(-25 * s, -1200 * s);
+          ctx.lineTo(25 * s, -1200 * s);
+          ctx.lineTo(45 * s, 0);
+          ctx.fill();
 
-          // Leaves (Painterly style)
-          const drawLeafCluster = (cx: number, cy: number, radius: number) => {
-             // Dark base
-             ctx.fillStyle = '#4A7C2A';
-             ctx.beginPath();
-             ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-             ctx.fill();
+          // Vines hanging down the trunk
+          ctx.strokeStyle = '#2d4215';
+          ctx.lineWidth = 4 * s;
+          ctx.beginPath();
+          ctx.moveTo(-10 * s, -1000 * s);
+          ctx.quadraticCurveTo(-30 * s, -500 * s, -5 * s, 0);
+          ctx.stroke();
+
+          // Luscious green leafy canopies
+          const drawCanopy = (cx, cy, rX, rY, lightColor, midColor, shadowColor) => {
+             ctx.fillStyle = shadowColor;
+             ctx.beginPath(); ctx.ellipse(cx, cy, rX, rY, 0, 0, Math.PI * 2); ctx.fill();
              
-             // Mid tone
-             ctx.fillStyle = '#6B8E23';
-             ctx.beginPath();
-             ctx.arc(cx - radius * 0.2, cy - radius * 0.2, radius * 0.8, 0, Math.PI * 2);
-             ctx.fill();
+             ctx.fillStyle = midColor;
+             ctx.beginPath(); ctx.ellipse(cx - rX * 0.1, cy - rY * 0.2, rX * 0.8, rY * 0.8, 0, 0, Math.PI * 2); ctx.fill();
              
-             // Highlight (sun from top left)
-             ctx.fillStyle = '#9ACD32';
-             ctx.beginPath();
-             ctx.arc(cx - radius * 0.4, cy - radius * 0.4, radius * 0.5, 0, Math.PI * 2);
-             ctx.fill();
+             ctx.fillStyle = lightColor;
+             ctx.beginPath(); ctx.ellipse(cx - rX * 0.3, cy - rY * 0.4, rX * 0.5, rY * 0.5, 0, 0, Math.PI * 2); ctx.fill();
           };
 
-          drawLeafCluster(0, -1000 * s, 250 * s);
-          drawLeafCluster(-150 * s, -900 * s, 180 * s);
-          drawLeafCluster(150 * s, -850 * s, 200 * s);
-          drawLeafCluster(0, -1200 * s, 220 * s);
-          drawLeafCluster(-100 * s, -1100 * s, 150 * s);
-          drawLeafCluster(120 * s, -1050 * s, 160 * s);
+          const lColor = '#8ee53f';
+          const mColor = '#5cb823';
+          const sColor = '#2b6e15';
+
+          // Huge enveloping canopies
+          drawCanopy(0, -1100 * s, 400 * s, 250 * s, lColor, mColor, sColor);
+          drawCanopy(-200 * s, -950 * s, 300 * s, 200 * s, lColor, mColor, sColor);
+          drawCanopy(200 * s, -850 * s, 350 * s, 250 * s, lColor, mColor, sColor);
+          drawCanopy(0, -700 * s, 250 * s, 150 * s, lColor, mColor, sColor);
+          
+          // Foreground bushes
+          drawCanopy(-100 * s, 0, 150 * s, 100 * s, lColor, mColor, sColor);
+          drawCanopy(150 * s, 0, 200 * s, 120 * s, lColor, mColor, sColor);
         }
         else if (obj.type === 'mountain') {
           const s = obj.scale;
-          ctx.fillStyle = isConstruction ? '#2E5A3A' : '#2E8B57'; // Darker green/blueish shadow for base
+          ctx.fillStyle = isClaridad ? '#2E5A3A' : '#2E8B57'; // Darker green/blueish shadow for base
           ctx.beginPath();
           ctx.moveTo(-500 * s, 0);
           ctx.lineTo(0, -800 * s);
@@ -839,7 +792,7 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.fill();
           
           // Mountain highlight (left side)
-          ctx.fillStyle = isConstruction ? '#4CAF50' : '#3CB371'; // Lighter green
+          ctx.fillStyle = isClaridad ? '#4CAF50' : '#3CB371'; // Lighter green
           ctx.beginPath();
           ctx.moveTo(-500 * s, 0);
           ctx.lineTo(0, -800 * s);
@@ -1168,28 +1121,8 @@ export const Game2D: React.FC<Game2DProps> = ({
         }
       });
 
-      // 5. Fog Overlay
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      if (isConstruction) {
-        // Light atmospheric haze for bright sunny day
-        gradient.addColorStop(0, fogColor + '0.0)');
-        gradient.addColorStop(0.8, fogColor + '0.0)');
-        gradient.addColorStop(1, fogColor + '0.05)');
-      } else if (isExploration) {
-        // No fog in Phase 2
-        gradient.addColorStop(0, fogColor + '0.0)');
-        gradient.addColorStop(1, fogColor + '0.0)');
-      } else {
-        gradient.addColorStop(0, fogColor + '0.6)');
-        gradient.addColorStop(0.5, fogColor + '0.3)');
-        gradient.addColorStop(0.8, fogColor + '0.1)');
-        gradient.addColorStop(1, fogColor + '0.5)'); // Thicker fog at the very bottom (ground mist)
-      }
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // 5.5 Vignette (Shadows to hide map limits beyond the forest)
-      if (!isConstruction) {
+      // 5.5 Vignette or Sunbeams
+      if (!isClaridad) {
         const vignetteGrad = ctx.createRadialGradient(
           canvas.width / 2, canvas.height / 2, canvas.height * 0.4,
           canvas.width / 2, canvas.height / 2, canvas.width * 0.8
@@ -1199,6 +1132,41 @@ export const Game2D: React.FC<Game2DProps> = ({
         vignetteGrad.addColorStop(1, 'rgba(0,0,0,0.95)');
         ctx.fillStyle = vignetteGrad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else {
+        // Draw Majestic Sunbeams
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        
+        // Swaying sunbeams based on time
+        const time = Date.now() / 3000;
+        const centerX = canvas.width * 0.3;
+        const centerY = -canvas.height * 0.2;
+        
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+           const beamAngle = Math.PI / 4 + Math.sin(time + i * 0.5) * 0.1;
+           const beamWidth = canvas.width * 0.15 + Math.cos(time + i) * 50;
+           
+           ctx.moveTo(centerX, centerY);
+           
+           // Left edge of beam
+           const leftAngle = beamAngle - 0.1;
+           const rightAngle = beamAngle + 0.1;
+           const length = canvas.height * 2;
+           
+           ctx.lineTo(centerX + Math.cos(leftAngle) * length, centerY + Math.sin(leftAngle) * length);
+           ctx.lineTo(centerX + Math.cos(rightAngle) * length, centerY + Math.sin(rightAngle) * length);
+           ctx.lineTo(centerX, centerY);
+        }
+        
+        const beamGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, canvas.height * 1.5);
+        beamGrad.addColorStop(0, 'rgba(255, 255, 230, 0.4)');
+        beamGrad.addColorStop(0.5, 'rgba(255, 250, 200, 0.15)');
+        beamGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.fillStyle = beamGrad;
+        ctx.fill();
+        ctx.restore();
       }
 
       // 6. On-Screen Indication (Left Panel for Selected Phrases)
@@ -1255,7 +1223,7 @@ export const Game2D: React.FC<Game2DProps> = ({
       if (interactionText && appState === 'PLAYING') {
         const isNiebla = stage === 'NIEBLA';
         const isExploracion = stage === 'EXPLORACION';
-        const isClaridad = stage === 'CLARIDAD';
+        
         const boxWidth = isMobile ? 320 : 400;
         const boxHeight = 50;
         const startX = canvas.width/2 - boxWidth/2;
