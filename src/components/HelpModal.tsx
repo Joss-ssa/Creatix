@@ -69,36 +69,19 @@ const modalV: any = {
       }
 
       const text = data.text || '';
+      let parsed;
+      try { parsed = JSON.parse(text); } catch(e) { console.error('Failed to parse JSON', e); return; }
       
       if (type === 'all') {
-        const sections = text.split('|||');
-        if (sections.length >= 3) {
-          const ideas = sections[0].split('|').map(s => s.trim()).filter(s => s);
-          const palette = sections[1].split('|').map(s => {
-            const parts = s.split(':');
-            return {
-              hex: parts[0]?.trim() || '#000000',
-              name: parts[1]?.trim() || 'Unknown'
-            };
-          }).filter(c => c.hex);
-          const elements = sections[2].split('|').map(s => s.trim()).filter(s => s);
-          setResults({ ideas, palette, elements });
+        if (parsed.ideas?.length > 0 && parsed.palette?.length > 0 && parsed.elements?.length > 0) {
+          setResults({ ideas: parsed.ideas, palette: parsed.palette, elements: parsed.elements });
         }
       } else if (type === 'ideas') {
-        const ideas = text.split('|').map(s => s.trim()).filter(s => s);
-        if (ideas.length > 0) setResults(prev => ({ ...prev, ideas }));
+        if (parsed.ideas?.length > 0) setResults(prev => ({ ...prev, ideas: parsed.ideas }));
       } else if (type === 'palette') {
-        const palette = text.split('|').map(s => {
-          const parts = s.split(':');
-          return {
-            hex: parts[0]?.trim() || '#000000',
-            name: parts[1]?.trim() || 'Unknown'
-          };
-        }).filter(c => c.hex);
-        if (palette.length > 0) setResults(prev => ({ ...prev, palette }));
+        if (parsed.palette?.length > 0) setResults(prev => ({ ...prev, palette: parsed.palette }));
       } else if (type === 'elements') {
-        const elements = text.split('|').map(s => s.trim()).filter(s => s);
-        if (elements.length > 0) setResults(prev => ({ ...prev, elements }));
+        if (parsed.elements?.length > 0) setResults(prev => ({ ...prev, elements: parsed.elements }));
       }
     } catch (error) {
       console.error("Error generating content:", error);
@@ -108,7 +91,7 @@ const modalV: any = {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex flex-row bg-black/70 backdrop-blur-md overflow-hidden">
+    <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex flex-row bg-black/70 backdrop-blur-md overflow-hidden">
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full relative overflow-y-auto w-full">

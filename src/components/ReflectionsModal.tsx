@@ -69,7 +69,7 @@ const modalV: any = {
 
   if (report) {
     return (
-      <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6">
+      <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6">
         {/* Modal Container: Image 2 Structure with Image 1 Colors/Aesthetics */}
         <div className="bg-[#13111C] border border-white/10 rounded-[40px] p-8 sm:p-12 max-w-2xl w-full max-h-[90vh] overflow-y-auto flex flex-col items-center relative shadow-[0_0_60px_rgba(255,77,121,0.1)]">
           
@@ -116,7 +116,7 @@ const modalV: any = {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
+    <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} transition={{ type: "spring", bounce: 0, damping: 20, stiffness: 100 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
       <div className="bg-[#191522] border-2 border-[#FF9CB1] rounded-2xl p-4 sm:p-8 max-w-2xl w-full max-h-[95vh] overflow-y-auto shadow-[0_0_40px_rgba(255,156,177,0.4)] text-[#FFE5EC] relative">
         <button 
           onClick={onClose}

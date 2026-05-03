@@ -1,6 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type, Schema } from '@google/genai';
 import path from 'path';
 
 async function startServer() {
@@ -14,26 +15,62 @@ async function startServer() {
     try {
       const { type, ideaInput } = req.body;
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      let prompt = `Actúa como un asistente creativo. Basado en la idea "${ideaInput}":\nGenera:\n`;
+      let prompt = `Actúa como un asistente creativo. Basado en la idea "${ideaInput}":\n`;
+      let schema: Schema;
 
       if (type === 'all') {
-        prompt += `1. 3 ideas o conceptos creativos (breves).
-2. 4 colores para una paleta (HEX y un nombre descriptivo en inglés corto).
-3. 5 elementos aleatorios inspirados en la idea (palabras clave cortas).
-
-Usa el siguiente formato exacto, sin markdown ni texto extra, separando las secciones por "|||" y los items por "|":
-idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|elemento2|elemento3|elemento4|elemento5`;
+        prompt += `Genera 3 ideas creativas breves, una paleta de 4 colores, y 5 elementos aleatorios inspirados.`;
+        schema = {
+          type: Type.OBJECT,
+          properties: {
+            ideas: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 ideas cortas" },
+            palette: { 
+              type: Type.ARRAY, 
+              items: { type: Type.OBJECT, properties: { hex: { type: Type.STRING }, name: { type: Type.STRING } } },
+              description: "4 colores con código hex y nombre en inglés"
+            },
+            elements: { type: Type.ARRAY, items: { type: Type.STRING }, description: "5 palabras clave" }
+          }
+        };
       } else if (type === 'ideas') {
-        prompt += `3 ideas o conceptos creativos (breves).\n\nUsa el siguiente formato exacto, sin markdown ni texto extra, separando los items por "|":\nidea1|idea2|idea3`;
+        prompt += `Genera 3 ideas o conceptos creativos breves.`;
+        schema = {
+          type: Type.OBJECT,
+          properties: {
+            ideas: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 ideas cortas" }
+          }
+        };
       } else if (type === 'palette') {
-        prompt += `4 colores para una paleta (HEX y un nombre descriptivo en inglés corto).\n\nUsa el siguiente formato exacto, sin markdown ni texto extra, separando los items por "|":\n#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre`;
+        prompt += `Genera 4 colores para una paleta (con código HEX y un nombre descriptivo en inglés corto).`;
+        schema = {
+          type: Type.OBJECT,
+          properties: {
+            palette: { 
+              type: Type.ARRAY, 
+              items: { type: Type.OBJECT, properties: { hex: { type: Type.STRING }, name: { type: Type.STRING } } },
+              description: "4 colores con código hex"
+            }
+          }
+        };
       } else if (type === 'elements') {
-        prompt += `5 elementos aleatorios inspirados en la idea (palabras clave cortas).\n\nUsa el siguiente formato exacto, sin markdown ni texto extra, separando los items por "|":\nelemento1|elemento2|elemento3|elemento4|elemento5`;
+        prompt += `Genera 5 elementos aleatorios inspirados en la idea (palabras clave cortas).`;
+        schema = {
+          type: Type.OBJECT,
+          properties: {
+            elements: { type: Type.ARRAY, items: { type: Type.STRING }, description: "5 palabras clave" }
+          }
+        };
+      } else {
+        throw new Error('Invalid type parameter');
       }
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.5-flash',
         contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: schema
+        }
       });
 
       res.json({ text: response.text });
@@ -61,7 +98,7 @@ Sus respuestas:
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.5-flash',
         contents: prompt,
       });
 
