@@ -40,26 +40,19 @@ const modalV: any = {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const prompt = `
-Eres un guía amigable, cercano y empático en un viaje de descubrimiento personal y creativo.
-El jugador acaba de terminar una fase de exploración y ha respondido a 5 preguntas sobre su experiencia.
-Por favor, lee sus respuestas y escribe un breve reporte o reflexión final (unas 3-4 oraciones) que lo haga sentir escuchado, validado y motivado para continuar. Usa un tono cálido y amistoso.
-
-Sus respuestas:
-1. ¿Qué hiciste? ${answers.q1}
-2. ¿Qué viste? ${answers.q2}
-3. ¿Qué sentiste? ${answers.q3}
-4. ¿Te recuerda algo? ${answers.q4}
-5. ¿Qué ideas tuviste... o generaste? ${answers.q5}
-      `;
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
+      const resp = await fetch('/api/generate-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ answers })
       });
+      const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data.error || 'Failed to generate report');
+      }
 
-      const finalReport = response.text || "Gracias por compartir tus reflexiones. ¡Sigue adelante con esa misma energía!";
+      const finalReport = data.text || "Gracias por compartir tus reflexiones. ¡Sigue adelante con esa misma energía!";
       setReport(finalReport);
       onSaveReflections({
         report: finalReport,

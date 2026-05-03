@@ -56,30 +56,19 @@ const modalV: any = {
     if (!ideaInput) return;
     setLoadingState(prev => ({ ...prev, [type]: true }));
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      let prompt = `Actúa como un asistente creativo. Basado en la idea "${ideaInput}":\nGenera:\n`;
-      
-      if (type === 'all') {
-        prompt += `1. 3 ideas o conceptos creativos (breves).
-2. 4 colores para una paleta (HEX y un nombre descriptivo en inglés corto).
-3. 5 elementos aleatorios inspirados en la idea (palabras clave cortas).
-
-Usa el siguiente formato exacto, sin markdown ni texto extra, separando las secciones por "|||" y los items por "|":
-idea1|idea2|idea3|||#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|||elemento1|elemento2|elemento3|elemento4|elemento5`;
-      } else if (type === 'ideas') {
-        prompt += `3 ideas o conceptos creativos (breves).\n\nUsa el siguiente formato exacto, sin markdown ni texto extra, separando los items por "|":\nidea1|idea2|idea3`;
-      } else if (type === 'palette') {
-        prompt += `4 colores para una paleta (HEX y un nombre descriptivo en inglés corto).\n\nUsa el siguiente formato exacto, sin markdown ni texto extra, separando los items por "|":\n#HEX:Nombre|#HEX:Nombre|#HEX:Nombre|#HEX:Nombre`;
-      } else if (type === 'elements') {
-        prompt += `5 elementos aleatorios inspirados en la idea (palabras clave cortas).\n\nUsa el siguiente formato exacto, sin markdown ni texto extra, separando los items por "|":\nelemento1|elemento2|elemento3|elemento4|elemento5`;
+      const resp = await fetch('/api/generate-help', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ type, ideaInput })
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data.error || 'Failed to generate help');
       }
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-      });
-
-      const text = response.text || '';
+      const text = data.text || '';
       
       if (type === 'all') {
         const sections = text.split('|||');
