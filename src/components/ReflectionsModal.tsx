@@ -108,7 +108,7 @@ const modalV: any = {
               “
             </div>
             
-            <motion.div variants={itemV} className="z-10 pt-6 pb-6 w-full max-h-[40vh] overflow-y-auto custom-scrollbar">
+            <motion.div variants={itemV} className="z-10 py-6 px-6 sm:px-10 mx-auto w-[85%] max-h-[40vh] overflow-y-auto custom-scrollbar">
               <p className="text-base sm:text-lg font-medium font-sans text-[#E2E2ED] leading-relaxed text-center">
                 {report}
               </p>
