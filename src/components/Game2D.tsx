@@ -1020,6 +1020,10 @@ export const Game2D: React.FC<Game2DProps> = ({
           const tunnelW = 1000;
           const tunnelH = 1100;
           const stoneSize = 140;
+
+          const isNiebla = stage === 'NIEBLA';
+          const isExploracion = stage === 'EXPLORACION';
+          const themeColor = isNiebla ? '#8BE8B9' : (isExploracion ? '#FF9CB1' : '#00E676');
           
           const drawArchPath = (expand = 0) => {
             const w = tunnelW / 2 + expand;
@@ -1065,19 +1069,20 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.save();
           drawStoneArchPath(0, stoneSize);
           
-          // Stone Texture
-          const stoneGrad = ctx.createLinearGradient(-tunnelW/2 - stoneSize, -tunnelH - stoneSize, tunnelW/2 + stoneSize, 0);
-          stoneGrad.addColorStop(0, '#55585b');
-          stoneGrad.addColorStop(0.5, '#7a7d80');
-          stoneGrad.addColorStop(1, '#4a4d50');
+          // Stone Texture matching arches
+          const stoneGrad = ctx.createLinearGradient(0, -tunnelH, 0, 0);
+          stoneGrad.addColorStop(0, '#2A2A2A'); 
+          stoneGrad.addColorStop(1, '#111111'); 
           ctx.fillStyle = stoneGrad;
           ctx.fill();
 
           // Draw Stone Blocks (voussoirs & pillars)
-          ctx.strokeStyle = '#2a2c2e';
+          ctx.strokeStyle = themeColor;
+          ctx.shadowColor = themeColor;
+          ctx.shadowBlur = 15;
           ctx.lineCap = 'butt';
           ctx.lineJoin = 'miter';
-          ctx.lineWidth = 8;
+          ctx.lineWidth = 6;
           ctx.stroke();
 
           // Left pillar blocks
@@ -1104,9 +1109,11 @@ export const Game2D: React.FC<Game2DProps> = ({
           }
           ctx.stroke();
           
+          ctx.shadowBlur = 0; // Turn off glow for internal details
+          
           // Inner shadow on stones
           ctx.lineWidth = 3;
-          ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+          ctx.strokeStyle = themeColor;
           ctx.stroke();
           
           ctx.restore();
@@ -1279,8 +1286,14 @@ export const Game2D: React.FC<Game2DProps> = ({
 
           // Glowing effect when ready to enter
           if (isEnd && hasSelectedPhrase) {
+            const hexToRgba = (hex: string, alpha: number) => {
+              const r = parseInt(hex.slice(1, 3), 16);
+              const g = parseInt(hex.slice(3, 5), 16);
+              const b = parseInt(hex.slice(5, 7), 16);
+              return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            };
             const glowGrad = ctx.createRadialGradient(0, -tunnelH/2, 0, 0, -tunnelH/2, tunnelW/2);
-            glowGrad.addColorStop(0, 'rgba(0, 230, 118, 0.4)');
+            glowGrad.addColorStop(0, hexToRgba(themeColor, 0.4));
             glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = glowGrad;
             ctx.fillRect(-tunnelW/2, -tunnelH, tunnelW, tunnelH);
