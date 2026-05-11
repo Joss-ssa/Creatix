@@ -80,34 +80,7 @@ async function startServer() {
     }
   });
 
-  app.post('/api/generate-report', async (req, res) => {
-    try {
-      const { answers } = req.body;
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const prompt = `
-Eres un guía amigable, cercano y empático en un viaje de descubrimiento personal y creativo.
-El jugador acaba de terminar una fase de exploración y ha respondido a 5 preguntas sobre su experiencia.
-Por favor, lee sus respuestas y escribe un breve reporte o reflexión final (unas 3-4 oraciones) que lo haga sentir escuchado, validado y motivado para continuar. Usa un tono cálido y amistoso.
-
-Sus respuestas:
-1. ¿Qué hiciste? ${answers.q1}
-2. ¿Qué viste? ${answers.q2}
-3. ¿Qué sentiste? ${answers.q3}
-4. ¿Te recuerda algo? ${answers.q4}
-5. ¿Qué ideas tuviste... o generaste? ${answers.q5}
-      `;
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
-
-      res.json({ text: response.text });
-    } catch (error: any) {
-      console.error("Error in /api/generate-report:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+  // Eliminated /api/generate-report as requested it should not use AI
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {

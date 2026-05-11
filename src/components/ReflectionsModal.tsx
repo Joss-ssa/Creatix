@@ -40,19 +40,27 @@ const modalV: any = {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const resp = await fetch('/api/generate-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ answers })
-      });
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.error || 'Failed to generate report');
+      // Generate the report summary locally without using an AI API
+      const { q1, q2, q3, q4, q5 } = answers;
+      
+      const parts = [];
+      if (q1.trim()) parts.push(`Compartiste que tus acciones fueron: "${q1}".`);
+      if (q2.trim()) parts.push(`Durante tu recorrido notaste: "${q2}".`);
+      if (q3.trim()) parts.push(`El panorama general de tus sentimientos refleja: "${q3}".`);
+      if (q4.trim()) parts.push(`Esta experiencia te conectó con el recuerdo de: "${q4}".`);
+      if (q5.trim()) parts.push(`Finalmente, pudiste inspirarte con ideas como: "${q5}".`);
+      
+      let finalReport = parts.join(' ');
+      
+      if (!finalReport.trim()) {
+        finalReport = "Gracias por compartir tus reflexiones. ¡Sigue adelante con esa misma energía!";
+      } else {
+        finalReport = "En base a tus reflexiones: " + finalReport + " Es un excelente progreso en tu autoconocimiento y proceso creativo. ¡Sigue explorando!";
       }
 
-      const finalReport = data.text || "Gracias por compartir tus reflexiones. ¡Sigue adelante con esa misma energía!";
+      // Simulate a brief processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       setReport(finalReport);
       onSaveReflections({
         report: finalReport,
@@ -61,7 +69,7 @@ const modalV: any = {
       });
     } catch (error) {
       console.error("Error generating report:", error);
-      setReport("Gracias por compartir tus reflexiones. Ha habido un pequeño error al generar tu reporte, pero tus pensamientos son muy valiosos. ¡Sigue adelante!");
+      setReport("Gracias por compartir tus reflexiones. Ha habido un pequeño error, pero tus pensamientos son muy valiosos. ¡Sigue adelante!");
     } finally {
       setIsLoading(false);
     }
