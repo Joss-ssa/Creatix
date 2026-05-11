@@ -84,8 +84,8 @@ export const Game2D: React.FC<Game2DProps> = ({
 
     const handleMouseMove = (e: MouseEvent) => {
       if (document.pointerLockElement === canvas && appState === 'PLAYING') {
-        playerState.current.yaw -= e.movementX * 0.002; // Reverted to original (mouse left -> view right)
-        playerState.current.pitch -= e.movementY * 0.002;
+        playerState.current.yaw += e.movementX * 0.002; // Inverted X axis
+        playerState.current.pitch += e.movementY * 0.002; // Inverted Y axis
         // Limit pitch to avoid flipping and extreme distortion
         playerState.current.pitch = Math.max(-0.2, Math.min(0.2, playerState.current.pitch));
       }
@@ -329,8 +329,8 @@ export const Game2D: React.FC<Game2DProps> = ({
           const dx = touchControls.current.joystickCurrent.x - touchControls.current.joystickStart.x;
           const dy = touchControls.current.joystickCurrent.y - touchControls.current.joystickStart.y;
           
-          playerState.current.yaw += dx * 0.0005; // Fixed inversion
-          playerState.current.pitch += dy * 0.0005; // Inverted pitch control
+          playerState.current.yaw -= dx * 0.0005; // Inverted
+          playerState.current.pitch -= dy * 0.0005; // Inverted
           playerState.current.pitch = Math.max(-0.2, Math.min(0.2, playerState.current.pitch));
         }
 
