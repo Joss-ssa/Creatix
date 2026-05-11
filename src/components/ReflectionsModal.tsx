@@ -43,19 +43,26 @@ const modalV: any = {
       // Generate the report summary locally without using an AI API
       const { q1, q2, q3, q4, q5 } = answers;
       
-      const parts = [];
-      if (q1.trim()) parts.push(`Compartiste que tus acciones fueron: "${q1}".`);
-      if (q2.trim()) parts.push(`Durante tu recorrido notaste: "${q2}".`);
-      if (q3.trim()) parts.push(`El panorama general de tus sentimientos refleja: "${q3}".`);
-      if (q4.trim()) parts.push(`Esta experiencia te conectó con el recuerdo de: "${q4}".`);
-      if (q5.trim()) parts.push(`Finalmente, pudiste inspirarte con ideas como: "${q5}".`);
+      const activeAnswers = [];
+      if (q1.trim()) activeAnswers.push(`mencionaste enfocarte en "${q1.trim()}"`);
+      if (q2.trim()) activeAnswers.push(`observaste "${q2.trim()}"`);
       
-      let finalReport = parts.join(' ');
-      
-      if (!finalReport.trim()) {
-        finalReport = "Gracias por compartir tus reflexiones. ¡Sigue adelante con esa misma energía!";
+      let intro = "Al reflexionar sobre esta fase, ";
+      if (activeAnswers.length > 0) {
+          intro += `${activeAnswers.join(' y ')}. `;
       } else {
-        finalReport = "En base a tus reflexiones: " + finalReport + " Es un excelente progreso en tu autoconocimiento y proceso creativo. ¡Sigue explorando!";
+          intro = "En tu recorrido por esta fase silenciosa, ";
+      }
+      
+      let emotional = q3.trim() ? `Tu paisaje emocional estuvo marcado por sensaciones de "${q3.trim()}". ` : "";
+      let memory = q4.trim() ? `Esto evocó en ti conexiones con "${q4.trim()}". ` : "";
+      let ideas = q5.trim() ? `Toda esta vivencia estimuló tu imaginación, resultando en ideas como "${q5.trim()}". ` : "";
+      
+      let finalReport = intro + emotional + memory + ideas;
+      if (finalReport.trim() !== "En tu recorrido por esta fase silenciosa, ") {
+          finalReport += "Todo esto conforma el inicio de una valiosa narrativa personal de redescubrimiento. ¡Sigue explorando tu creatividad!";
+      } else {
+          finalReport = "Gracias por este momento reflexivo. A veces el solo hecho de pausar ayuda a asimilar la experiencia. ¡Sigue adelante con tu viaje creativo!";
       }
 
       // Simulate a brief processing time
@@ -101,9 +108,11 @@ const modalV: any = {
               “
             </div>
             
-            <motion.p variants={itemV} className="text-lg sm:text-xl font-medium font-sans text-[#E2E2ED] leading-relaxed text-center z-10 pt-6 pb-6 w-full">
-              {report}
-            </motion.p>
+            <motion.div variants={itemV} className="z-10 pt-6 pb-6 w-full max-h-[40vh] overflow-y-auto custom-scrollbar">
+              <p className="text-base sm:text-lg font-medium font-sans text-[#E2E2ED] leading-relaxed text-center">
+                {report}
+              </p>
+            </motion.div>
             
             {/* Bottom Right Quote Icon */}
             <div className="absolute bottom-0 right-0 text-6xl font-serif text-[#2CD4CE] leading-none select-none opacity-80 mix-blend-screen drop-shadow-[0_0_10px_rgba(44,212,206,0.5)]">
