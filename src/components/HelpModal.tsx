@@ -1,7 +1,6 @@
 import { motion } from 'motion/react';
 import React, { useState } from 'react';
 import { X, Sparkles, Loader2, Settings, Lightbulb, Palette, Puzzle, RefreshCw } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
 
 interface HelpModalProps {
   onClose: () => void;
@@ -56,32 +55,48 @@ const modalV: any = {
     if (!ideaInput) return;
     setLoadingState(prev => ({ ...prev, [type]: true }));
     try {
-      const resp = await fetch('/api/generate-help', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ type, ideaInput })
-      });
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.error || 'Failed to generate help');
-      }
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-      const text = data.text || '';
-      let parsed;
-      try { parsed = JSON.parse(text); } catch(e) { console.error('Failed to parse JSON', e); return; }
+      const words = ideaInput.split(" ").filter(w => w.length > 3);
+      const theme = words.length > 0 ? words[Math.floor(Math.random() * words.length)] : "lo desconocido";
+
+      const randomIdeas = [
+        `Explora la relación entre ${theme} y la luz.`,
+        `Usa texturas que recuerden a ${theme} fracturado.`,
+        `Agrega un elemento que contraste fuertemente con ${theme}.`,
+        `¿Qué pasaría si ${theme} pudiera flotar?`,
+        `Imagina ${theme} pero en un universo paralelo.`,
+        `Minimalismo pero enfocado en ${theme}.`,
+        `¿Cómo sonaría ${theme} si fuera una canción?`,
+        `Pinta ${theme} con colores opuestos a los habituales.`
+      ].sort(() => 0.5 - Math.random()).slice(0, 3);
+
+      const allColors = [
+        { hex: '#FF5722', name: 'Vermilion' }, { hex: '#4CAF50', name: 'Verdant' },
+        { hex: '#2196F3', name: 'Azure' }, { hex: '#9C27B0', name: 'Amethyst' },
+        { hex: '#FFC107', name: 'Amber' }, { hex: '#00BCD4', name: 'Cyan' },
+        { hex: '#E91E63', name: 'Rose' }, { hex: '#795548', name: 'Umber' },
+        { hex: '#607D8B', name: 'Slate' }, { hex: '#8BC34A', name: 'Pistachio' },
+        { hex: '#3F51B5', name: 'Indigo' }, { hex: '#FFEB3B', name: 'Lemon' },
+        { hex: '#FF9800', name: 'Orange' }, { hex: '#009688', name: 'Teal' },
+      ].sort(() => 0.5 - Math.random()).slice(0, 4);
+
+      const allElements = [
+        "Espejos", "Niebla", "Cristales rotos", "Cables", "Agua", 
+        "Polvo espacial", "Papel arrugado", "Eco", "Viento", "Neon",
+        theme, "Relojes", "Sombras", "Flores marchitas", "Lava",
+        "Engranajes", "Lluvia", "Ruinas", "Estrellas", "Burbujas"
+      ].sort(() => 0.5 - Math.random()).slice(0, 5);
       
       if (type === 'all') {
-        if (parsed.ideas?.length > 0 && parsed.palette?.length > 0 && parsed.elements?.length > 0) {
-          setResults({ ideas: parsed.ideas, palette: parsed.palette, elements: parsed.elements });
-        }
+        setResults({ ideas: randomIdeas, palette: allColors, elements: allElements });
       } else if (type === 'ideas') {
-        if (parsed.ideas?.length > 0) setResults(prev => ({ ...prev, ideas: parsed.ideas }));
+        setResults(prev => ({ ...prev, ideas: randomIdeas }));
       } else if (type === 'palette') {
-        if (parsed.palette?.length > 0) setResults(prev => ({ ...prev, palette: parsed.palette }));
+        setResults(prev => ({ ...prev, palette: allColors }));
       } else if (type === 'elements') {
-        if (parsed.elements?.length > 0) setResults(prev => ({ ...prev, elements: parsed.elements }));
+        setResults(prev => ({ ...prev, elements: allElements }));
       }
     } catch (error) {
       console.error("Error generating content:", error);
