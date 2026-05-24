@@ -299,8 +299,13 @@ export const Game2D: React.FC<Game2DProps> = ({
     touchControls.current.joystickActive = false;
 
     let animationId: number;
+    let lastTime = performance.now();
 
-    const draw = () => {
+    const draw = (time: DOMHighResTimeStamp) => {
+      // Calculate delta time mapped to ~60FPS (16.66ms per frame)
+      const dt = Math.min((time - lastTime) / (1000 / 60), 3.0) || 1.0;
+      lastTime = time;
+
       // Update Player & Camera (Only if PLAYING)
       if (appState === 'PLAYING') {
         // Calculate movement vector based on yaw
@@ -308,20 +313,20 @@ export const Game2D: React.FC<Game2DProps> = ({
         let moveZ = 0;
 
         if (keys.current['w'] || keys.current['arrowup'] || touchControls.current.moveForward) {
-          moveZ += speed * Math.cos(playerState.current.yaw);
-          moveX += speed * Math.sin(playerState.current.yaw);
+          moveZ += speed * dt * Math.cos(playerState.current.yaw);
+          moveX += speed * dt * Math.sin(playerState.current.yaw);
         }
         if (keys.current['s'] || keys.current['arrowdown'] || touchControls.current.moveBackward) {
-          moveZ -= speed * Math.cos(playerState.current.yaw);
-          moveX -= speed * Math.sin(playerState.current.yaw);
+          moveZ -= speed * dt * Math.cos(playerState.current.yaw);
+          moveX -= speed * dt * Math.sin(playerState.current.yaw);
         }
         if (keys.current['a'] || keys.current['arrowleft'] || touchControls.current.moveLeft) {
-          moveX -= speed * Math.cos(playerState.current.yaw);
-          moveZ += speed * Math.sin(playerState.current.yaw);
+          moveX -= speed * dt * Math.cos(playerState.current.yaw);
+          moveZ += speed * dt * Math.sin(playerState.current.yaw);
         }
         if (keys.current['d'] || keys.current['arrowright'] || touchControls.current.moveRight) {
-          moveX += speed * Math.cos(playerState.current.yaw);
-          moveZ -= speed * Math.sin(playerState.current.yaw);
+          moveX += speed * dt * Math.cos(playerState.current.yaw);
+          moveZ -= speed * dt * Math.sin(playerState.current.yaw);
         }
 
         // Mobile Joystick Camera Control
@@ -434,7 +439,7 @@ export const Game2D: React.FC<Game2DProps> = ({
             ctx.shadowBlur = 0;
 
             // Generate Path Particles
-            if (Math.random() < 0.1 && appState === 'PLAYING') {
+            if (particles.length < 500 && Math.random() < 0.1 && appState === 'PLAYING') {
               particles.push({
                 x: getPathX(z) + (Math.random() - 0.5) * pathWidth * 2,
                 y: -10,
@@ -461,7 +466,12 @@ export const Game2D: React.FC<Game2DProps> = ({
           const proj = project(obj.x, obj.y, obj.z);
           return { ...obj, proj };
         })
-        .filter(obj => obj.proj && obj.proj.z > 0 && obj.proj.z < drawDistance)
+        .filter(obj => {
+          if (!obj.proj || obj.proj.z <= 0 || obj.proj.z > drawDistance) return false;
+          // Conservative lateral culling (ignore objects way off screen horizontally)
+          const cullMargin = obj.type === 'arch' ? 2000 : 1500;
+          return obj.proj.x > -cullMargin && obj.proj.x < canvas.width + cullMargin;
+        })
         .sort((a, b) => b.proj.z - a.proj.z);
 
       let interactionText = '';
@@ -984,7 +994,7 @@ export const Game2D: React.FC<Game2DProps> = ({
           ctx.fill();
 
           // Spawn Particles
-          if (Math.random() < 0.5 && appState === 'PLAYING') {
+          if (particles.length < 500 && Math.random() < 0.5 && appState === 'PLAYING') {
             particles.push({
               x: obj.x + (Math.random() - 0.5) * archW,
               y: archY + Math.random() * archH,
@@ -1324,28 +1334,62 @@ export const Game2D: React.FC<Game2DProps> = ({
 
       // Draw Particles
       ctx.globalAlpha = 1;
-      particles.forEach((p, index) => {
+      
+      const visibleParticles: Particle[] = [];
+      const camYaw = playerState.current.yaw;
+      
+      for (let i = 0; i < particles.length; i++) {
+        let p = particles[i];
+        
         if (appState === 'PLAYING') {
-          p.x += p.vx + Math.sin(p.life / 5) * 1.5; 
-          p.y += p.vy;
-          if (p.maxLife !== 999999) p.life -= 1; // Ambient particles don't die
+          p.x += (p.vx + Math.sin(p.life / 5) * 1.5) * dt; 
+          p.y += p.vy * dt;
+          if (p.maxLife !== 999999) p.life -= 1 * dt; // Ambient particles don't die
         }
 
-        if (p.life <= 0) {
-          particles.splice(index, 1);
-        } else {
-          const proj = project(p.x, p.y, p.z);
-          if (proj && proj.z > 0 && proj.z < drawDistance) {
-            ctx.fillStyle = p.maxLife === 999999 ? p.color : `rgba(255, 215, 0, ${p.life / p.maxLife})`; 
-            ctx.shadowColor = p.color;
-            ctx.shadowBlur = 10;
-            ctx.beginPath();
-            ctx.arc(proj.x, proj.y, p.size * proj.scale, 0, Math.PI*2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
+        if (p.life > 0) {
+          const dx = p.x - playerState.current.x;
+          const dz = p.z - playerState.current.z;
+          const distSq = dx*dx + dz*dz;
+          
+          // Recycle ambient particles if they get too far behind or off-screen
+          if (p.maxLife === 999999 && (dz < -500 || distSq > drawDistance*drawDistance)) {
+             p.z = playerState.current.z + Math.random() * maxZ * 0.5;
+             p.x = playerState.current.x + (Math.random() - 0.5) * 4000;
+          }
+          
+          visibleParticles.push(p);
+          
+          // Simple culling (don't project or render if well behind player or outside general view)
+          if (dz > -100 && distSq < drawDistance * drawDistance) {
+            // Rough frustum check
+            const angleToParticle = Math.atan2(dx, dz);
+            let angleDiff = angleToParticle - camYaw;
+            
+            // Normalize angle diff
+            while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+            while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+            
+            if (Math.abs(angleDiff) < Math.PI / 2) {
+              const proj = project(p.x, p.y, p.z);
+              if (proj && proj.z > 0 && proj.z < drawDistance) {
+                // Ensure particle is on screen before rendering
+                const radius = p.size * proj.scale;
+                if (proj.x + radius > 0 && proj.x - radius < canvas.width && proj.y + radius > 0 && proj.y - radius < canvas.height) {
+                  ctx.fillStyle = p.maxLife === 999999 ? p.color : `rgba(255, 215, 0, ${p.life / p.maxLife})`; 
+                  ctx.shadowColor = p.color;
+                  ctx.shadowBlur = 10;
+                  ctx.beginPath();
+                  ctx.arc(proj.x, proj.y, radius, 0, Math.PI*2);
+                  ctx.fill();
+                  ctx.shadowBlur = 0;
+                }
+              }
+            }
           }
         }
-      });
+      }
+      particles = visibleParticles;
 
       // 5.5 Vignette or Sunbeams
       if (!isClaridad) {
@@ -1515,7 +1559,7 @@ export const Game2D: React.FC<Game2DProps> = ({
       animationId = requestAnimationFrame(draw);
     };
 
-    draw();
+    draw(performance.now());
 
     return () => {
       window.removeEventListener('resize', resize);

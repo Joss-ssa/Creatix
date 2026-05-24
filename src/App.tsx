@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X, Maximize, Minimize, Compass, SlidersHorizontal, Castle, Leaf, Play, Square, Smile, Settings2, Palette, Folder, Users, Settings, PlusCircle, Search, Bell, Zap, Paintbrush, LayoutGrid, TrendingUp, RotateCcw } from 'lucide-react';
 import { Game2D } from './components/Game2D';
@@ -248,10 +248,10 @@ export default function App() {
     return () => clearInterval(interval);
   }, [phraseTimerRunning]);
 
-  const handlePhraseSelect = (phrase: string) => {
+  const handlePhraseSelect = useCallback((phrase: string) => {
     setCurrentPhrase(phrase);
     setAppState('CARD_VIEW');
-  };
+  }, []);
 
   const handleAcceptPhrase = () => {
     setSelectedPhrases(prev => {
@@ -273,7 +273,7 @@ export default function App() {
     setAppState('PLAYING');
   };
 
-  const handleEnterTunnel = () => {
+  const handleEnterTunnel = useCallback(() => {
     if (stage === 'NIEBLA') {
       setStage('EXPLORACION');
     } else if (stage === 'EXPLORACION') {
@@ -290,7 +290,7 @@ export default function App() {
     setPhraseTimers({});
     setPhraseTimerRunning({});
     setAppState('STAGE_INTRO');
-  };
+  }, [stage]);
 
   const currentTimeLeft = currentPhrase && phraseTimers[currentPhrase] !== undefined ? phraseTimers[currentPhrase] : 300;
   const currentIsRunning = currentPhrase ? !!phraseTimerRunning[currentPhrase] : false;
