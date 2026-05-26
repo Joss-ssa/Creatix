@@ -351,8 +351,8 @@ export const Game2D: React.FC<Game2DProps> = ({
           const dx = touchControls.current.joystickCurrent.x - touchControls.current.joystickStart.x;
           const dy = touchControls.current.joystickCurrent.y - touchControls.current.joystickStart.y;
           
-          playerState.current.yaw -= dx * 0.0005; // Inverted
-          playerState.current.pitch -= dy * 0.0005; // Inverted
+          playerState.current.yaw += dx * 0.0005; // Direct (not inverted)
+          playerState.current.pitch += dy * 0.0005; // Direct (not inverted)
           playerState.current.pitch = Math.max(-0.2, Math.min(0.2, playerState.current.pitch));
         }
 
