@@ -344,24 +344,27 @@ export default function App() {
         }}
         onOpenReflections={() => setShowReflectionsModal(true)}
         onOpenHelp={() => setShowHelpModal(true)}
+        isPaused={showHelpModal || showReflectionsModal}
       />
 
       {/* EXPLORACION Active Overlay */}
       {selectedPhrases.length > 0 && appState === 'PLAYING' && stage === 'EXPLORACION' && (
-        <div className={`absolute left-0 top-0 bottom-0 z-20 flex flex-col bg-[#191522] border-r border-[#3D1C34] shadow-[20px_0_40px_rgba(0,0,0,0.8)] ${isMobile ? 'w-[240px] px-4 py-6' : 'w-[280px] py-12 px-8'} overflow-y-auto custom-scrollbar`}>
-          <div className="flex flex-col items-center mb-12 w-full mt-8">
-            <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-[#2C1625] border border-[#FF9CB1]/30 flex items-center justify-center mb-6 shadow-inner`}>
-              <Footprints className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} text-[#FF9CB1] fill-current`} />
+        <div className={`absolute z-20 bg-[#191522] border-[#3D1C34] shadow-[20px_0_40px_rgba(0,0,0,0.8)] custom-scrollbar pointer-events-none ${isMobile ? 'left-0 top-0 right-0 h-[100px] border-b flex-row px-4 py-2 flex items-center gap-4 overflow-x-auto overflow-y-hidden' : 'left-0 top-0 bottom-0 flex-col border-r shadow-[20px_0_40px_rgba(0,0,0,0.8)] w-[280px] py-12 px-8 overflow-y-auto'}`}>
+          <div className={`flex items-center w-full ${isMobile ? 'flex-row gap-3 mb-0 w-auto shrink-0' : 'flex-col mb-12 mt-8'}`}>
+            <div className={`${isMobile ? 'w-12 h-12' : 'w-24 h-24'} rounded-full bg-[#2C1625] border border-[#FF9CB1]/30 flex items-center justify-center shadow-inner ${!isMobile && 'mb-6'}`}>
+              <Footprints className={`${isMobile ? 'w-6 h-6' : 'w-12 h-12'} text-[#FF9CB1] fill-current`} />
             </div>
-            <motion.h2 variants={itemV} className="text-[28px] font-bold text-[#FF9CB1] tracking-wide" style={{ fontFamily: '"Inter", sans-serif' }}>Acciones</motion.h2>
-            <motion.p variants={itemV} className="text-[11px] text-[#FFE5EC]/60 font-semibold tracking-[0.2em] uppercase mt-2">A TOMAR</motion.p>
+            <div className={`flex flex-col ${isMobile ? 'items-start' : 'items-center'}`}>
+              <motion.h2 variants={itemV} className={`${isMobile ? 'text-[16px]' : 'text-[28px]'} font-bold text-[#FF9CB1] tracking-wide`} style={{ fontFamily: '"Inter", sans-serif' }}>Acciones</motion.h2>
+              <motion.p variants={itemV} className="text-[11px] text-[#FFE5EC]/60 font-semibold tracking-[0.2em] uppercase mt-1">A TOMAR</motion.p>
+            </div>
           </div>
           
-          <div className="flex-1 flex flex-col gap-4 w-full">
+          <div className={`${isMobile ? 'flex-1 flex flex-row gap-3 h-full items-center shrink-0 w-max pr-4' : 'flex-1 flex flex-col gap-4 w-full'}`}>
             {selectedPhrases.map((phrase, idx) => (
-              <div key={idx} className="bg-[#2A1629] rounded p-5 flex gap-4 w-full items-start">
-                <span className="text-[#FF9CB1] font-bold text-[15px]">{idx + 1}.</span>
-                <motion.p variants={itemV} className="text-[#FF9CB1] text-[15px] leading-relaxed font-medium">{phrase}</motion.p>
+              <div key={idx} className={`bg-[#2A1629] rounded p-3 flex gap-3 items-start ${isMobile ? 'w-[200px] h-[60px] overflow-y-auto custom-scrollbar shrink-0' : 'w-full'}`}>
+                <span className="text-[#FF9CB1] font-bold text-[13px]">{idx + 1}.</span>
+                <motion.p variants={itemV} className="text-[#FF9CB1] text-[13px] leading-snug font-medium">{phrase}</motion.p>
               </div>
             ))}
           </div>
@@ -374,19 +377,21 @@ export default function App() {
 
       {/* Niebla Emociones Sidebar HUD */}
       {appState === 'PLAYING' && stage === 'NIEBLA' && selectedPhrases.length > 0 && (
-        <div className={`absolute top-0 left-0 bottom-0 ${isMobile ? 'w-[220px]' : 'w-[280px]'} bg-[#16201C] border-r border-[#24352B] z-20 flex flex-col pt-16 shadow-[20px_0_40px_rgba(0,0,0,0.4)] transition-all duration-300`}>
-          <div className="flex flex-col items-center mb-10 px-6">
-            <div className={`rounded-full bg-[#355946] flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(53,89,70,0.5)] border border-[#48755D] ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}`}>
+        <div className={`absolute z-20 bg-[#16201C] border-[#24352B] shadow-[20px_0_40px_rgba(0,0,0,0.4)] transition-all duration-300 pointer-events-none custom-scrollbar ${isMobile ? 'left-0 top-0 right-0 h-[80px] border-b flex flex-row items-center px-4 overflow-x-auto overflow-y-hidden' : 'top-0 left-0 bottom-0 w-[280px] border-r flex flex-col pt-16'}`}>
+          <div className={`flex ${isMobile ? 'flex-row gap-3 items-center shrink-0 w-auto mr-4' : 'flex-col items-center mb-10 px-6'}`}>
+            <div className={`rounded-full bg-[#355946] flex items-center justify-center shadow-[0_0_20px_rgba(53,89,70,0.5)] border border-[#48755D] ${isMobile ? 'w-12 h-12' : 'w-16 h-16 mb-4'}`}>
               <Leaf className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-[#A1C6B2] fill-current`} />
             </div>
-            <motion.h2 variants={itemV} className="text-[#FFFFFF] text-lg font-medium tracking-wide">Emociones</motion.h2>
-            <motion.p variants={itemV} className="text-[#A1C6B2] text-xs font-bold tracking-widest uppercase mt-1">Identificadas</motion.p>
+            <div className={`flex flex-col ${isMobile ? 'items-start' : 'items-center'}`}>
+              <motion.h2 variants={itemV} className="text-[#FFFFFF] text-lg font-medium tracking-wide">Emociones</motion.h2>
+              <motion.p variants={itemV} className="text-[#A1C6B2] text-[10px] font-bold tracking-widest uppercase mt-0.5">Identificadas</motion.p>
+            </div>
           </div>
-          <div className="flex flex-col w-full overflow-y-auto custom-scrollbar flex-1 pb-8">
+          <div className={`flex flex-1 ${isMobile ? 'flex-row items-center gap-2 h-full' : 'flex-col w-full overflow-y-auto custom-scrollbar pb-8'}`}>
             {selectedPhrases.map((phrase, idx) => (
-              <div key={idx} className="flex px-6 py-4 bg-[#253E32] border-l-[4px] border-[#80E5A7] border-b border-[#16201C] hover:bg-[#2A4537] transition-colors">
-                <div className="w-6 shrink-0 text-[#80E5A7] font-bold text-[13px] mt-[1px]">{idx + 1}.</div>
-                <div className="text-[#80E5A7] text-[13px] leading-snug font-medium pr-2">{phrase}</div>
+              <div key={idx} className={`flex px-4 py-3 bg-[#253E32] border-[#80E5A7] hover:bg-[#2A4537] transition-colors ${isMobile ? 'rounded-lg border-l-2 shrink-0 h-[50px] w-[200px] overflow-y-auto custom-scrollbar' : 'border-l-[4px] border-b border-[#16201C]'}`}>
+                <div className="w-5 shrink-0 text-[#80E5A7] font-bold text-[12px] mt-[1px]">{idx + 1}.</div>
+                <div className="text-[#80E5A7] text-[12px] leading-snug font-medium pr-1">{phrase}</div>
               </div>
             ))}
           </div>
@@ -438,7 +443,7 @@ export default function App() {
             <motion.div
               key="start"
               variants={pageV} initial="hidden" animate="visible" exit="exit"
-              className={`${isMobile ? 'px-6 py-12' : 'px-16 py-24'} max-w-[600px] w-full rounded-2xl bg-[#0B0F0C]/40 backdrop-blur-xl border border-white/5 flex flex-col items-center text-center relative z-10 shadow-[0_0_50px_rgba(0,0,0,0.8)]`}
+              className={`${isMobile ? 'px-6 py-12' : 'px-16 py-24'} max-w-[600px] w-full max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0B0F0C]/40 backdrop-blur-xl border border-white/5 flex flex-col items-center text-center relative z-10 shadow-[0_0_50px_rgba(0,0,0,0.8)]`}
             >
               <motion.h1 variants={itemV} className={`${isMobile ? 'text-4xl' : 'text-5xl'} font-bold text-[#8BE8B9] tracking-[0.15em] mb-8 drop-shadow-[0_0_20px_rgba(139,232,185,0.4)]`} style={{ fontFamily: '"Inter", sans-serif' }}>
                 CREATIX
@@ -481,7 +486,7 @@ export default function App() {
                       <motion.h2 variants={itemV} className="text-[#34D399] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
                       <motion.p variants={itemV} className="text-[#34D399]/60 text-[11px] uppercase tracking-wider font-light mt-1">Modo Inmersivo</motion.p>
                     </div>
-                    <div className="flex flex-col flex-1">
+                    <div className="flex flex-col flex-1 overflow-y-auto custom-scrollbar">
                       <div 
                         className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${nieblaMenuTab === 'intro' ? 'bg-[#0B2A1E] text-[#34D399]' : 'text-[#34D399]/40 hover:text-[#34D399]/70'}`}
                         onClick={() => setNieblaMenuTab('intro')}
@@ -514,7 +519,7 @@ export default function App() {
                       <motion.div
                         key="niebla-intro"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[440px] aspect-square max-h-[440px] rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center justify-center text-center px-10 py-8 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
+                        className="w-full max-w-[440px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center justify-center text-center px-10 py-8 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
                       >
                         <Cloud className="w-16 h-16 text-[#8BE8B9] mb-8 drop-shadow-[0_0_15px_rgba(139,232,185,0.3)] fill-current" />
                         <motion.h2 variants={itemV} className="text-3xl font-bold text-white tracking-[0.2em] mb-6">NIEBLA</motion.h2>
@@ -534,7 +539,7 @@ export default function App() {
                       <motion.div
                         key="niebla-controles"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[480px] rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center p-10 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
+                        className="w-full max-w-[480px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0F1E16]/80 backdrop-blur-xl border border-[#1B3024] flex flex-col items-center p-10 relative shadow-[0_0_80px_rgba(0,0,0,0.6)]"
                       >
                         <motion.h2 variants={itemV} className="text-3xl font-bold text-[#8BE8B9] tracking-[0.25em] mb-8 drop-shadow-[0_0_10px_rgba(139,232,185,0.4)]">CONTROLES</motion.h2>
                         <div className="w-full h-px bg-[#1B3024] mb-8"></div>
@@ -621,8 +626,7 @@ export default function App() {
                       <motion.h2 variants={itemV} className="text-[#FF9CB1] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
                       <motion.p variants={itemV} className="text-[#FFE5EC]/60 text-[11px] uppercase tracking-wider font-light mt-1">Exploración</motion.p>
                     </div>
-
-                    <div className="flex flex-col flex-1 gap-2">
+                    <div className="flex flex-col flex-1 gap-2 overflow-y-auto custom-scrollbar">
                        <div 
                         className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${exploracionMenuTab === 'intro' ? 'bg-[#2C1625] text-[#FF9CB1] border-l-2 border-[#FF9CB1]' : 'text-[#FFE5EC]/60 hover:text-[#FF9CB1] hover:bg-[#2A1629]'}`}
                         onClick={() => setExploracionMenuTab('intro')}
@@ -662,7 +666,7 @@ export default function App() {
                       <motion.div
                         key="stage-intro-exploracion"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[440px] rounded-3xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center text-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
+                        className="w-full max-w-[440px] max-h-[90vh] overflow-y-auto rounded-3xl bg-[#191522]/90 backdrop-blur-xl border border-[#3D1C34] flex flex-col items-center text-center p-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
                       >
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#2C1625] to-[#2A1629] border border-[#FFB3C6] shadow-[0_0_30px_rgba(255,156,177,0.15)] flex items-center justify-center mb-8 relative">
                           <div className="absolute inset-0 rounded-full border border-[#FF9CB1]/20 blur-[1px]"></div>
@@ -818,8 +822,7 @@ export default function App() {
                       <motion.h2 variants={itemV} className="text-[#00E676] text-xl font-bold tracking-wide uppercase">Creatividad</motion.h2>
                       <motion.p variants={itemV} className="text-[#F1F8E9]/60 text-[11px] uppercase tracking-wider font-light mt-1">Claridad</motion.p>
                     </div>
-
-                    <div className="flex flex-col flex-1 gap-2">
+                    <div className="flex flex-col flex-1 gap-2 overflow-y-auto custom-scrollbar">
                        <div 
                         className={`flex items-center gap-4 px-8 py-4 w-full cursor-pointer transition-colors ${claridadMenuTab === 'intro' ? 'bg-[#004D40]/50 text-[#00E676] border-l-2 border-[#00E676]' : 'text-[#F1F8E9]/60 hover:text-[#00E676] hover:bg-[#004D40]/30'}`}
                         onClick={() => setClaridadMenuTab('intro')}
@@ -866,7 +869,7 @@ export default function App() {
                       <motion.div
                         key="claridad-intro"
                         variants={pageV} initial="hidden" animate="visible" exit="exit"
-                        className="w-full max-w-[480px] rounded-2xl bg-[#0A191A] border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden"
+                        className="w-full max-w-[480px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0A191A] border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative"
                       >
                         <div className="mb-6 w-16 h-16 rounded-full bg-[#242C1B] border border-[#78A840] shadow-[0_0_25px_rgba(120,168,64,0.3)] flex items-center justify-center">
                           <Footprints className="w-8 h-8 text-[#86B84A] fill-current" />
@@ -1002,7 +1005,7 @@ export default function App() {
               <motion.div
                 key="card-view-niebla"
                 variants={pageV} initial="hidden" animate="visible" exit="exit"
-                className="w-full max-w-[400px] rounded-[32px] bg-gradient-to-b from-[#557360] to-[#24312A] border border-white/5 flex flex-col items-center text-center px-8 py-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
+                className="w-full max-h-[90vh] overflow-y-auto max-w-[400px] rounded-[32px] bg-gradient-to-b from-[#557360] to-[#24312A] border border-white/5 flex flex-col items-center text-center px-8 py-10 relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] custom-scrollbar"
               >
                 <Leaf className="w-10 h-10 text-[#8BE8B9] mb-6 fill-current opacity-90" />
                 
@@ -1111,7 +1114,7 @@ export default function App() {
               <motion.div
                 key="card-view-claridad"
                 variants={pageV} initial="hidden" animate="visible" exit="exit"
-                className="w-full max-w-[480px] rounded-2xl bg-[#0A191A]/90 border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative overflow-hidden backdrop-blur-md"
+                className="w-full max-h-[90vh] overflow-y-auto custom-scrollbar max-w-[480px] rounded-2xl bg-[#0A191A]/90 border border-[#00E676]/50 shadow-[0_0_40px_rgba(0,230,118,0.15)] flex flex-col items-center text-center px-10 py-12 relative backdrop-blur-md"
               >
                 <div className="mb-6">
                   <Sun className="w-12 h-12 text-[#00E676]" strokeWidth={1.5} />
@@ -1144,7 +1147,7 @@ export default function App() {
               <motion.div
                 key="card-view"
                 variants={pageV} initial="hidden" animate="visible" exit="exit"
-                className={`${isMobile ? 'p-4 pt-10 max-w-xs' : 'p-10 pt-16 max-w-md'} w-full rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#00E676] shadow-[0_0_50px_rgba(0,230,118,0.5)] flex flex-col items-center text-center ${isMobile ? 'gap-4' : 'gap-6'} relative overflow-hidden`}
+                className={`${isMobile ? 'p-4 pt-10 max-w-xs' : 'p-10 pt-16 max-w-md'} w-full max-h-[90vh] overflow-y-auto rounded-t-[150px] rounded-b-2xl bg-gradient-to-b from-[#8B5A2B] via-[#4A2810] to-[#2A1408] border-4 border-[#00E676] shadow-[0_0_50px_rgba(0,230,118,0.5)] flex flex-col items-center text-center ${isMobile ? 'gap-4' : 'gap-6'} relative`}
               >
                 {isMobile && (
                   <button
@@ -1181,29 +1184,33 @@ export default function App() {
           </div>
         )}
         {appState === 'END_SCREEN' && (
-          <div className="absolute inset-0 flex flex-row z-50 bg-[#16140F]">
+          <div className={`absolute inset-0 flex ${isMobile ? 'flex-col' : 'flex-row'} z-50 bg-[#16140F]`}>
             
-            {/* Sidebar */}
-            <div className="w-[280px] bg-[#0A191A] h-full border-r border-[#2C2A25] flex flex-col shrink-0">
-              <div className="px-8 pt-8 pb-6 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full border border-[#00E676]/30 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
-                  {/* Using a placeholder for avatar */}
-                  <div className="w-full h-full bg-[#004D40]" />
-                </div>
-                <div>
-                  <motion.h1 variants={itemV} className="text-xl font-extrabold text-[#00E676] tracking-wide uppercase" style={{ fontFamily: '"Inter", sans-serif' }}>Creatix</motion.h1>
-                  <motion.p variants={itemV} className="text-[#888377] text-xs font-light">Santuario Creativo</motion.p>
+            {/* Sidebar / Header */}
+            <div className={`${isMobile ? 'w-full h-auto py-4 border-b' : 'w-[280px] h-full border-r'} bg-[#0A191A] border-[#2C2A25] flex flex-col shrink-0`}>
+              <div className={`px-8 ${isMobile ? 'py-0 flex-row justify-between' : 'pt-8 pb-6 flex-row gap-4'} flex items-center`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full border border-[#00E676]/30 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+                    {/* Using a placeholder for avatar */}
+                    <div className="w-full h-full bg-[#004D40]" />
+                  </div>
+                  <div>
+                    <motion.h1 variants={itemV} className="text-xl font-extrabold text-[#00E676] tracking-wide uppercase" style={{ fontFamily: '"Inter", sans-serif' }}>Creatix</motion.h1>
+                    <motion.p variants={itemV} className="text-[#888377] text-xs font-light">Santuario Creativo</motion.p>
+                  </div>
                 </div>
               </div>
               
-              <nav className="flex flex-col gap-1 px-4 mt-6">
-                <button className="flex items-center gap-4 px-4 py-3 text-[#00E676] bg-gradient-to-r from-[#004D40] to-transparent border-l-[3px] border-[#00E676] rounded-r-lg text-sm font-medium">
-                  <Palette className="w-5 h-5 shrink-0" />
-                  Hub Creativo
-                </button>
-              </nav>
+              {!isMobile && (
+                <nav className="flex flex-col gap-1 px-4 mt-6">
+                  <button className="flex items-center gap-4 px-4 py-3 text-[#00E676] bg-gradient-to-r from-[#004D40] to-transparent border-l-[3px] border-[#00E676] rounded-r-lg text-sm font-medium">
+                    <Palette className="w-5 h-5 shrink-0" />
+                    Hub Creativo
+                  </button>
+                </nav>
+              )}
 
-              <div className="mt-auto px-4 pb-8 flex flex-col gap-4">
+              <div className={`${isMobile ? 'hidden' : 'mt-auto px-4 pb-8 flex flex-col gap-4'}`}>
                 <button 
                   onClick={() => {
                     setStage('NIEBLA');
@@ -1235,7 +1242,7 @@ export default function App() {
               </div>
 
               {/* Main Content Padding/Scroll */}
-              <div className="flex-1 overflow-y-auto px-10 pb-12 z-10 flex flex-col gap-8">
+              <div className={`flex-1 overflow-y-auto ${isMobile ? 'px-4 pb-6 min-h-0' : 'px-10 pb-12 min-h-0'} z-10 flex flex-col gap-6 sm:gap-8`}>
                 
                 {/* Progress/Summary Timeline */}
                 <div className="w-full h-16 rounded-full bg-[#0A191A]/80 border border-[#3A3832] relative flex items-center px-4 backdrop-blur-md shadow-lg mb-4">
@@ -1261,7 +1268,7 @@ export default function App() {
                 </div>
 
                 {/* Cards Grid: Summary of the 3 phases */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 pb-10 mt-4 h-[400px]">
+                <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 pb-10 mt-4 ${isMobile ? 'min-h-[auto]' : 'h-[400px]'}`}>
                   {/* Niebla Summary */}
                   <div className="bg-[#0A191A]/80 border border-[#3A3832] rounded-3xl p-6 hover:border-[#888377]/50 transition-all group backdrop-blur-md cursor-pointer shadow-lg flex flex-col h-full overflow-hidden">
                     <div className="flex items-center gap-4 mb-6 shrink-0">
@@ -1335,6 +1342,27 @@ export default function App() {
                   </div>
                 </div>
 
+                {isMobile && (
+                  <div className="px-4 pb-8 w-full mt-4 flex justify-center">
+                    <button 
+                      onClick={() => {
+                        setStage('NIEBLA');
+                        setPhraseSelectedForStage(false);
+                        setCurrentPhrase("");
+                        setSelectedPhrases([]);
+                        setAllSelectedPhrases({ NIEBLA: [], EXPLORACION: [], CLARIDAD: [] });
+                        setPhraseTimers({});
+                        setPhraseTimerRunning({});
+                        setAppState('START_MENU');
+                        setGameSessionId(prev => prev + 1);
+                      }}
+                      className="w-full max-w-[300px] flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-[#00E676] text-[#004D40] font-bold hover:bg-[#B9F6CA] transition-colors shadow-md shadow-[#00E676]/20"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Volver a Jugar
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

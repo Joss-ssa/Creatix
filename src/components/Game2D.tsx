@@ -12,6 +12,7 @@ interface Game2DProps {
   onOpenMenu?: () => void;
   onOpenReflections?: () => void;
   onOpenHelp?: () => void;
+  isPaused?: boolean;
 }
 
 interface Particle {
@@ -37,7 +38,8 @@ export const Game2D: React.FC<Game2DProps> = ({
   isMobile,
   onOpenMenu,
   onOpenReflections,
-  onOpenHelp
+  onOpenHelp,
+  isPaused
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const joystickRef = useRef<HTMLDivElement>(null);
@@ -62,6 +64,11 @@ export const Game2D: React.FC<Game2DProps> = ({
     moveRight: false
   });
 
+  const isPausedRef = useRef(isPaused);
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -81,6 +88,8 @@ export const Game2D: React.FC<Game2DProps> = ({
     const fov = 500; 
     const drawDistance = 4000;
     const maxZ = 15000;
+    
+    let simulatedTimeMs = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (document.pointerLockElement === canvas && appState === 'PLAYING') {
@@ -303,8 +312,16 @@ export const Game2D: React.FC<Game2DProps> = ({
 
     const draw = (time: DOMHighResTimeStamp) => {
       // Calculate delta time mapped to ~60FPS (16.66ms per frame)
-      const dt = Math.min((time - lastTime) / (1000 / 60), 3.0) || 1.0;
+      const rawDt = Math.min((time - lastTime) / (1000 / 60), 3.0) || 1.0;
+      const realFrameDeltaMs = Math.min((time - lastTime), 100); // cap max ms to avoid huge jumps
       lastTime = time;
+      
+      const isCurrentlyPaused = ((stage === 'CLARIDAD' || stage === 'EXPLORACION') && isPausedRef.current);
+      const dt = isCurrentlyPaused ? 0 : rawDt;
+      
+      if (!isCurrentlyPaused) {
+        simulatedTimeMs += realFrameDeltaMs;
+      }
 
       // Update Player & Camera (Only if PLAYING)
       if (appState === 'PLAYING') {
@@ -983,7 +1000,7 @@ export const Game2D: React.FC<Game2DProps> = ({
           }
 
           // Magic Pulsing Dot (at the keystone)
-          const pulse = (Math.sin(Date.now() / 150) + 1) / 2;
+          const pulse = (Math.sin(simulatedTimeMs / 150) + 1) / 2;
           ctx.fillStyle = isSelected ? `rgba(255, 255, 255, ${0.6 + pulse * 0.4})` : (isNiebla ? `rgba(139, 232, 185, ${0.4 + pulse * 0.6})` : (isExploracion ? `rgba(255, 156, 177, ${0.4 + pulse * 0.6})` : `rgba(241, 196, 15, ${0.4 + pulse * 0.6})`));
           ctx.beginPath();
           ctx.arc(0, archY - 5, 10 + pulse * 5, 0, Math.PI*2);
@@ -1408,14 +1425,14 @@ export const Game2D: React.FC<Game2DProps> = ({
         ctx.globalCompositeOperation = 'screen';
         
         // Swaying sunbeams based on time
-        const time = Date.now() / 3000;
+        const timeVal = simulatedTimeMs / 3000;
         const centerX = canvas.width * 0.3;
         const centerY = -canvas.height * 0.2;
         
         ctx.beginPath();
         for (let i = 0; i < 5; i++) {
-           const beamAngle = Math.PI / 4 + Math.sin(time + i * 0.5) * 0.1;
-           const beamWidth = canvas.width * 0.15 + Math.cos(time + i) * 50;
+           const beamAngle = Math.PI / 4 + Math.sin(timeVal + i * 0.5) * 0.1;
+           const beamWidth = canvas.width * 0.15 + Math.cos(timeVal + i) * 50;
            
            ctx.moveTo(centerX, centerY);
            
