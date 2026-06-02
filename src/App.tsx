@@ -461,17 +461,21 @@ export default function App() {
               }}
             ></div>
             
-            {deferredPrompt && (
-              <motion.button
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={handleInstallApp}
-                className="absolute top-6 right-6 z-50 px-4 py-2 rounded-full bg-[#00E676] text-[#004D40] text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#B9F6CA] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,230,118,0.4)]"
-              >
-                <Download className="w-4 h-4" />
-                <span>Instalar App</span>
-              </motion.button>
-            )}
+            <motion.button
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={() => {
+                if (deferredPrompt) {
+                  handleInstallApp();
+                } else {
+                  alert("Para instalar la aplicación, selecciona 'Añadir a la pantalla de inicio' en el menú de tu navegador o 'Compartir' en iOS.");
+                }
+              }}
+              className="absolute top-6 right-6 z-50 px-4 py-2 rounded-full bg-[#00E676] text-[#004D40] text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#B9F6CA] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,230,118,0.4)]"
+            >
+              <Download className="w-4 h-4" />
+              <span>Instalar App</span>
+            </motion.button>
 
             <motion.div
               key="start"
