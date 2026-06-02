@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X, Maximize, Minimize, Compass, SlidersHorizontal, Castle, Leaf, Play, Square, Smile, Settings2, Palette, Folder, Users, Settings, PlusCircle, Search, Bell, Zap, Paintbrush, LayoutGrid, TrendingUp, RotateCcw } from 'lucide-react';
+import { Cloud, Footprints, Sun, Sparkles, ArrowRight, CheckCircle2, HelpCircle, X, Maximize, Minimize, Compass, SlidersHorizontal, Castle, Leaf, Play, Square, Smile, Settings2, Palette, Folder, Users, Settings, PlusCircle, Search, Bell, Zap, Paintbrush, LayoutGrid, TrendingUp, RotateCcw, Download } from 'lucide-react';
 import { Game2D } from './components/Game2D';
 import { ReflectionsModal } from './components/ReflectionsModal';
 import { HelpModal } from './components/HelpModal';
@@ -101,6 +101,26 @@ const sidebarV: any = {
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('START_MENU');
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
+
   const [nieblaMenuTab, setNieblaMenuTab] = useState<'intro' | 'controles' | 'emociones'>('intro');
   const [exploracionMenuTab, setExploracionMenuTab] = useState<'intro' | 'controles' | 'acciones' | 'reflexiones'>('intro');
   const [claridadMenuTab, setClaridadMenuTab] = useState<'intro' | 'controles' | 'ejercicios' | 'ayuda'>('intro');
@@ -440,6 +460,19 @@ export default function App() {
                 filter: 'brightness(0.3) contrast(1.1) grayscale(0.2)'
               }}
             ></div>
+            
+            {deferredPrompt && (
+              <motion.button
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={handleInstallApp}
+                className="absolute top-6 right-6 z-50 px-4 py-2 rounded-full bg-[#00E676] text-[#004D40] text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#B9F6CA] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,230,118,0.4)]"
+              >
+                <Download className="w-4 h-4" />
+                <span>Instalar App</span>
+              </motion.button>
+            )}
+
             <motion.div
               key="start"
               variants={pageV} initial="hidden" animate="visible" exit="exit"
