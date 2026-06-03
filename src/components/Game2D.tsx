@@ -398,21 +398,16 @@ export const Game2D: React.FC<Game2DProps> = ({
 
       // 5. Fog Overlay
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      let initRatio = canvas.height > 0 ? (horizonY / canvas.height) : 0.5;
-      if (isNaN(initRatio)) initRatio = 0.5;
-      const horizonRatio = Math.max(0, Math.min(1, initRatio));
+      const horizonRatio = Math.max(0, Math.min(1, (horizonY) / canvas.height));
       
       if (isClaridad) {
         // Bright dense haze at the horizon to blend sky and ground
-        let topRatio = Math.max(0, Math.min(1, horizonRatio - 0.25));
-        let topHazeRatio = Math.max(topRatio, Math.min(1, horizonRatio - 0.05));
-        let botHazeRatio = Math.max(topHazeRatio, Math.min(1, horizonRatio + 0.05));
-        let botRatio = Math.max(botHazeRatio, Math.min(1, horizonRatio + 0.25));
-        
+        let topRatio = Math.max(0, horizonRatio - 0.25);
+        let botRatio = Math.min(1, horizonRatio + 0.25);
         gradient.addColorStop(0, fogColor + '0.0)');
         gradient.addColorStop(topRatio, fogColor + '0.1)');
-        gradient.addColorStop(topHazeRatio, fogColor + '1.0)');
-        gradient.addColorStop(botHazeRatio, fogColor + '1.0)');
+        gradient.addColorStop(horizonRatio - 0.05, fogColor + '1.0)');
+        gradient.addColorStop(horizonRatio + 0.05, fogColor + '1.0)');
         gradient.addColorStop(botRatio, fogColor + '0.1)');
         gradient.addColorStop(1, fogColor + '0.0)');
       } else if (isExploration) {
